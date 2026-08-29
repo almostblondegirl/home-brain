@@ -116,12 +116,13 @@
         .modal-actions .btn { flex:1; margin-bottom:0; }
 
         .room-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
-        .room-tile { background:var(--bg-card); border-radius:14px; padding:16px 10px; text-align:center; border:1px solid var(--border); cursor:pointer; box-shadow:0 2px 8px var(--shadow); transition:transform 0.15s; }
+        .room-tile { position:relative; background:var(--bg-card); border-radius:14px; padding:16px 10px; text-align:center; border:1px solid var(--border); cursor:pointer; box-shadow:0 2px 8px var(--shadow); transition:transform 0.15s; }
         .room-tile:active { transform:scale(0.95); }
         .room-tile.selected { border-color:var(--accent); box-shadow:0 0 0 2px var(--accent); }
         .room-tile .emoji { font-size:1.8rem; display:block; margin-bottom:5px; }
         .room-tile .name { font-size:0.85rem; font-weight:600; }
         .room-tile .count { font-size:0.72rem; color:var(--text-muted); margin-top:3px; }
+        .room-tile .room-reorder { position:absolute; top:4px; right:4px; display:flex; flex-direction:column; }
 
         .bucket-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
         .bucket-tile { background:var(--bg-card); border-radius:14px; padding:14px; text-align:center; border:1px solid var(--border); cursor:pointer; box-shadow:0 2px 8px var(--shadow); }
@@ -414,11 +415,13 @@ function init(){
     if(!state.onboarded)startOb();
     else{
         showApp();
-        // Check if coming from floor plan with a room to open
         const params=new URLSearchParams(window.location.search);
         const openRoom=params.get('room');
+        const from=params.get('from');
         if(openRoom&&state.profile.rooms.includes(openRoom)){
             setTimeout(()=>viewRoom(openRoom),100);
+        } else if(from==='floorplan'){
+            setTimeout(()=>navigate('home'),100);
         }
     }
 }
@@ -564,6 +567,10 @@ function setMood(m){state.mood=m;saveState();document.querySelectorAll('.mood-bt
 
 // ============ MY SPACE ============
 function renderHome(){
+    if(state.profile.spaceView==='floorplan'){
+        window.location.href='floorplan.html';
+        return;
+    }
     const rooms=state.profile.rooms;
     document.getElementById('view-home').innerHTML=`<div class="view-header"><h2>🏠 My Space</h2><p>Your rooms & what's where</p></div><div class="room-grid">${rooms.length?rooms.map(r=>{const cnt=state.items.filter(i=>(i.origin===r||i.destination===r)&&!i.completed).length;return`<div class="room-tile" onclick="viewRoom('${r}')"><span class="emoji">${roomEmoji(r)}</span><div class="name">${r}</div><div class="count">${cnt} item${cnt!==1?'s':''}</div></div>`;}).join(''):'<p style="grid-column:1/-1;text-align:center;color:var(--text-muted)">No rooms yet!</p>'}</div><button class="btn btn-secondary" onclick="showModal('addRoom')">+ Add Room</button><button class="btn btn-secondary" onclick="window.location.href='floorplan.html'" style="margin-top:0;">🗺️ View Floor Plan</button>`;
 }
@@ -579,6 +586,16 @@ function viewRoom(room){
     document.querySelectorAll('#main-app .view').forEach(v=>v.classList.remove('active'));document.getElementById('view-room').classList.add('active');
 }
 
+function moveRoom(index,direction){
+    const rooms=state.profile.rooms;
+    const newIndex=index+direction;
+    if(newIndex<0||newIndex>=rooms.length)return;
+    const temp=rooms[index];
+    rooms[index]=rooms[newIndex];
+    rooms[newIndex]=temp;
+    saveState();
+    renderHome();
+}
 function itemCard(it){
     const ix=state.items.indexOf(it),meta=[];
     if(it.origin)meta.push(`📍 ${it.origin}`);if(it.destination)meta.push(`🎯 → ${it.destination}${it.spot?' ('+it.spot+')':''}`);if(it.giveTo)meta.push(`👤 ${it.giveTo}`);if(it.moved)meta.push('✅ Moved!');
@@ -730,6 +747,7 @@ function renderSettings(){
     <div class="card"><h3>🎆 Celebrations</h3><div class="option-grid">${[['confetti','🎊','Confetti'],['fireworks','🎆','Fireworks'],['starburst','🌟','Starburst'],['none','🔇','Subtle']].map(([v,e,l])=>`<button class="option-btn ${state.profile.celebrationStyle===v?'selected':''}" onclick="state.profile.celebrationStyle='${v}';saveState();renderSettings();"><span class="emoji">${e}</span>${l}</button>`).join('')}</div></div>
     <div class="card"><h3>⏱️ Focus</h3><div class="step-item"><input type="checkbox" ${state.profile.screenAwake!==false?'checked':''} onchange="state.profile.screenAwake=this.checked;saveState();"><span>Screen awake</span></div><div class="step-item"><input type="checkbox" ${state.profile.showTimer!==false?'checked':''} onchange="state.profile.showTimer=this.checked;saveState();"><span>Show countdown</span></div></div>
     <div class="card"><h3>📍 Location</h3><input type="text" value="${state.profile.location}" placeholder="City, State" onchange="state.profile.location=this.value.trim();saveState();"></div>
+    <div class="card"><h3>🏠 Space View</h3><div class="option-grid"><button class="option-btn ${state.profile.spaceView!=='floorplan'?'selected':''}" onclick="state.profile.spaceView='grid';saveState();renderSettings();"><span class="emoji">🔲</span>Room Grid</button><button class="option-btn ${state.profile.spaceView==='floorplan'?'selected':''}" onclick="state.profile.spaceView='floorplan';saveState();renderSettings();"><span class="emoji">🗺️</span>Floor Plan</button></div></div>
     <div class="card"><h3>🎯 Goal</h3><select onchange="state.profile.goal=this.value;saveState();"><option value="scratch" ${state.profile.goal==='scratch'?'selected':''}>Organize from scratch</option><option value="maintain" ${state.profile.goal==='maintain'?'selected':''}>Help me maintain</option><option value="declutter" ${state.profile.goal==='declutter'?'selected':''}>Help me declutter</option><option value="purge" ${state.profile.goal==='purge'?'selected':''}>Full purge mode</option></select></div>
     <div class="card"><h3>💾 Data</h3><button class="btn btn-secondary" onclick="exportCSV()">📊 Export Items (CSV/Excel)</button><button class="btn btn-secondary" onclick="exportJSON()">💾 Backup All (JSON)</button><button class="btn btn-secondary" onclick="importJSON()">📂 Restore Backup</button><button class="btn btn-danger mt-10" onclick="showModal('confirm',{title:'Delete Everything?',message:'Cannot be undone!',danger:true,confirmText:'Delete All',onConfirm:'resetAll()'})">⚠️ Delete All Data</button></div>
     <div class="card"><h3>🔄 Redo Setup</h3><button class="btn btn-secondary" onclick="showModal('confirm',{title:'Redo Setup?',message:'Items & progress stay.',confirmText:'Redo',onConfirm:'state.onboarded=false;saveState();closeModal();location.reload();'})">Start Over</button></div>
