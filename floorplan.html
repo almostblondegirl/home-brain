@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Home Brain — Floor Plan</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+        :root { --opacity: 0.55; }
+        [data-theme="meadow"] { --bg-primary:rgba(240,247,240,var(--opacity));--bg-card:rgba(255,255,255,0.82);--bg-input:rgba(255,255,255,0.92);--accent:#4a9e5c;--accent-secondary:#8bc34a;--text-primary:#2d3a2d;--text-secondary:#5a6e5a;--text-muted:#8a9e8a;--border:rgba(74,158,92,0.2);--shadow:rgba(0,0,0,0.06);--danger:#e74c3c; }
+        [data-theme="reef"] { --bg-primary:rgba(230,248,255,var(--opacity));--bg-card:rgba(255,255,255,0.82);--bg-input:rgba(255,255,255,0.92);--accent:#0097a7;--accent-secondary:#ff7043;--text-primary:#1a3a4a;--text-secondary:#4a6a7a;--text-muted:#7a9aaa;--border:rgba(0,151,167,0.2);--shadow:rgba(0,0,0,0.06);--danger:#e74c3c; }
+        [data-theme="golden"] { --bg-primary:rgba(255,245,235,var(--opacity));--bg-card:rgba(255,255,255,0.80);--bg-input:rgba(255,255,255,0.90);--accent:#e65100;--accent-secondary:#ff8a65;--text-primary:#3e2723;--text-secondary:#5d4037;--text-muted:#8d6e63;--border:rgba(230,81,0,0.18);--shadow:rgba(0,0,0,0.08);--danger:#e74c3c; }
+        [data-theme="chibi"] { --bg-primary:rgba(240,235,255,var(--opacity));--bg-card:rgba(255,255,255,0.82);--bg-input:rgba(255,255,255,0.92);--accent:#7c4dff;--accent-secondary:#ff4081;--text-primary:#2a1f4e;--text-secondary:#5a4f7e;--text-muted:#8a7fae;--border:rgba(124,77,255,0.2);--shadow:rgba(0,0,0,0.06);--danger:#e74c3c; }
+        [data-theme="tome"] { --bg-primary:rgba(255,248,235,var(--opacity));--bg-card:rgba(255,252,245,0.80);--bg-input:rgba(255,255,250,0.90);--accent:#bf8c2c;--accent-secondary:#6d8f3e;--text-primary:#3e2f1c;--text-secondary:#6b5435;--text-muted:#9e8a6a;--border:rgba(191,140,44,0.2);--shadow:rgba(0,0,0,0.08);--danger:#e74c3c; }
+        [data-theme="midnight"] { --bg-primary:rgba(15,15,40,var(--opacity));--bg-card:rgba(25,25,55,0.82);--bg-input:rgba(20,20,50,0.92);--accent:#b39ddb;--accent-secondary:#80cbc4;--text-primary:#e8e0f0;--text-secondary:#b0a8c0;--text-muted:#7a7290;--border:rgba(179,157,219,0.25);--shadow:rgba(0,0,0,0.2);--danger:#e74c3c; }
+
+        * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+        body {
+            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+            background-color:#2d5a3d; background-size:cover; background-position:center;
+            background-repeat:no-repeat; color:var(--text-primary); min-height:100vh;
+            overflow:hidden; touch-action:none;
+        }
+        .fp-container {
+            min-height:100vh; background:var(--bg-primary);
+            display:flex; flex-direction:column;
+        }
+
+        /* Header */
+        .fp-header {
+            padding:12px 16px; padding-top:max(12px,env(safe-area-inset-top));
+            display:flex; justify-content:space-between; align-items:center;
+            background:var(--bg-card); border-bottom:1px solid var(--border);
+            backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+            z-index:100;
+        }
+        .fp-header h2 { font-size:1.1rem; color:var(--accent); }
+        .fp-back { background:none; border:none; color:var(--accent); font-size:0.9rem; font-weight:600; cursor:pointer; padding:8px 12px; }
+        .fp-save { background:var(--accent); color:white; border:none; border-radius:10px; padding:8px 14px; font-size:0.85rem; font-weight:600; cursor:pointer; }
+
+        /* Canvas area */
+        .fp-canvas {
+            flex:1; position:relative; overflow:hidden;
+            background-image:
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size:40px 40px;
+        }
+
+        /* Room blocks */
+        .fp-room {
+            position:absolute; background:var(--bg-card); border:2px solid var(--accent);
+            border-radius:12px; cursor:grab; user-select:none; -webkit-user-select:none;
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            box-shadow:0 2px 12px var(--shadow); transition:box-shadow 0.2s;
+            min-width:80px; min-height:60px;
+        }
+        .fp-room:active { cursor:grabbing; box-shadow:0 4px 20px rgba(0,0,0,0.15); }
+        .fp-room.dragging { opacity:0.8; z-index:1000; }
+        .fp-room .fp-room-emoji { font-size:1.5rem; pointer-events:none; }
+        .fp-room .fp-room-name { font-size:0.7rem; font-weight:600; color:var(--text-primary); pointer-events:none; margin-top:2px; text-align:center; padding:0 4px; }
+        .fp-room .fp-room-count { font-size:0.6rem; color:var(--text-muted); pointer-events:none; }
+
+        /* Resize handle */
+        .fp-resize {
+            position:absolute; bottom:0; right:0; width:20px; height:20px;
+            cursor:nwse-resize; display:flex; align-items:center; justify-content:center;
+        }
+        .fp-resize::after {
+            content:''; width:8px; height:8px; border-right:2px solid var(--accent);
+            border-bottom:2px solid var(--accent); opacity:0.5;
+        }
+
+        /* Bottom toolbar */
+        .fp-toolbar {
+            padding:10px 16px; padding-bottom:max(10px,env(safe-area-inset-bottom));
+            background:var(--bg-card); border-top:1px solid var(--border);
+            backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+            display:flex; gap:8px; overflow-x:auto; z-index:100;
+        }
+        .fp-tool-btn {
+            background:var(--bg-input); border:1px solid var(--border); border-radius:10px;
+            padding:8px 14px; font-size:0.8rem; font-weight:600; color:var(--text-primary);
+            cursor:pointer; white-space:nowrap; flex-shrink:0;
+        }
+        .fp-tool-btn:active { transform:scale(0.95); }
+        .fp-tool-btn.primary { background:var(--accent); color:white; border-color:var(--accent); }
+
+        .fp-instructions {
+            position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+            text-align:center; color:var(--text-muted); font-size:0.9rem; padding:20px;
+            pointer-events:none;
+        }
+        .fp-instructions .emoji { font-size:2.5rem; margin-bottom:10px; display:block; }
+
+        @media (min-width:768px) {
+            .fp-room .fp-room-emoji { font-size:1.8rem; }
+            .fp-room .fp-room-name { font-size:0.8rem; }
+            .fp-header h2 { font-size:1.3rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="fp-container">
+    <div class="fp-header">
+        <button class="fp-back" onclick="goBack()">← Back</button>
+        <h2>🗺️ Floor Plan</h2>
+        <button class="fp-save" onclick="saveLayout()">Save</button>
+    </div>
+
+    <div class="fp-canvas" id="fp-canvas">
+        <div class="fp-instructions" id="fp-instructions">
+            <span class="emoji">🏠</span>
+            <p>Tap <b>Add Rooms</b> below to start building your floor plan.</p>
+            <p style="margin-top:8px;font-size:0.8rem;">Drag to move · Pull corners to resize</p>
+        </div>
+    </div>
+
+    <div class="fp-toolbar">
+        <button class="fp-tool-btn primary" onclick="addAllRooms()">+ Add All Rooms</button>
+        <button class="fp-tool-btn" onclick="resetLayout()">↺ Reset</button>
+        <button class="fp-tool-btn" onclick="autoArrange()">✨ Auto Arrange</button>
+    </div>
+</div>
+
+<script>
+// ============ LOAD STATE FROM MAIN APP ============
+let state = JSON.parse(localStorage.getItem('homeBrainState')||'null') || {profile:{rooms:[],theme:'meadow',bgIntensity:60}};
+let layout = JSON.parse(localStorage.getItem('homeBrain_floorplan')||'null') || {};
+
+// Apply theme
+function applyTheme(){
+    const t=state.profile.theme||'meadow';
+    document.body.setAttribute('data-theme',t);
+    const op=(100-(state.profile.bgIntensity||60))/100;
+    document.documentElement.style.setProperty('--opacity',op.toFixed(2));
+    if(state.profile.customBg){
+        const cb=localStorage.getItem('homeBrain_customBg');
+        if(cb)document.body.style.backgroundImage=`url(${cb})`;
+    } else {
+        document.body.style.backgroundImage=`url(bg-${t}.png)`;
+    }
+}
+applyTheme();
+
+// ============ ROOM EMOJI HELPER ============
+function roomEmoji(r){
+    r=r.toLowerCase();
+    if(r.includes('bed'))return'🛏️';if(r.includes('bath'))return'🛁';
+    if(r.includes('kitchen'))return'🍳';if(r.includes('living'))return'🛋️';
+    if(r.includes('garage'))return'🚗';if(r.includes('closet'))return'🚪';
+    if(r.includes('laundry'))return'🧺';if(r.includes('dining'))return'🍽️';
+    if(r.includes('office')||r.includes('desk'))return'💻';
+    if(r.includes('porch')||r.includes('patio'))return'🪑';
+    if(r.includes('shed')||r.includes('storage'))return'🏚️';
+    return'📍';
+}
+
+// ============ CANVAS & ROOMS ============
+const canvas=document.getElementById('fp-canvas');
+let rooms=[];
+let activeRoom=null;
+let offsetX=0,offsetY=0;
+let isResizing=false;
+let startW=0,startH=0,startX=0,startY=0;
+
+function getItemCount(roomName){
+    return(state.items||[]).filter(i=>(i.origin===roomName||i.destination===roomName)&&!i.completed).length;
+}
+
+function createRoomEl(room){
+    const el=document.createElement('div');
+    el.className='fp-room';
+    el.style.left=room.x+'px';
+    el.style.top=room.y+'px';
+    el.style.width=room.w+'px';
+    el.style.height=room.h+'px';
+    el.dataset.name=room.name;
+    
+    const count=getItemCount(room.name);
+    el.innerHTML=`
+        <span class="fp-room-emoji">${roomEmoji(room.name)}</span>
+        <span class="fp-room-name">${room.name}</span>
+        <span class="fp-room-count">${count} item${count!==1?'s':''}</span>
+        <div class="fp-resize" data-resize="true"></div>
+    `;
+    
+    // Touch events
+    el.addEventListener('touchstart',onTouchStart,{passive:false});
+    el.addEventListener('mousedown',onMouseDown);
+    
+    canvas.appendChild(el);
+    return el;
+}
+
+function renderRooms(){
+    // Clear existing
+    canvas.querySelectorAll('.fp-room').forEach(el=>el.remove());
+    
+    const roomNames=state.profile.rooms||[];
+    if(roomNames.length===0){
+        document.getElementById('fp-instructions').style.display='block';
+        return;
+    }
+    
+    // Check if we have layout data
+    const hasLayout=Object.keys(layout).length>0&&roomNames.some(r=>layout[r]);
+    
+    if(hasLayout){
+        document.getElementById('fp-instructions').style.display='none';
+        roomNames.forEach(name=>{
+            if(layout[name]){
+                createRoomEl({name,...layout[name]});
+            }
+        });
+    } else {
+        document.getElementById('fp-instructions').style.display='block';
+    }
+}
+
+// ============ DRAG & RESIZE LOGIC ============
+function onTouchStart(e){
+    const touch=e.touches[0];
+    const el=e.currentTarget;
+    const resize=e.target.dataset.resize;
+    
+    if(resize){
+        e.preventDefault();
+        isResizing=true;
+        activeRoom=el;
+        startW=el.offsetWidth;
+        startH=el.offsetHeight;
+        startX=touch.clientX;
+        startY=touch.clientY;
+    } else {
+        e.preventDefault();
+        activeRoom=el;
+        isResizing=false;
+        const rect=el.getBoundingClientRect();
+        offsetX=touch.clientX-rect.left;
+        offsetY=touch.clientY-rect.top;
+        el.classList.add('dragging');
+    }
+    
+    document.addEventListener('touchmove',onTouchMove,{passive:false});
+    document.addEventListener('touchend',onTouchEnd);
+}
+
+function onTouchMove(e){
+    if(!activeRoom)return;
+    e.preventDefault();
+    const touch=e.touches[0];
+    
+    if(isResizing){
+        const dx=touch.clientX-startX;
+        const dy=touch.clientY-startY;
+        const newW=Math.max(80,startW+dx);
+        const newH=Math.max(60,startH+dy);
+        activeRoom.style.width=newW+'px';
+        activeRoom.style.height=newH+'px';
+    } else {
+        const canvasRect=canvas.getBoundingClientRect();
+        let x=touch.clientX-canvasRect.left-offsetX;
+        let y=touch.clientY-canvasRect.top-offsetY;
+        // Snap to grid
+        x=Math.round(x/20)*20;
+        y=Math.round(y/20)*20;
+        // Bounds
+        x=Math.max(0,Math.min(x,canvasRect.width-activeRoom.offsetWidth));
+        y=Math.max(0,Math.min(y,canvasRect.height-activeRoom.offsetHeight));
+        activeRoom.style.left=x+'px';
+        activeRoom.style.top=y+'px';
+    }
+}
+
+function onTouchEnd(){
+    if(activeRoom){
+        activeRoom.classList.remove('dragging');
+        updateLayout();
+    }
+    activeRoom=null;
+    isResizing=false;
+    document.removeEventListener('touchmove',onTouchMove);
+    document.removeEventListener('touchend',onTouchEnd);
+}
+
+// Mouse events (for desktop testing)
+function onMouseDown(e){
+    const el=e.currentTarget;
+    const resize=e.target.dataset.resize;
+    
+    if(resize){
+        isResizing=true;
+        activeRoom=el;
+        startW=el.offsetWidth;
+        startH=el.offsetHeight;
+        startX=e.clientX;
+        startY=e.clientY;
+    } else {
+        activeRoom=el;
+        isResizing=false;
+        const rect=el.getBoundingClientRect();
+        offsetX=e.clientX-rect.left;
+        offsetY=e.clientY-rect.top;
+        el.classList.add('dragging');
+    }
+    
+    document.addEventListener('mousemove',onMouseMove);
+    document.addEventListener('mouseup',onMouseUp);
+}
+
+function onMouseMove(e){
+    if(!activeRoom)return;
+    
+    if(isResizing){
+        const dx=e.clientX-startX;
+        const dy=e.clientY-startY;
+        activeRoom.style.width=Math.max(80,startW+dx)+'px';
+        activeRoom.style.height=Math.max(60,startH+dy)+'px';
+    } else {
+        const canvasRect=canvas.getBoundingClientRect();
+        let x=e.clientX-canvasRect.left-offsetX;
+        let y=e.clientY-canvasRect.top-offsetY;
+        x=Math.round(x/20)*20;
+        y=Math.round(y/20)*20;
+        x=Math.max(0,Math.min(x,canvasRect.width-activeRoom.offsetWidth));
+        y=Math.max(0,Math.min(y,canvasRect.height-activeRoom.offsetHeight));
+        activeRoom.style.left=x+'px';
+        activeRoom.style.top=y+'px';
+    }
+}
+
+function onMouseUp(){
+    if(activeRoom){
+        activeRoom.classList.remove('dragging');
+        updateLayout();
+    }
+    activeRoom=null;
+    isResizing=false;
+    document.removeEventListener('mousemove',onMouseMove);
+    document.removeEventListener('mouseup',onMouseUp);
+}
+
+// ============ LAYOUT MANAGEMENT ============
+function updateLayout(){
+    canvas.querySelectorAll('.fp-room').forEach(el=>{
+        const name=el.dataset.name;
+        layout[name]={
+            x:parseInt(el.style.left),
+            y:parseInt(el.style.top),
+            w:parseInt(el.style.width),
+            h:parseInt(el.style.height)
+        };
+    });
+}
+
+function saveLayout(){
+    updateLayout();
+    localStorage.setItem('homeBrain_floorplan',JSON.stringify(layout));
+    showToast('✓ Floor plan saved!');
+}
+
+function addAllRooms(){
+    const roomNames=state.profile.rooms||[];
+    if(roomNames.length===0){
+        showToast('No rooms to add. Set up rooms in the main app first.');
+        return;
+    }
+    
+    document.getElementById('fp-instructions').style.display='none';
+    
+    // Auto-arrange in grid
+    const canvasRect=canvas.getBoundingClientRect();
+    const cols=Math.ceil(Math.sqrt(roomNames.length));
+    const roomW=Math.min(150,Math.floor((canvasRect.width-40)/cols)-20);
+    const roomH=Math.floor(roomW*0.7);
+    
+    roomNames.forEach((name,i)=>{
+        if(!layout[name]){
+            const col=i%cols;
+            const row=Math.floor(i/cols);
+            layout[name]={
+                x:20+col*(roomW+20),
+                y:20+row*(roomH+20),
+                w:roomW,
+                h:roomH
+            };
+        }
+    });
+    
+    localStorage.setItem('homeBrain_floorplan',JSON.stringify(layout));
+    renderRooms();
+}
+
+function autoArrange(){
+    const roomNames=state.profile.rooms||[];
+    if(roomNames.length===0)return;
+    
+    const canvasRect=canvas.getBoundingClientRect();
+    const cols=Math.ceil(Math.sqrt(roomNames.length));
+    const roomW=Math.min(150,Math.floor((canvasRect.width-40)/cols)-20);
+    const roomH=Math.floor(roomW*0.7);
+    
+    layout={};
+    roomNames.forEach((name,i)=>{
+        const col=i%cols;
+        const row=Math.floor(i/cols);
+        layout[name]={
+            x:20+col*(roomW+20),
+            y:20+row*(roomH+20),
+            w:roomW,
+            h:roomH
+        };
+    });
+    
+    localStorage.setItem('homeBrain_floorplan',JSON.stringify(layout));
+    renderRooms();
+    showToast('✨ Rooms rearranged!');
+}
+
+function resetLayout(){
+    if(!confirm('Reset floor plan layout?'))return;
+    layout={};
+    localStorage.removeItem('homeBrain_floorplan');
+    renderRooms();
+}
+
+// ============ NAVIGATION ============
+function goBack(){
+    saveLayout();
+    window.location.href='index.html';
+}
+
+// ============ TOAST ============
+function showToast(msg){
+    const existing=document.querySelector('.fp-toast');
+    if(existing)existing.remove();
+    const t=document.createElement('div');
+    t.className='fp-toast';
+    t.textContent=msg;
+    t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--accent);color:white;padding:12px 22px;border-radius:24px;font-size:0.88rem;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+    document.body.appendChild(t);
+    setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity 0.3s';setTimeout(()=>t.remove(),300);},2000);
+}
+
+// ============ INIT ============
+renderRooms();
+</script>
+</body>
+</html>
