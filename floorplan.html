@@ -272,11 +272,19 @@ function renderRooms(){
 }
 
 // ============ TOUCH EVENTS ============
+let mouseStartTime=0;
+let mouseMoved=false;
+let touchStartTime=0;
+let touchMoved=false;
+
 function onTouchStart(e){
     const touch=e.touches[0];
     const el=e.currentTarget;
     const resize=e.target.dataset.resize;
     const name=el.dataset.name;
+    
+    touchStartTime=Date.now();
+    touchMoved=false;
     
     // Select mode: tap to toggle selection
     if(selectMode&&!resize){
@@ -289,7 +297,6 @@ function onTouchStart(e){
             el.classList.add('selected');
         }
         
-        // If dragging a selected room, move all selected
         if(selectedRooms.has(name)&&selectedRooms.size>0){
             activeRoom=el;
             isResizing=false;
@@ -297,7 +304,6 @@ function onTouchStart(e){
             offsetX=touch.clientX-rect.left;
             offsetY=touch.clientY-rect.top;
             
-            // Store start positions of all selected rooms
             groupStartPositions={};
             selectedRooms.forEach(rn=>{
                 const rEl=canvas.querySelector(`[data-name="${rn}"]`);
@@ -336,10 +342,10 @@ function onTouchStart(e){
     document.addEventListener('touchmove',onTouchMove,{passive:false});
     document.addEventListener('touchend',onTouchEnd);
 }
-
 function onTouchMove(e){
     if(!activeRoom)return;
     e.preventDefault();
+    touchMoved=true;
     const touch=e.touches[0];
     
     if(isResizing){
@@ -359,10 +365,20 @@ function onTouchMove(e){
         activeRoom.style.top=y+'px';
     }
 }
-
 function onTouchEnd(){
     if(activeRoom){
         activeRoom.classList.remove('dragging');
+        
+        // If it was a quick tap (not a drag), navigate to room
+        const elapsed=Date.now()-touchStartTime;
+        if(!touchMoved&&elapsed<300&&!isResizing){
+            const name=activeRoom.dataset.name;
+            undoStack.pop(); // Remove the undo we pushed since nothing actually moved
+            saveLayout();
+            window.location.href=`index.html?room=${encodeURIComponent(name)}`;
+            return;
+        }
+        
         updateLayout();
     }
     activeRoom=null;
@@ -407,6 +423,9 @@ function onMouseDown(e){
     const el=e.currentTarget;
     const resize=e.target.dataset.resize;
     const name=el.dataset.name;
+    
+    mouseStartTime=Date.now();
+    mouseMoved=false;
     
     if(selectMode&&!resize){
         if(selectedRooms.has(name)){
@@ -460,9 +479,9 @@ function onMouseDown(e){
     document.addEventListener('mousemove',onMouseMove);
     document.addEventListener('mouseup',onMouseUp);
 }
-
 function onMouseMove(e){
     if(!activeRoom)return;
+    mouseMoved=true;
     
     if(isResizing){
         const dx=e.clientX-startX;
@@ -485,6 +504,16 @@ function onMouseMove(e){
 function onMouseUp(){
     if(activeRoom){
         activeRoom.classList.remove('dragging');
+        
+        const elapsed=Date.now()-mouseStartTime;
+        if(!mouseMoved&&elapsed<300&&!isResizing){
+            const name=activeRoom.dataset.name;
+            undoStack.pop();
+            saveLayout();
+            window.location.href=`index.html?room=${encodeURIComponent(name)}`;
+            return;
+        }
+        
         updateLayout();
     }
     activeRoom=null;
