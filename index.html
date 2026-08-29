@@ -4,112 +4,106 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Home Brain</title>
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
         :root {
-            /* Meadow Theme (Default) */
-            --bg-primary: rgba(34, 80, 52, 0.85);
-            --bg-card: rgba(45, 95, 60, 0.8);
-            --bg-input: rgba(30, 70, 45, 0.9);
-            --accent: #7ed957;
-            --accent-secondary: #f9e547;
-            --text-primary: #f0f7f0;
-            --text-secondary: #b8d4b8;
-            --text-muted: #7aa87a;
-            --border: rgba(126, 217, 87, 0.3);
+            --bg-primary: rgba(240, 247, 240, 0.88);
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --bg-input: rgba(255, 255, 255, 0.95);
+            --accent: #4a9e5c;
+            --accent-secondary: #8bc34a;
+            --text-primary: #2d3a2d;
+            --text-secondary: #5a6e5a;
+            --text-muted: #8a9e8a;
+            --border: rgba(74, 158, 92, 0.25);
             --danger: #e74c3c;
-            --star: #f9e547;
-            --confetti1: #7ed957;
-            --confetti2: #f9e547;
-            --confetti3: #ff9a9e;
-            --confetti4: #a8e6cf;
+            --star: #f9a825;
+            --shadow: rgba(0,0,0,0.08);
+        }
+
+        [data-theme="meadow"] {
+            --bg-primary: rgba(240, 247, 240, 0.88);
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --bg-input: rgba(255, 255, 255, 0.95);
+            --accent: #4a9e5c;
+            --accent-secondary: #8bc34a;
+            --text-primary: #2d3a2d;
+            --text-secondary: #5a6e5a;
+            --text-muted: #8a9e8a;
+            --border: rgba(74, 158, 92, 0.25);
+            --star: #f9a825;
+            --shadow: rgba(0,0,0,0.08);
         }
 
         [data-theme="reef"] {
-            --bg-primary: rgba(20, 60, 80, 0.85);
-            --bg-card: rgba(25, 75, 95, 0.8);
-            --bg-input: rgba(15, 55, 75, 0.9);
-            --accent: #00bcd4;
+            --bg-primary: rgba(230, 248, 255, 0.88);
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --bg-input: rgba(255, 255, 255, 0.95);
+            --accent: #0097a7;
             --accent-secondary: #ff7043;
-            --text-primary: #e0f7fa;
-            --text-secondary: #80deea;
-            --text-muted: #4db6ac;
-            --border: rgba(0, 188, 212, 0.3);
-            --star: #ffd54f;
-            --confetti1: #00bcd4;
-            --confetti2: #ff7043;
-            --confetti3: #ffd54f;
-            --confetti4: #80deea;
+            --text-primary: #1a3a4a;
+            --text-secondary: #4a6a7a;
+            --text-muted: #7a9aaa;
+            --border: rgba(0, 151, 167, 0.25);
+            --star: #f9a825;
+            --shadow: rgba(0,0,0,0.08);
         }
 
         [data-theme="golden"] {
-            --bg-primary: rgba(80, 40, 20, 0.85);
-            --bg-card: rgba(95, 50, 25, 0.8);
-            --bg-input: rgba(70, 35, 18, 0.9);
-            --accent: #ffab40;
-            --accent-secondary: #ff6e40;
-            --text-primary: #fff3e0;
-            --text-secondary: #ffcc80;
-            --text-muted: #c88a50;
-            --border: rgba(255, 171, 64, 0.3);
-            --star: #ffd54f;
-            --confetti1: #ffab40;
-            --confetti2: #ff6e40;
-            --confetti3: #ffee58;
-            --confetti4: #ff8a65;
+            --bg-primary: rgba(255, 245, 235, 0.88);
+            --bg-card: rgba(255, 255, 255, 0.8);
+            --bg-input: rgba(255, 255, 255, 0.92);
+            --accent: #e65100;
+            --accent-secondary: #ff8a65;
+            --text-primary: #3e2723;
+            --text-secondary: #5d4037;
+            --text-muted: #8d6e63;
+            --border: rgba(230, 81, 0, 0.2);
+            --star: #f9a825;
+            --shadow: rgba(0,0,0,0.1);
         }
 
         [data-theme="chibi"] {
-            --bg-primary: rgba(60, 20, 80, 0.85);
-            --bg-card: rgba(75, 25, 100, 0.8);
-            --bg-input: rgba(50, 15, 70, 0.9);
-            --accent: #ff4081;
-            --accent-secondary: #40c4ff;
-            --text-primary: #fce4ec;
-            --text-secondary: #f48fb1;
-            --text-muted: #ab47bc;
-            --border: rgba(255, 64, 129, 0.3);
-            --star: #ffea00;
-            --confetti1: #ff4081;
-            --confetti2: #40c4ff;
-            --confetti3: #ffea00;
-            --confetti4: #69f0ae;
+            --bg-primary: rgba(240, 235, 255, 0.88);
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --bg-input: rgba(255, 255, 255, 0.95);
+            --accent: #7c4dff;
+            --accent-secondary: #ff4081;
+            --text-primary: #2a1f4e;
+            --text-secondary: #5a4f7e;
+            --text-muted: #8a7fae;
+            --border: rgba(124, 77, 255, 0.25);
+            --star: #ffd54f;
+            --shadow: rgba(0,0,0,0.08);
         }
 
         [data-theme="tome"] {
-            --bg-primary: rgba(60, 20, 20, 0.85);
-            --bg-card: rgba(75, 30, 30, 0.8);
-            --bg-input: rgba(50, 18, 18, 0.9);
-            --accent: #ffd54f;
-            --accent-secondary: #a1887f;
-            --text-primary: #fff8e1;
-            --text-secondary: #ffe082;
-            --text-muted: #a1887f;
-            --border: rgba(255, 213, 79, 0.3);
-            --star: #ffd54f;
-            --confetti1: #ffd54f;
-            --confetti2: #a1887f;
-            --confetti3: #ff8a65;
-            --confetti4: #fff176;
+            --bg-primary: rgba(255, 248, 235, 0.85);
+            --bg-card: rgba(255, 252, 245, 0.82);
+            --bg-input: rgba(255, 255, 250, 0.92);
+            --accent: #bf8c2c;
+            --accent-secondary: #6d8f3e;
+            --text-primary: #3e2f1c;
+            --text-secondary: #6b5435;
+            --text-muted: #9e8a6a;
+            --border: rgba(191, 140, 44, 0.25);
+            --star: #f9a825;
+            --shadow: rgba(0,0,0,0.1);
         }
 
         [data-theme="midnight"] {
-            --bg-primary: rgba(15, 15, 45, 0.85);
-            --bg-card: rgba(25, 25, 60, 0.8);
-            --bg-input: rgba(12, 12, 40, 0.9);
+            --bg-primary: rgba(15, 15, 40, 0.9);
+            --bg-card: rgba(25, 25, 55, 0.85);
+            --bg-input: rgba(20, 20, 50, 0.95);
             --accent: #b39ddb;
             --accent-secondary: #80cbc4;
-            --text-primary: #ede7f6;
-            --text-secondary: #b39ddb;
-            --text-muted: #7e57c2;
+            --text-primary: #e8e0f0;
+            --text-secondary: #b0a8c0;
+            --text-muted: #7a7290;
             --border: rgba(179, 157, 219, 0.3);
             --star: #ffd54f;
-            --confetti1: #b39ddb;
-            --confetti2: #80cbc4;
-            --confetti3: #ffd54f;
-            --confetti4: #f48fb1;
+            --shadow: rgba(0,0,0,0.3);
         }
 
         * {
@@ -121,10 +115,11 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background-color: #1a2e1a;
+            background-color: #f0f7f0;
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
+            background-repeat: no-repeat;
             color: var(--text-primary);
             min-height: 100vh;
             min-height: -webkit-fill-available;
@@ -133,13 +128,13 @@
 
         .app-container {
             min-height: 100vh;
-            padding: 20px;
-            padding-top: max(20px, env(safe-area-inset-top));
-            padding-bottom: max(80px, calc(env(safe-area-inset-bottom) + 70px));
+            padding: 15px;
+            padding-top: max(15px, env(safe-area-inset-top));
+            padding-bottom: max(85px, calc(env(safe-area-inset-bottom) + 75px));
             background: var(--bg-primary);
         }
 
-        /* Navigation */
+        /* ===== NAVIGATION ===== */
         .nav-bar {
             position: fixed;
             bottom: 0;
@@ -150,81 +145,66 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-top: 1px solid var(--border);
-            padding-bottom: env(safe-area-inset-bottom);
+            padding: 8px 5px;
+            padding-bottom: max(8px, env(safe-area-inset-bottom));
             z-index: 1000;
+            box-shadow: 0 -2px 10px var(--shadow);
         }
 
         .nav-btn {
             flex: 1;
-            padding: 12px 5px;
+            padding: 6px 2px;
             border: none;
             background: none;
             color: var(--text-muted);
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
             cursor: pointer;
             transition: color 0.2s;
         }
 
-        .nav-btn.active {
-            color: var(--accent);
-        }
+        .nav-btn.active { color: var(--accent); }
+        .nav-btn span.icon { font-size: 1.3rem; }
 
-        .nav-btn span.icon {
-            font-size: 1.4rem;
-        }
-
-        /* Cards */
+        /* ===== CARDS ===== */
         .card {
             background: var(--bg-card);
             border-radius: 16px;
-            padding: 18px;
+            padding: 16px;
             margin-bottom: 12px;
             border: 1px solid var(--border);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            transition: transform 0.2s;
+            box-shadow: 0 2px 8px var(--shadow);
+            transition: transform 0.15s;
         }
 
-        .card:active {
-            transform: scale(0.98);
-        }
+        .card:active { transform: scale(0.98); }
+        .card h3 { color: var(--accent); margin-bottom: 5px; font-size: 1rem; }
+        .card p { color: var(--text-secondary); font-size: 0.85rem; }
 
-        .card h3 {
-            color: var(--accent);
-            margin-bottom: 6px;
-            font-size: 1.1rem;
-        }
-
-        .card p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        /* Buttons */
+        /* ===== BUTTONS ===== */
         .btn {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             border: none;
             border-radius: 14px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             margin-bottom: 10px;
-            transition: transform 0.2s, opacity 0.2s;
+            transition: transform 0.15s, opacity 0.15s;
         }
 
-        .btn:active {
-            transform: scale(0.97);
-            opacity: 0.8;
-        }
+        .btn:active { transform: scale(0.97); opacity: 0.85; }
 
         .btn-primary {
             background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-            color: #1a1a2e;
+            color: white;
+            box-shadow: 0 3px 12px var(--shadow);
         }
 
         .btn-secondary {
@@ -233,109 +213,216 @@
             border: 1px solid var(--border);
         }
 
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
+        .btn-danger { background: var(--danger); color: white; }
 
         .btn-small {
             width: auto;
-            padding: 10px 18px;
-            font-size: 0.9rem;
+            padding: 10px 16px;
+            font-size: 0.85rem;
             display: inline-block;
             margin: 4px;
         }
 
-        /* Inputs */
+        /* ===== INPUTS ===== */
         input, textarea, select {
             width: 100%;
-            padding: 14px;
+            padding: 13px;
             border-radius: 12px;
             border: 1px solid var(--border);
             background: var(--bg-input);
             color: var(--text-primary);
             font-size: 1rem;
             font-family: inherit;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             transition: border-color 0.2s;
         }
 
-        input:focus, textarea:focus {
+        input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(74, 158, 92, 0.1);
         }
 
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
+        textarea { min-height: 100px; resize: vertical; }
 
-        /* Views */
-        .view {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .view.active {
-            display: block;
-        }
+        /* ===== VIEWS ===== */
+        .view { display: none; animation: fadeIn 0.25s ease; }
+        .view.active { display: block; }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Header */
-        .view-header {
+        /* ===== HEADER ===== */
+        .view-header { margin-bottom: 18px; }
+        .view-header h2 { font-size: 1.4rem; margin-bottom: 4px; }
+        .view-header p { color: var(--text-secondary); font-size: 0.9rem; }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 0;
+            margin-bottom: 10px;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 24px;
+            width: 100%;
+            max-width: 340px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal h3 { color: var(--accent); margin-bottom: 12px; font-size: 1.1rem; }
+        .modal p { color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9rem; }
+
+        .modal-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .modal-actions .btn { flex: 1; margin-bottom: 0; }
+
+        /* ===== GRID LAYOUT ===== */
+        .room-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .room-tile {
+            background: var(--bg-card);
+            border-radius: 14px;
+            padding: 18px 12px;
             text-align: center;
-            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: transform 0.15s;
+            box-shadow: 0 2px 8px var(--shadow);
         }
 
-        .view-header h2 {
-            font-size: 1.4rem;
-            margin-bottom: 5px;
-        }
+        .room-tile:active { transform: scale(0.95); }
+        .room-tile .emoji { font-size: 2rem; display: block; margin-bottom: 6px; }
+        .room-tile .name { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+        .room-tile .count { font-size: 0.75rem; color: var(--text-muted); margin-top: 3px; }
 
-        .view-header p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        /* Mood Selector */
+        /* ===== MOOD SELECTOR ===== */
         .mood-selector {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             justify-content: center;
-            margin-bottom: 20px;
+            margin: 20px 0;
         }
 
         .mood-btn {
-            width: 70px;
-            height: 70px;
+            width: 75px;
+            height: 75px;
             border-radius: 50%;
             border: 2px solid var(--border);
-            background: var(--bg-input);
-            font-size: 2rem;
+            background: var(--bg-card);
+            font-size: 2.2rem;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: all 0.2s;
+            box-shadow: 0 2px 8px var(--shadow);
         }
 
         .mood-btn.active {
             border-color: var(--accent);
-            transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(126, 217, 87, 0.3);
+            transform: scale(1.15);
+            box-shadow: 0 4px 15px rgba(74, 158, 92, 0.3);
         }
 
-        /* Progress */
+        /* ===== ONBOARDING ===== */
+        .onboarding-step { padding: 10px 0; }
+        .onboarding-step h2 { font-size: 1.5rem; margin-bottom: 8px; text-align: center; }
+        .onboarding-step p { color: var(--text-secondary); margin-bottom: 18px; line-height: 1.5; text-align: center; }
+        .onboarding-step .emoji-big { font-size: 3.5rem; text-align: center; margin-bottom: 12px; }
+
+        .option-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .option-btn {
+            padding: 14px 10px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            box-shadow: 0 2px 6px var(--shadow);
+        }
+
+        .option-btn.selected {
+            border-color: var(--accent);
+            background: rgba(74, 158, 92, 0.08);
+            box-shadow: 0 2px 10px rgba(74, 158, 92, 0.15);
+        }
+
+        .option-btn .emoji { font-size: 1.5rem; display: block; margin-bottom: 5px; }
+
+        /* ===== TAGS ===== */
+        .tag {
+            display: inline-block;
+            padding: 7px 13px;
+            border-radius: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            margin: 3px;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tag.selected {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* ===== PROGRESS BAR ===== */
         .progress-bar {
             height: 8px;
             background: var(--bg-input);
             border-radius: 4px;
             overflow: hidden;
             margin: 10px 0;
+            border: 1px solid var(--border);
         }
 
         .progress-fill {
@@ -345,54 +432,35 @@
             transition: width 0.5s ease;
         }
 
-        /* Stars */
-        .star-display {
-            color: var(--star);
-            font-size: 1.5rem;
-            text-align: center;
-            margin: 10px 0;
-        }
-
-        /* Streak */
-        .streak-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            background: var(--bg-input);
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            border: 1px solid var(--border);
-        }
-
-        /* Timer */
+        /* ===== TIMER ===== */
         .timer-display {
-            font-size: 3rem;
+            font-size: 3.5rem;
             font-weight: 700;
             text-align: center;
             color: var(--accent);
             font-variant-numeric: tabular-nums;
-            margin: 20px 0;
+            margin: 15px 0;
         }
 
-        /* Chat */
+        /* ===== CHAT ===== */
         .chat-container {
-            max-height: 50vh;
+            max-height: 45vh;
             overflow-y: auto;
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 12px;
+            margin-bottom: 12px;
+            padding: 12px;
+            border-radius: 14px;
             background: var(--bg-input);
+            border: 1px solid var(--border);
         }
 
         .chat-bubble {
             max-width: 85%;
-            padding: 12px 16px;
-            border-radius: 18px;
-            margin-bottom: 10px;
-            font-size: 0.95rem;
+            padding: 11px 15px;
+            border-radius: 16px;
+            margin-bottom: 8px;
+            font-size: 0.92rem;
             line-height: 1.5;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.25s ease;
         }
 
         .chat-bubble.ai {
@@ -404,7 +472,7 @@
 
         .chat-bubble.user {
             background: var(--accent);
-            color: #1a1a2e;
+            color: white;
             margin-left: auto;
             border-bottom-right-radius: 4px;
         }
@@ -414,105 +482,171 @@
             gap: 8px;
         }
 
-        .chat-input-row input {
-            flex: 1;
-            margin-bottom: 0;
-        }
+        .chat-input-row input { flex: 1; margin-bottom: 0; }
 
         .chat-input-row button {
-            width: 50px;
-            height: 50px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             border: none;
             background: var(--accent);
-            color: #1a1a2e;
+            color: white;
             font-size: 1.2rem;
             cursor: pointer;
+            flex-shrink: 0;
         }
 
-        /* Onboarding */
-        .onboarding-step {
-            text-align: center;
-            padding: 20px 0;
-        }
-
-        .onboarding-step h2 {
-            margin-bottom: 10px;
-            font-size: 1.5rem;
-        }
-
-        .onboarding-step p {
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-
-        .onboarding-step .emoji-big {
-            font-size: 4rem;
-            margin-bottom: 15px;
-        }
-
-        .option-grid {
+        /* ===== BUCKETS ===== */
+        .bucket-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
             margin-bottom: 15px;
         }
 
-        .option-btn {
+        .bucket-tile {
+            background: var(--bg-card);
+            border-radius: 14px;
             padding: 15px;
+            text-align: center;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            box-shadow: 0 2px 8px var(--shadow);
+            transition: transform 0.15s;
+        }
+
+        .bucket-tile:active { transform: scale(0.95); }
+        .bucket-tile .emoji { font-size: 1.8rem; display: block; margin-bottom: 4px; }
+        .bucket-tile .label { font-size: 0.85rem; font-weight: 600; }
+        .bucket-tile .count { font-size: 0.75rem; color: var(--text-muted); margin-top: 3px; }
+
+        /* ===== ITEM CARD ===== */
+        .item-card {
+            background: var(--bg-card);
             border-radius: 12px;
-            border: 2px solid var(--border);
+            padding: 14px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 4px var(--shadow);
+        }
+
+        .item-card .item-name { font-weight: 600; margin-bottom: 4px; }
+        .item-card .item-meta { font-size: 0.8rem; color: var(--text-muted); }
+        .item-card .item-tags { margin-top: 6px; }
+
+        .item-card .item-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .item-card .item-actions button {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
             background: var(--bg-input);
             color: var(--text-primary);
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             cursor: pointer;
-            transition: all 0.2s;
+        }
+
+        /* ===== STREAK ===== */
+        .streak-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--bg-card);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 6px var(--shadow);
+        }
+
+        /* ===== FOCUS STEP ===== */
+        .focus-step {
             text-align: center;
+            padding: 25px 18px;
+            background: var(--bg-card);
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            margin: 12px 0;
+            box-shadow: 0 2px 8px var(--shadow);
         }
 
-        .option-btn.selected {
-            border-color: var(--accent);
-            background: rgba(126, 217, 87, 0.1);
+        .focus-step .step-number { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
+        .focus-step .step-text { font-size: 1.2rem; font-weight: 600; line-height: 1.4; }
+
+        .step-checklist {
+            text-align: left;
+            margin: 15px 0;
         }
 
-        .option-btn .emoji {
-            font-size: 1.5rem;
-            display: block;
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        .step-item input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            accent-color: var(--accent);
+            margin: 0;
+            flex-shrink: 0;
+        }
+
+        .step-item.completed { opacity: 0.5; text-decoration: line-through; }
+
+        /* ===== VIBE SLIDER ===== */
+        .vibe-slider { margin: 15px 0; }
+
+        .vibe-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-muted);
             margin-bottom: 5px;
         }
 
-        /* Room tags */
-        .tag {
-            display: inline-block;
-            padding: 8px 14px;
-            border-radius: 20px;
+        .vibe-notches {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 5px;
+            margin-top: 5px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
             background: var(--bg-input);
             border: 1px solid var(--border);
-            margin: 4px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s;
+            padding: 0;
+            margin: 8px 0;
         }
 
-        .tag.selected {
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
             background: var(--accent);
-            color: #1a1a2e;
-            border-color: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 2px 6px var(--shadow);
         }
 
-        .tag.removable::after {
-            content: ' ✕';
-            opacity: 0.7;
-        }
-
-        /* Confetti */
-        .confetti-container {
+        /* ===== CONFETTI/FIREWORKS ===== */
+        .celebration-container {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             pointer-events: none;
             z-index: 9999;
         }
@@ -526,154 +660,84 @@
         }
 
         @keyframes confettiFall {
-            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
             100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
         }
 
-        /* Slider */
-        .slider-container {
-            margin: 15px 0;
-        }
-
-        .slider-container label {
-            display: flex;
-            justify-content: space-between;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            margin-bottom: 8px;
-        }
-
-        input[type="range"] {
-            -webkit-appearance: none;
-            width: 100%;
+        .firework {
+            position: absolute;
+            width: 6px;
             height: 6px;
-            border-radius: 3px;
-            background: var(--bg-input);
-            border: none;
-            padding: 0;
-            margin: 10px 0;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 24px;
-            height: 24px;
             border-radius: 50%;
-            background: var(--accent);
-            cursor: pointer;
+            animation: fireworkBurst 1.5s ease-out forwards;
         }
 
-        /* Loading */
-        .loading-spinner {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 30px;
-            gap: 15px;
+        @keyframes fireworkBurst {
+            0% { transform: scale(0); opacity: 1; }
+            50% { opacity: 1; }
+            100% { transform: scale(1) translate(var(--tx), var(--ty)); opacity: 0; }
         }
 
+        .starburst {
+            position: absolute;
+            font-size: 1.5rem;
+            animation: starBurst 1.5s ease-out forwards;
+        }
+
+        @keyframes starBurst {
+            0% { transform: scale(0) rotate(0deg); opacity: 1; }
+            100% { transform: scale(1) translate(var(--tx), var(--ty)) rotate(360deg); opacity: 0; }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+        /* ===== LOADING ===== */
         .spinner {
-            width: 36px;
-            height: 36px;
+            width: 28px;
+            height: 28px;
             border: 3px solid var(--border);
             border-top-color: var(--accent);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
+            margin: 0 auto;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Focus step */
-        .focus-step {
-            text-align: center;
-            padding: 30px 20px;
-            background: var(--bg-card);
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            margin: 15px 0;
-        }
-
-        .focus-step .step-number {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-        }
-
-        .focus-step .step-text {
-            font-size: 1.3rem;
-            font-weight: 600;
-            line-height: 1.4;
-        }
-
-        /* Checkbox items */
-        .check-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .check-item input[type="checkbox"] {
-            width: 22px;
-            height: 22px;
-            margin: 0;
-            accent-color: var(--accent);
-        }
-
-        .check-item.checked label {
-            text-decoration: line-through;
-            opacity: 0.5;
-        }
-
-        /* Scrollable horizontal */
-        .scroll-row {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding: 5px 0 15px;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .scroll-row::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Hidden utility */
-        .hidden {
-            display: none !important;
-        }
-
-        /* Privacy notice */
+        /* ===== PRIVACY BADGE ===== */
         .privacy-badge {
             text-align: center;
             padding: 10px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
-            margin-top: 20px;
+            margin-top: 15px;
         }
 
-        .privacy-badge::before {
-            content: '🔒 ';
-        }
+        /* ===== UTILITIES ===== */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .mt-10 { margin-top: 10px; }
+        .mb-10 { margin-bottom: 10px; }
+        .mb-15 { margin-bottom: 15px; }
     </style>
 </head>
 <body>
 <div class="app-container" id="app">
 
-<!-- ==================== ONBOARDING ==================== -->
+<!-- ===== ONBOARDING ===== -->
 <div id="onboarding" class="view active">
     <div id="onboarding-content"></div>
 </div>
 
-<!-- ==================== MAIN APP ==================== -->
+<!-- ===== MAIN APP ===== -->
 <div id="main-app" class="hidden">
 
     <!-- DAILY CHECK-IN -->
     <div id="view-checkin" class="view">
-        <div class="view-header">
+        <div class="view-header text-center">
             <h2 id="greeting-text">Hey there! 👋</h2>
             <p>How are you feeling today?</p>
         </div>
@@ -682,85 +746,94 @@
             <button class="mood-btn" onclick="setMood('okay')" data-mood="okay">🟡</button>
             <button class="mood-btn" onclick="setMood('rough')" data-mood="rough">🔴</button>
         </div>
-        <div id="mood-labels" style="display:flex;justify-content:center;gap:20px;margin-bottom:20px;">
-            <span style="font-size:0.8rem;color:var(--text-muted)">Let's go!</span>
-            <span style="font-size:0.8rem;color:var(--text-muted)">Something small</span>
-            <span style="font-size:0.8rem;color:var(--text-muted)">Be gentle</span>
+        <div style="display:flex;justify-content:center;gap:15px;margin-bottom:20px;">
+            <span style="font-size:0.78rem;color:var(--text-muted);width:75px;text-align:center">Let's go!</span>
+            <span style="font-size:0.78rem;color:var(--text-muted);width:75px;text-align:center">Something small</span>
+            <span style="font-size:0.78rem;color:var(--text-muted);width:75px;text-align:center">Be gentle</span>
         </div>
-        <div id="streak-display" class="hidden" style="text-align:center;margin-bottom:20px;"></div>
+        <div id="streak-display" style="text-align:center;margin-bottom:15px;"></div>
     </div>
 
-    <!-- HOME / MY SPACE -->
+    <!-- MY SPACE -->
     <div id="view-home" class="view">
         <div class="view-header">
             <h2>🏠 My Space</h2>
             <p>Your rooms & what's where</p>
         </div>
-        <div id="rooms-list"></div>
-        <button class="btn btn-secondary" onclick="showAddRoom()">+ Add Room</button>
+        <div class="room-grid" id="rooms-grid"></div>
+        <button class="btn btn-secondary" onclick="showModal('addRoom')">+ Add Room</button>
     </div>
 
     <!-- ROOM DETAIL -->
     <div id="view-room" class="view">
+        <button class="back-btn" onclick="navigate('home')">← Back</button>
         <div id="room-detail-content"></div>
     </div>
 
-    <!-- HELP ME (AI Chat) -->
+    <!-- HELP ME -->
     <div id="view-help" class="view">
         <div class="view-header">
             <h2>🧠 Help Me</h2>
             <p>Ask me anything about your space</p>
         </div>
-        <div class="scroll-row" style="margin-bottom:15px;">
+        <div style="overflow-x:auto;white-space:nowrap;margin-bottom:12px;padding-bottom:5px;">
             <button class="btn btn-small btn-secondary" onclick="quickPrompt('where')">Where should I put...?</button>
             <button class="btn btn-small btn-secondary" onclick="quickPrompt('decide')">Help me decide</button>
             <button class="btn btn-small btn-secondary" onclick="quickPrompt('overwhelm')">I'm overwhelmed</button>
-            <button class="btn btn-small btn-secondary" onclick="quickPrompt('photo')">📸 Show you something</button>
+            <button class="btn btn-small btn-secondary" onclick="quickPrompt('photo')">📸 Show you</button>
         </div>
         <div class="chat-container" id="chat-container"></div>
         <div class="chat-input-row">
             <input type="text" id="chat-input" placeholder="Ask me anything..." onkeypress="if(event.key==='Enter')sendChat()">
             <button onclick="sendChat()">→</button>
         </div>
-        <div style="margin-top:10px;">
-            <button class="btn btn-small btn-secondary" onclick="document.getElementById('help-photo-input').click()">📷</button>
-            <input type="file" id="help-photo-input" accept="image/*" capture="environment" style="display:none" onchange="handleHelpPhoto(event)">
-        </div>
+        <button class="btn btn-small btn-secondary mt-10" onclick="document.getElementById('help-photo-input').click()">📷 Add Photo</button>
+        <input type="file" id="help-photo-input" accept="image/*" capture="environment" style="display:none" onchange="handleHelpPhoto(event)">
     </div>
 
     <!-- FOCUS MODE -->
     <div id="view-focus" class="view">
         <div class="view-header">
             <h2>✅ Focus Mode</h2>
-            <p id="focus-subtitle">How much time do you have?</p>
+            <p id="focus-subtitle">Pick a spot and time</p>
         </div>
-        <div id="focus-time-select">
+        <div id="focus-setup">
+            <p style="font-weight:600;margin-bottom:8px;">Where do you want to focus?</p>
+            <div class="room-grid" id="focus-room-grid"></div>
+            <p style="font-weight:600;margin-bottom:8px;margin-top:15px;">How much time?</p>
             <div class="option-grid">
-                <button class="option-btn" onclick="startFocus(5)"><span class="emoji">⚡</span>5 min</button>
-                <button class="option-btn" onclick="startFocus(15)"><span class="emoji">🌱</span>15 min</button>
-                <button class="option-btn" onclick="startFocus(30)"><span class="emoji">💪</span>30 min</button>
-                <button class="option-btn" onclick="startFocus(60)"><span class="emoji">🏆</span>1 hour</button>
+                <button class="option-btn" onclick="selectFocusTime(5)"><span class="emoji">⚡</span>5 min</button>
+                <button class="option-btn" onclick="selectFocusTime(15)"><span class="emoji">🌱</span>15 min</button>
+                <button class="option-btn" onclick="selectFocusTime(30)"><span class="emoji">💪</span>30 min</button>
+                <button class="option-btn" onclick="selectFocusTime(60)"><span class="emoji">🏆</span>1 hour</button>
             </div>
-            <button class="btn btn-secondary" onclick="startFocus(0)">🐢 Just one thing</button>
+            <button class="btn btn-secondary" onclick="selectFocusTime(0)">🐢 Just one thing</button>
         </div>
         <div id="focus-active" class="hidden">
             <div class="timer-display" id="timer-display">15:00</div>
-            <div class="focus-step" id="focus-step-display">
-                <div class="step-number">Step 1 of 5</div>
-                <div class="step-text">Loading your task...</div>
-            </div>
-            <div style="display:flex;gap:10px;margin-top:15px;">
-                <button class="btn btn-primary" onclick="nextFocusStep()" style="flex:1">Done! Next →</button>
-                <button class="btn btn-secondary" onclick="endFocus()" style="flex:0.5">Stop</button>
+            <div id="focus-steps-list" class="step-checklist"></div>
+            <div style="display:flex;gap:8px;margin-top:12px;">
+                <button class="btn btn-primary" onclick="completeFocusStep()" style="flex:1">✓ Done! Next →</button>
+                <button class="btn btn-secondary" onclick="endFocus()" style="flex:0.4;font-size:0.85rem;">Stop</button>
             </div>
         </div>
-        <div id="focus-complete" class="hidden" style="text-align:center;padding:30px;">
-            <div style="font-size:4rem;margin-bottom:15px;">🎉</div>
-            <h2>Amazing!</h2>
-            <p style="color:var(--text-secondary);margin:10px 0;" id="focus-complete-msg"></p>
-            <div class="star-display" id="stars-earned"></div>
-            <button class="btn btn-primary" onclick="resetFocus()" style="margin-top:20px;">Done!</button>
+        <div id="focus-complete" class="hidden text-center" style="padding:25px 0;"></div>
+    </div>
+
+    <!-- BUCKETS -->
+    <div id="view-buckets" class="view">
+        <div class="view-header">
+            <h2>📦 My Items</h2>
+            <p>Sort, organize, let go</p>
         </div>
+        <div class="bucket-grid" id="bucket-grid"></div>
+        <button class="btn btn-primary" onclick="showModal('addItem')">+ Add Item</button>
+    </div>
+
+    <!-- BUCKET DETAIL -->
+    <div id="view-bucket-detail" class="view">
+        <button class="back-btn" onclick="navigate('buckets')">← Back</button>
+        <div id="bucket-detail-content"></div>
     </div>
 
     <!-- LETTING GO -->
@@ -769,29 +842,24 @@
             <h2>♻️ Letting Go</h2>
             <p>At your pace. No pressure.</p>
         </div>
-        <div class="scroll-row" style="margin-bottom:15px;">
+        <div style="overflow-x:auto;white-space:nowrap;margin-bottom:12px;padding-bottom:5px;">
             <button class="btn btn-small btn-secondary" onclick="letGoMode('permission')">🫂 Permission</button>
             <button class="btn btn-small btn-secondary" onclick="letGoMode('logic')">🧠 Logic</button>
             <button class="btn btn-small btn-secondary" onclick="letGoMode('hype')">🔥 Hype me</button>
-            <button class="btn btn-small btn-secondary" onclick="letGoMode('tiny')">🐢 Make it tiny</button>
-            <button class="btn btn-small btn-secondary" onclick="letGoMode('photo')">📸 Help me see</button>
+            <button class="btn btn-small btn-secondary" onclick="letGoMode('tiny')">🐢 Tiny</button>
+            <button class="btn btn-small btn-secondary" onclick="letGoMode('photo')">📸 Show me</button>
         </div>
-        <div id="letgo-thinking" class="card hidden">
-            <h3>🤔 Thinking About...</h3>
-            <div id="thinking-list"></div>
-            <button class="btn btn-small btn-secondary" style="margin-top:10px;" onclick="addToThinkingList()">+ Add item</button>
-        </div>
-        <div id="letgo-released" class="card">
-            <h3>🌟 Released</h3>
-            <p id="released-count">0 items freed so far</p>
-            <div class="progress-bar"><div class="progress-fill" id="released-progress" style="width:0%"></div></div>
-        </div>
-        <div id="letgo-chat-container" class="hidden">
+        <div id="letgo-chat-area">
             <div class="chat-container" id="letgo-chat"></div>
             <div class="chat-input-row">
                 <input type="text" id="letgo-input" placeholder="Tell me what you're working through..." onkeypress="if(event.key==='Enter')sendLetGoChat()">
                 <button onclick="sendLetGoChat()">→</button>
             </div>
+        </div>
+        <div class="card mt-10">
+            <h3>🌟 Released So Far</h3>
+            <p id="released-count">0 items freed</p>
+            <div class="progress-bar"><div class="progress-fill" id="released-progress" style="width:0%"></div></div>
         </div>
     </div>
 
@@ -818,42 +886,54 @@
     <button class="nav-btn" onclick="navigate('home')"><span class="icon">🏠</span>Space</button>
     <button class="nav-btn" onclick="navigate('help')"><span class="icon">🧠</span>Help</button>
     <button class="nav-btn" onclick="navigate('focus')"><span class="icon">✅</span>Focus</button>
+    <button class="nav-btn" onclick="navigate('buckets')"><span class="icon">📦</span>Items</button>
     <button class="nav-btn" onclick="navigate('letgo')"><span class="icon">♻️</span>Let Go</button>
     <button class="nav-btn" onclick="navigate('progress')"><span class="icon">🏆</span>Stars</button>
     <button class="nav-btn" onclick="navigate('settings')"><span class="icon">⚙️</span>More</button>
 </nav>
 
+<!-- MODAL CONTAINER -->
+<div id="modal-container"></div>
+
 </div>
 
 <script>
 // ======================== STATE ========================
-let state = JSON.parse(localStorage.getItem('homeBrainState') || 'null') || {
-    onboarded: false,
-    profile: {
-        name: '',
-        goal: '',
-        spaceType: '',
-        rooms: [],
-        storage: {},
-        pets: [],
-        housemates: '',
-        collections: [],
-        location: '',
-        vibe: 50,
-        theme: 'meadow',
-        bgIntensity: 50
-    },
-    rooms: [],
-    items: [],
-    thinkingList: [],
-    releasedItems: [],
-    stars: 0,
-    streak: 0,
-    lastActive: null,
-    focusHistory: [],
-    chatHistory: [],
-    mood: null
-};
+let state = JSON.parse(localStorage.getItem('homeBrainState') || 'null') || getDefaultState();
+
+function getDefaultState() {
+    return {
+        onboarded: false,
+        profile: {
+            name: '',
+            goal: '',
+            spaceType: '',
+            rooms: [],
+            storage: {},
+            pets: [],
+            housemates: '',
+            collections: [],
+            location: '',
+            vibe: 50,
+            theme: 'meadow',
+            bgIntensity: 50,
+            spaceFeel: '',
+            celebrationStyle: 'confetti',
+            soundStyle: 'chime',
+            screenAwake: true,
+            showTimer: true
+        },
+        items: [],
+        tags: [],
+        stars: 0,
+        streak: 0,
+        lastActive: null,
+        focusHistory: [],
+        releasedItems: [],
+        mood: null,
+        photoDisclaimer: false
+    };
+}
 
 function saveState() {
     localStorage.setItem('homeBrainState', JSON.stringify(state));
@@ -871,30 +951,231 @@ function init() {
 
 // ======================== THEME ========================
 function applyTheme() {
-    document.body.setAttribute('data-theme', state.profile.theme || 'meadow');
-    // Background image would be set here when images are ready
-    // For now using solid color fallback
+    const theme = state.profile.theme || 'meadow';
+    document.body.setAttribute('data-theme', theme);
+    document.body.style.backgroundImage = `url(bg-${theme}.png)`;
+
+    // Apply custom bg if set
+    const customBg = localStorage.getItem('homeBrain_customBg');
+    if (customBg) {
+        document.body.style.backgroundImage = `url(${customBg})`;
+    }
+}
+
+// ======================== MODAL SYSTEM ========================
+function showModal(type, data = {}) {
+    const container = document.getElementById('modal-container');
+    let html = '';
+
+    switch(type) {
+        case 'addRoom':
+            html = `
+                <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+                    <div class="modal">
+                        <h3>Add a Room</h3>
+                        <input type="text" id="modal-room-name" placeholder="Room name (e.g., Bedroom 2)">
+                        <div class="modal-actions">
+                            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button class="btn btn-primary" onclick="confirmAddRoom()">Add</button>
+                        </div>
+                    </div>
+                </div>`;
+            break;
+
+        case 'addItem':
+            const goalFlow = state.profile.goal;
+            html = `
+                <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+                    <div class="modal">
+                        <h3>Add an Item</h3>
+                        <input type="text" id="modal-item-name" placeholder="What is it?">
+                        ${goalFlow === 'maintain' ? `
+                            <select id="modal-item-room">
+                                <option value="">Where is it?</option>
+                                ${state.profile.rooms.map(r => `<option value="${r}">${r}</option>`).join('')}
+                            </select>
+                            <input type="text" id="modal-item-location" placeholder="Where specifically? (shelf, drawer...)">
+                        ` : ''}
+                        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:8px;">What do you want to do with it?</p>
+                        <div class="option-grid">
+                            <button class="option-btn" onclick="selectItemBucket('keep')" id="bucket-opt-keep"><span class="emoji">🏠</span>Keep</button>
+                            <button class="option-btn" onclick="selectItemBucket('give')" id="bucket-opt-give"><span class="emoji">🎁</span>Give Away</button>
+                            <button class="option-btn" onclick="selectItemBucket('toss')" id="bucket-opt-toss"><span class="emoji">🗑️</span>Toss</button>
+                            <button class="option-btn" onclick="selectItemBucket('unsure')" id="bucket-opt-unsure"><span class="emoji">🤷</span>Not Sure</button>
+                        </div>
+                        <input type="text" id="modal-item-tags" placeholder="Tags (e.g., Jenn, Goodwill)">
+                        <div class="modal-actions">
+                            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button class="btn btn-primary" onclick="confirmAddItem()">Add</button>
+                        </div>
+                    </div>
+                </div>`;
+            break;
+
+        case 'editItem':
+            const item = data.item;
+            html = `
+                <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+                    <div class="modal">
+                        <h3>Edit Item</h3>
+                        <input type="text" id="modal-edit-name" value="${item.name}">
+                        <select id="modal-edit-room">
+                            <option value="">No room assigned</option>
+                            ${state.profile.rooms.map(r => `<option value="${r}" ${item.room===r?'selected':''}>${r}</option>`).join('')}
+                        </select>
+                        <input type="text" id="modal-edit-location" placeholder="Where specifically?" value="${item.location || ''}">
+                        <input type="text" id="modal-edit-tags" placeholder="Tags (comma separated)" value="${(item.tags||[]).join(', ')}">
+                        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:8px;">Bucket:</p>
+                        <div class="option-grid">
+                            <button class="option-btn ${item.bucket==='keep'?'selected':''}" onclick="selectEditBucket('keep')"><span class="emoji">🏠</span>Keep</button>
+                            <button class="option-btn ${item.bucket==='give'?'selected':''}" onclick="selectEditBucket('give')"><span class="emoji">🎁</span>Give</button>
+                            <button class="option-btn ${item.bucket==='toss'?'selected':''}" onclick="selectEditBucket('toss')"><span class="emoji">🗑️</span>Toss</button>
+                            <button class="option-btn ${item.bucket==='unsure'?'selected':''}" onclick="selectEditBucket('unsure')"><span class="emoji">🤷</span>Unsure</button>
+                        </div>
+                        <div class="modal-actions">
+                            <button class="btn btn-danger btn-small" onclick="confirmDeleteItem(${data.index})">🗑️ Delete</button>
+                            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button class="btn btn-primary" onclick="confirmEditItem(${data.index})">Save</button>
+                        </div>
+                    </div>
+                </div>`;
+            break;
+
+        case 'photoDisclaimer':
+            html = `
+                <div class="modal-overlay">
+                    <div class="modal">
+                        <h3>📸 Photo Privacy Notice</h3>
+                        <p>When you scan a photo, it's sent securely to AI for analysis. Here's the deal:</p>
+                        <div style="font-size:0.85rem;color:var(--text-secondary);line-height:1.6;margin-bottom:12px;">
+                            <p>• Photos travel encrypted (HTTPS)</p>
+                            <p>• OpenAI does not save or train on API images</p>
+                            <p>• No human reviews your photos</p>
+                            <p>• Only YOU see the results</p>
+                            <p>• Images are not stored after processing</p>
+                        </div>
+                        <div class="modal-actions">
+                            <button class="btn btn-primary" onclick="acceptPhotoDisclaimer()">Got it!</button>
+                        </div>
+                    </div>
+                </div>`;
+            break;
+
+        case 'confirm':
+            html = `
+                <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+                    <div class="modal">
+                        <h3>${data.title || 'Confirm'}</h3>
+                        <p>${data.message || 'Are you sure?'}</p>
+                        <div class="modal-actions">
+                            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button class="btn ${data.danger?'btn-danger':'btn-primary'}" onclick="${data.onConfirm}">${data.confirmText || 'Confirm'}</button>
+                        </div>
+                    </div>
+                </div>`;
+            break;
+    }
+
+    container.innerHTML = html;
+}
+
+function closeModal() {
+    document.getElementById('modal-container').innerHTML = '';
+}
+
+let selectedBucket = 'unsure';
+function selectItemBucket(bucket) {
+    selectedBucket = bucket;
+    document.querySelectorAll('[id^="bucket-opt-"]').forEach(b => b.classList.remove('selected'));
+    document.getElementById(`bucket-opt-${bucket}`).classList.add('selected');
+}
+
+let editBucket = '';
+function selectEditBucket(bucket) {
+    editBucket = bucket;
+    document.querySelectorAll('.modal .option-btn').forEach(b => b.classList.remove('selected'));
+    event.target.closest('.option-btn').classList.add('selected');
+}
+
+function confirmAddRoom() {
+    const name = document.getElementById('modal-room-name').value.trim();
+    if (name && !state.profile.rooms.includes(name)) {
+        state.profile.rooms.push(name);
+        saveState();
+        closeModal();
+        renderHome();
+    }
+}
+
+function confirmAddItem() {
+    const name = document.getElementById('modal-item-name').value.trim();
+    if (!name) return;
+
+    const item = {
+        id: Date.now(),
+        name: name,
+        bucket: selectedBucket,
+        room: document.getElementById('modal-item-room')?.value || '',
+        location: document.getElementById('modal-item-location')?.value || '',
+        tags: document.getElementById('modal-item-tags').value.split(',').map(t => t.trim()).filter(t => t),
+        added: new Date().toISOString(),
+        completed: false
+    };
+
+    state.items.push(item);
+
+    // Track unique tags
+    item.tags.forEach(tag => {
+        if (!state.tags.includes(tag)) state.tags.push(tag);
+    });
+
+    saveState();
+    closeModal();
+    selectedBucket = 'unsure';
+
+    // If goal is "scratch" and bucket is "keep", offer AI suggestion
+    if (state.profile.goal === 'scratch' && item.bucket === 'keep') {
+        navigate('help');
+        sendChatMessage(`I just added "${name}" to my keep pile. Where should I put it in my space?`);
+    } else {
+        renderBuckets();
+    }
+}
+
+function confirmEditItem(index) {
+    const item = state.items[index];
+    item.name = document.getElementById('modal-edit-name').value.trim();
+    item.room = document.getElementById('modal-edit-room').value;
+    item.location = document.getElementById('modal-edit-location').value.trim();
+    item.tags = document.getElementById('modal-edit-tags').value.split(',').map(t => t.trim()).filter(t => t);
+    if (editBucket) item.bucket = editBucket;
+
+    // Update tag list
+    item.tags.forEach(tag => {
+        if (!state.tags.includes(tag)) state.tags.push(tag);
+    });
+
+    saveState();
+    closeModal();
+    editBucket = '';
+    renderBucketDetail(item.bucket);
+}
+
+function confirmDeleteItem(index) {
+    state.items.splice(index, 1);
+    saveState();
+    closeModal();
+    navigate('buckets');
+}
+
+function acceptPhotoDisclaimer() {
+    state.photoDisclaimer = true;
+    saveState();
+    closeModal();
 }
 
 // ======================== ONBOARDING ========================
 let onboardingStep = 0;
-const onboardingSteps = [
-    'welcome',
-    'name',
-    'goal',
-    'spaceType',
-    'rooms',
-    'storage',
-    'housemates',
-    'pets',
-    'petDetails',
-    'collections',
-    'location',
-    'theme',
-    'vibe',
-    'privacy',
-    'done'
-];
 
 function startOnboarding() {
     document.getElementById('onboarding').classList.add('active');
@@ -903,7 +1184,8 @@ function startOnboarding() {
 
 function renderOnboardingStep() {
     const container = document.getElementById('onboarding-content');
-    const step = onboardingSteps[onboardingStep];
+    const steps = ['welcome','apikey','name','goal','spaceType','rooms','storage','housemates','pets','petDetails','collections','location','theme','vibe','privacy','done'];
+    const step = steps[onboardingStep];
 
     switch(step) {
         case 'welcome':
@@ -912,12 +1194,22 @@ function renderOnboardingStep() {
                     <div class="emoji-big">🧠🏠</div>
                     <h2>Welcome to Home Brain</h2>
                     <p>Your personal space organizer, decision helper, and gentle coach.</p>
-                    <p style="margin-top:10px;color:var(--text-muted);font-size:0.85rem;">
-                        This app is just for you. Your data stays on this device only.
-                    </p>
+                    <p style="color:var(--text-muted);font-size:0.82rem;">This app is just for you. Your data stays on this device only.</p>
                     <button class="btn btn-primary" onclick="nextOnboarding()">Let's Get Started →</button>
-                </div>
-            `;
+                </div>`;
+            break;
+
+        case 'apikey':
+            container.innerHTML = `
+                <div class="onboarding-step">
+                    <div class="emoji-big">🔑</div>
+                    <h2>Quick Setup: API Key</h2>
+                    <p>This powers the AI features. You can also do this later in Settings.</p>
+                    <input type="password" id="ob-apikey" placeholder="Paste your OpenAI API key (sk-...)" value="${localStorage.getItem('homeBrain_apiKey') || ''}">
+                    <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:10px;">Get one at platform.openai.com → API Keys</p>
+                    <button class="btn btn-primary" onclick="saveObApiKey()">Save & Continue →</button>
+                    <button class="btn btn-secondary" onclick="nextOnboarding()">Skip for now</button>
+                </div>`;
             break;
 
         case 'name':
@@ -925,228 +1217,175 @@ function renderOnboardingStep() {
                 <div class="onboarding-step">
                     <div class="emoji-big">👋</div>
                     <h2>What should I call you?</h2>
-                    <p>Just a first name or nickname — whatever feels right.</p>
-                    <input type="text" id="ob-name" placeholder="Your name" value="${state.profile.name}" 
-                        style="text-align:center;font-size:1.2rem;">
+                    <p>First name or nickname — whatever feels right.</p>
+                    <input type="text" id="ob-name" placeholder="Your name" value="${state.profile.name}" style="text-align:center;font-size:1.1rem;">
                     <button class="btn btn-primary" onclick="saveName()">Next →</button>
-                </div>
-            `;
+                </div>`;
             break;
 
         case 'goal':
             container.innerHTML = `
                 <div class="onboarding-step">
                     <h2>What's your main goal?</h2>
-                    <p>No wrong answers. You can always change this later.</p>
+                    <p>This changes how the app works for you. You can change it later.</p>
                     <div class="option-grid">
-                        <button class="option-btn ${state.profile.goal==='scratch'?'selected':''}" onclick="selectGoal('scratch')">
-                            <span class="emoji">🆕</span>Organize from scratch
-                        </button>
-                        <button class="option-btn ${state.profile.goal==='maintain'?'selected':''}" onclick="selectGoal('maintain')">
-                            <span class="emoji">🧹</span>Help me maintain
-                        </button>
-                        <button class="option-btn ${state.profile.goal==='declutter'?'selected':''}" onclick="selectGoal('declutter')">
-                            <span class="emoji">📦</span>Help me declutter
-                        </button>
-                        <button class="option-btn ${state.profile.goal==='purge'?'selected':''}" onclick="selectGoal('purge')">
-                            <span class="emoji">🌊</span>Full purge mode
-                        </button>
+                        <button class="option-btn ${state.profile.goal==='scratch'?'selected':''}" onclick="selectGoal('scratch')"><span class="emoji">🆕</span>Organize from scratch</button>
+                        <button class="option-btn ${state.profile.goal==='maintain'?'selected':''}" onclick="selectGoal('maintain')"><span class="emoji">🧹</span>Help me maintain</button>
+                        <button class="option-btn ${state.profile.goal==='declutter'?'selected':''}" onclick="selectGoal('declutter')"><span class="emoji">📦</span>Help me declutter</button>
+                        <button class="option-btn ${state.profile.goal==='purge'?'selected':''}" onclick="selectGoal('purge')"><span class="emoji">🌊</span>Full purge mode</button>
                     </div>
-                    <button class="btn btn-primary ${state.profile.goal?'':'hidden'}" id="goal-next" onclick="nextOnboarding()">Next →</button>
-                </div>
-            `;
+                    <button class="btn btn-primary ${state.profile.goal?'':'hidden'}" id="goal-next-btn" onclick="nextOnboarding()">Next →</button>
+                </div>`;
             break;
 
         case 'spaceType':
             container.innerHTML = `
                 <div class="onboarding-step">
                     <h2>What's your space?</h2>
-                    <p>This helps me understand what we're working with.</p>
                     <div class="option-grid">
-                        <button class="option-btn ${state.profile.spaceType==='room'?'selected':''}" onclick="selectSpace('room')">
-                            <span class="emoji">🛏️</span>Just my room
-                        </button>
-                        <button class="option-btn ${state.profile.spaceType==='apartment'?'selected':''}" onclick="selectSpace('apartment')">
-                            <span class="emoji">🏢</span>Apartment
-                        </button>
-                        <button class="option-btn ${state.profile.spaceType==='house'?'selected':''}" onclick="selectSpace('house')">
-                            <span class="emoji">🏠</span>House
-                        </button>
-                        <button class="option-btn ${state.profile.spaceType==='mobile'?'selected':''}" onclick="selectSpace('mobile')">
-                            <span class="emoji">🏡</span>Mobile/Modular home
-                        </button>
+                        <button class="option-btn ${state.profile.spaceType==='room'?'selected':''}" onclick="selectSpace('room')"><span class="emoji">🛏️</span>Just my room</button>
+                        <button class="option-btn ${state.profile.spaceType==='apartment'?'selected':''}" onclick="selectSpace('apartment')"><span class="emoji">🏢</span>Apartment</button>
+                        <button class="option-btn ${state.profile.spaceType==='house'?'selected':''}" onclick="selectSpace('house')"><span class="emoji">🏠</span>House</button>
+                        <button class="option-btn ${state.profile.spaceType==='mobile'?'selected':''}" onclick="selectSpace('mobile')"><span class="emoji">🏡</span>Mobile/Modular</button>
                     </div>
-                    <button class="btn btn-primary ${state.profile.spaceType?'':'hidden'}" id="space-next" onclick="nextOnboarding()">Next →</button>
-                </div>
-            `;
+                    <button class="btn btn-primary ${state.profile.spaceType?'':'hidden'}" id="space-next-btn" onclick="nextOnboarding()">Next →</button>
+                </div>`;
             break;
 
         case 'rooms':
-            const suggestedRooms = getSuggestedRooms();
             container.innerHTML = `
                 <div class="onboarding-step">
                     <h2>What rooms do you have?</h2>
-                    <p>Tap to select. You can add custom ones too.</p>
-                    <div id="room-tags" style="margin-bottom:15px;">
-                        ${suggestedRooms.map(r => `
-                            <span class="tag ${state.profile.rooms.includes(r)?'selected':''}" onclick="toggleRoom('${r}')">${r}</span>
-                        `).join('')}
+                    <p>Tap to add. For multiples, I'll ask how many.</p>
+                    <div id="room-suggestions" style="margin-bottom:12px;">${getRoomSuggestionHTML()}</div>
+                    <div style="display:flex;gap:8px;margin-bottom:12px;">
+                        <input type="text" id="custom-room-input" placeholder="Custom room..." style="margin:0;flex:1;">
+                        <button class="btn btn-small btn-primary" onclick="addCustomRoomOb()">+</button>
                     </div>
-                    <div style="display:flex;gap:8px;margin-bottom:15px;">
-                        <input type="text" id="custom-room" placeholder="Add custom room..." style="margin:0;flex:1;">
-                        <button class="btn btn-small btn-secondary" onclick="addCustomRoom()">+</button>
+                    <div style="margin-bottom:12px;">
+                        <p style="font-size:0.85rem;font-weight:600;margin-bottom:5px;">Your rooms:</p>
+                        <div id="selected-rooms">${state.profile.rooms.map(r => `<span class="tag selected" onclick="removeRoomOb('${r}')">${r} ✕</span>`).join('') || '<span style="color:var(--text-muted);font-size:0.85rem;">None yet</span>'}</div>
                     </div>
                     <button class="btn btn-primary" onclick="nextOnboarding()">Next →</button>
-                </div>
-            `;
+                </div>`;
             break;
 
         case 'storage':
             container.innerHTML = `
                 <div class="onboarding-step">
-                    <h2>Let's talk storage</h2>
-                    <p>What storage do you have? Check all that apply.</p>
-                    <div style="text-align:left;max-width:300px;margin:0 auto;">
-                        ${generateStorageChecklist()}
+                    <h2>What storage do you have?</h2>
+                    <p>Check all that apply.</p>
+                    <div style="text-align:left;margin-bottom:15px;">
+                        ${getStorageHTML()}
                     </div>
-                    <div style="margin-top:20px;">
-                        <h3 style="font-size:1rem;margin-bottom:10px;">How does your space feel?</h3>
-                        <div class="option-grid">
-                            <button class="option-btn ${state.profile.spaceFeel==='plenty'?'selected':''}" onclick="selectSpaceFeel('plenty')">
-                                <span class="emoji">😌</span>Plenty of room
-                            </button>
-                            <button class="option-btn ${state.profile.spaceFeel==='tight'?'selected':''}" onclick="selectSpaceFeel('tight')">
-                                <span class="emoji">😅</span>Tight on space
-                            </button>
-                            <button class="option-btn ${state.profile.spaceFeel==='drowning'?'selected':''}" onclick="selectSpaceFeel('drowning')">
-                                <span class="emoji">😰</span>Drowning in stuff
-                            </button>
-                            <button class="option-btn ${state.profile.spaceFeel==='ok'?'selected':''}" onclick="selectSpaceFeel('ok')">
-                                <span class="emoji">🤷</span>It's okay
-                            </button>
-                        </div>
+                    <p style="font-weight:600;margin-bottom:8px;">How does your space feel?</p>
+                    <div class="option-grid">
+                        <button class="option-btn ${state.profile.spaceFeel==='plenty'?'selected':''}" onclick="selectSpaceFeel('plenty')"><span class="emoji">😌</span>Plenty of room</button>
+                        <button class="option-btn ${state.profile.spaceFeel==='tight'?'selected':''}" onclick="selectSpaceFeel('tight')"><span class="emoji">😅</span>Tight</button>
+                        <button class="option-btn ${state.profile.spaceFeel==='drowning'?'selected':''}" onclick="selectSpaceFeel('drowning')"><span class="emoji">😰</span>Drowning</button>
+                        <button class="option-btn ${state.profile.spaceFeel==='ok'?'selected':''}" onclick="selectSpaceFeel('ok')"><span class="emoji">🤷</span>It's OK</button>
                     </div>
-                    <button class="btn btn-primary" style="margin-top:15px;" onclick="saveStorage()">Next →</button>
-                </div>
-            `;
+                    <button class="btn btn-primary" onclick="nextOnboarding()">Next →</button>
+                </div>`;
             break;
 
         case 'housemates':
             container.innerHTML = `
                 <div class="onboarding-step">
                     <h2>Who else lives with you?</h2>
-                    <p>This helps me know shared vs. personal spaces.</p>
                     <div class="option-grid">
-                        <button class="option-btn ${state.profile.housemates==='alone'?'selected':''}" onclick="selectHousemates('alone')">
-                            <span class="emoji">🙋</span>Just me
-                        </button>
-                        <button class="option-btn ${state.profile.housemates==='partner'?'selected':''}" onclick="selectHousemates('partner')">
-                            <span class="emoji">💑</span>Partner
-                        </button>
-                        <button class="option-btn ${state.profile.housemates==='family'?'selected':''}" onclick="selectHousemates('family')">
-                            <span class="emoji">👨‍👩‍👧</span>Family
-                        </button>
-                        <button class="option-btn ${state.profile.housemates==='roommates'?'selected':''}" onclick="selectHousemates('roommates')">
-                            <span class="emoji">🏠</span>Roommates
-                        </button>
+                        <button class="option-btn ${state.profile.housemates==='alone'?'selected':''}" onclick="selectHousemates('alone')"><span class="emoji">🙋</span>Just me</button>
+                        <button class="option-btn ${state.profile.housemates==='partner'?'selected':''}" onclick="selectHousemates('partner')"><span class="emoji">💑</span>Partner</button>
+                        <button class="option-btn ${state.profile.housemates==='family'?'selected':''}" onclick="selectHousemates('family')"><span class="emoji">👨‍👩‍👧</span>Family</button>
+                        <button class="option-btn ${state.profile.housemates==='roommates'?'selected':''}" onclick="selectHousemates('roommates')"><span class="emoji">🏠</span>Roommates</button>
                     </div>
-                    <button class="btn btn-primary ${state.profile.housemates?'':'hidden'}" id="housemates-next" onclick="nextOnboarding()">Next →</button>
-                </div>
-            `;
+                    <button class="btn btn-primary ${state.profile.housemates?'':'hidden'}" id="housemates-next-btn" onclick="nextOnboarding()">Next →</button>
+                </div>`;
             break;
 
         case 'pets':
             container.innerHTML = `
                 <div class="onboarding-step">
-                    <h2>Any furry (or scaly) friends?</h2>
-                    <p>Pets affect how we organize your space!</p>
+                    <h2>Any pets?</h2>
+                    <p>Pets affect how we organize!</p>
                     <div class="option-grid">
-                        <button class="option-btn" onclick="addPetType('dog')"><span class="emoji">🐕</span>Dog(s)</button>
-                        <button class="option-btn" onclick="addPetType('cat')"><span class="emoji">🐈</span>Cat(s)</button>
-                        <button class="option-btn" onclick="addPetType('other')"><span class="emoji">🐾</span>Other</button>
+                        <button class="option-btn" onclick="addPet('dog')"><span class="emoji">🐕</span>Dog(s)</button>
+                        <button class="option-btn" onclick="addPet('cat')"><span class="emoji">🐈</span>Cat(s)</button>
+                        <button class="option-btn" onclick="addPet('other')"><span class="emoji">🐾</span>Other</button>
                         <button class="option-btn" onclick="noPets()"><span class="emoji">🚫</span>No pets</button>
                     </div>
-                    <div id="pet-summary" style="margin:15px 0;"></div>
-                    <button class="btn btn-primary ${state.profile.pets.length>0?'':'hidden'}" id="pets-next" onclick="nextOnboarding()">Next →</button>
-                </div>
-            `;
-            renderPetSummary();
+                    <div id="pet-list-ob" style="margin:10px 0;">${renderPetListOb()}</div>
+                    <button class="btn btn-primary ${state.profile.pets.length?'':'hidden'}" id="pets-next-btn" onclick="nextOnboarding()">Next →</button>
+                </div>`;
             break;
 
         case 'petDetails':
-            if (state.profile.pets.length === 0) {
-                nextOnboarding();
-                return;
-            }
+            if (state.profile.pets.length === 0) { nextOnboarding(); return; }
             container.innerHTML = `
                 <div class="onboarding-step">
-                    <h2>Tell me about your pets</h2>
-                    <p>This helps with storage and space planning.</p>
+                    <h2>About your pets</h2>
                     ${state.profile.pets.map((pet, i) => `
                         <div class="card" style="text-align:left;margin-bottom:10px;">
-                            <h3>${pet.type === 'dog' ? '🐕' : pet.type === 'cat' ? '🐈' : '🐾'} ${pet.type} #${i+1}</h3>
-                            <label style="font-size:0.85rem;color:var(--text-secondary);">How many?</label>
-                            <input type="number" value="${pet.count||1}" min="1" max="10" onchange="updatePet(${i},'count',this.value)">
+                            <h3>${pet.type === 'dog' ? '🐕' : pet.type === 'cat' ? '🐈' : '🐾'} ${pet.type}</h3>
+                            <label style="font-size:0.82rem;color:var(--text-secondary);">How many?</label>
+                            <input type="number" value="${pet.count||1}" min="1" max="10" onchange="updatePetOb(${i},'count',this.value)">
                             ${pet.type === 'dog' ? `
-                                <label style="font-size:0.85rem;color:var(--text-secondary);">Size</label>
-                                <select onchange="updatePet(${i},'size',this.value)">
+                                <label style="font-size:0.82rem;color:var(--text-secondary);">Size</label>
+                                <select onchange="updatePetOb(${i},'size',this.value)">
                                     <option value="small" ${pet.size==='small'?'selected':''}>Small (under 25 lbs)</option>
                                     <option value="medium" ${pet.size==='medium'?'selected':''}>Medium (25-55 lbs)</option>
                                     <option value="large" ${pet.size==='large'?'selected':''}>Large (55+ lbs)</option>
                                 </select>
                             ` : ''}
-                            <label style="font-size:0.85rem;color:var(--text-secondary);">Free roam of the house?</label>
-                            <select onchange="updatePet(${i},'roam',this.value)">
+                            <label style="font-size:0.82rem;color:var(--text-secondary);">Free roam?</label>
+                            <select onchange="updatePetOb(${i},'roam',this.value)">
                                 <option value="full" ${pet.roam==='full'?'selected':''}>Full run of the house</option>
-                                <option value="mostly" ${pet.roam==='mostly'?'selected':''}>Mostly — some rooms off-limits</option>
-                                <option value="limited" ${pet.roam==='limited'?'selected':''}>Limited to certain areas</option>
+                                <option value="mostly" ${pet.roam==='mostly'?'selected':''}>Mostly</option>
+                                <option value="limited" ${pet.roam==='limited'?'selected':''}>Limited areas</option>
                             </select>
-                            <label style="font-size:0.85rem;color:var(--text-secondary);">Dedicated space?</label>
-                            <input type="text" placeholder="e.g., 'second bathroom for litter'" value="${pet.dedicatedSpace||''}" onchange="updatePet(${i},'dedicatedSpace',this.value)">
+                            <label style="font-size:0.82rem;color:var(--text-secondary);">Dedicated space? (e.g., "2nd bathroom for litter")</label>
+                            <input type="text" value="${pet.dedicatedSpace||''}" placeholder="Optional" onchange="updatePetOb(${i},'dedicatedSpace',this.value)">
                         </div>
                     `).join('')}
                     <button class="btn btn-primary" onclick="nextOnboarding()">Next →</button>
-                </div>
-            `;
+                </div>`;
             break;
 
         case 'collections':
             container.innerHTML = `
                 <div class="onboarding-step">
                     <h2>Do you collect anything?</h2>
-                    <p>Collections are special — I'll never suggest getting rid of these unless YOU bring it up.</p>
-                    <div id="collection-tags" style="margin-bottom:15px;">
-                        ${['Books','Funko Pops','Vinyl/Records','Art','Plants','Shoes','Video Games','Manga/Comics','Candles','Mugs','Other'].map(c => `
+                    <p>I'll never suggest getting rid of these unless YOU bring it up. 💛</p>
+                    <div style="margin-bottom:12px;">
+                        ${['Books','Funko Pops','Vinyl/Records','Art','Plants','Shoes','Video Games','Manga/Comics','Candles','Mugs'].map(c => `
                             <span class="tag ${state.profile.collections.includes(c)?'selected':''}" onclick="toggleCollection('${c}')">${c}</span>
                         `).join('')}
                     </div>
-                    <div style="display:flex;gap:8px;margin-bottom:15px;">
-                        <input type="text" id="custom-collection" placeholder="Add your own..." style="margin:0;flex:1;">
-                        <button class="btn btn-small btn-secondary" onclick="addCustomCollection()">+</button>
+                    <div style="display:flex;gap:8px;margin-bottom:12px;">
+                        <input type="text" id="custom-collection-input" placeholder="Add your own..." style="margin:0;flex:1;">
+                        <button class="btn btn-small btn-primary" onclick="addCustomCollectionOb()">+</button>
                     </div>
                     <button class="btn btn-primary" onclick="nextOnboarding()">Next →</button>
-                    <button class="btn btn-secondary" onclick="nextOnboarding()">I don't collect anything</button>
-                </div>
-            `;
+                    <button class="btn btn-secondary" onclick="nextOnboarding()">Skip</button>
+                </div>`;
             break;
 
         case 'location':
             container.innerHTML = `
                 <div class="onboarding-step">
                     <h2>Where are you located?</h2>
-                    <p>Just city/state — so I can suggest local donation spots when you're ready to let things go.</p>
-                    <input type="text" id="ob-location" placeholder="e.g., San Jose, CA" value="${state.profile.location}" style="text-align:center;">
+                    <p>City/state — so I can suggest local donation & disposal spots.</p>
+                    <input type="text" id="ob-location" placeholder="e.g., Sacramento, CA" value="${state.profile.location}" style="text-align:center;">
                     <button class="btn btn-primary" onclick="saveLocation()">Next →</button>
-                    <button class="btn btn-secondary" onclick="nextOnboarding()">Skip for now</button>
-                </div>
-            `;
+                    <button class="btn btn-secondary" onclick="nextOnboarding()">Skip</button>
+                </div>`;
             break;
 
         case 'theme':
             container.innerHTML = `
                 <div class="onboarding-step">
                     <h2>Pick your vibe 🎨</h2>
-                    <p>You can always change this later.</p>
+                    <p>Changes your background & colors. Switch anytime in Settings.</p>
                     <div class="option-grid">
                         <button class="option-btn ${state.profile.theme==='meadow'?'selected':''}" onclick="selectTheme('meadow')"><span class="emoji">🌿</span>Meadow</button>
                         <button class="option-btn ${state.profile.theme==='reef'?'selected':''}" onclick="selectTheme('reef')"><span class="emoji">🐠</span>Reef</button>
@@ -1156,25 +1395,22 @@ function renderOnboardingStep() {
                         <button class="option-btn ${state.profile.theme==='midnight'?'selected':''}" onclick="selectTheme('midnight')"><span class="emoji">🌙</span>Midnight</button>
                     </div>
                     <button class="btn btn-primary" onclick="nextOnboarding()">Next →</button>
-                </div>
-            `;
+                </div>`;
             break;
 
         case 'vibe':
             container.innerHTML = `
                 <div class="onboarding-step">
                     <h2>How should I talk to you?</h2>
-                    <p>This adjusts my tone. Slide to your preference.</p>
-                    <div class="slider-container">
-                        <label><span>🧘 Chill & calm</span><span>🎉 Hype & energetic</span></label>
-                        <input type="range" min="0" max="100" value="${state.profile.vibe}" oninput="state.profile.vibe=this.value;saveState();">
-                    </div>
-                    <div class="card" style="margin-top:15px;">
-                        <p style="font-style:italic;" id="vibe-preview">I'll adapt to what you need in the moment, too.</p>
+                    <div class="vibe-slider">
+                        <div class="vibe-labels"><span>🧘 Chill</span><span>🎉 Hype</span></div>
+                        <input type="range" min="0" max="100" value="${state.profile.vibe}" oninput="state.profile.vibe=parseInt(this.value);saveState();">
+                        <div class="vibe-notches">
+                            <span>Calm</span><span>Gentle</span><span>Balanced</span><span>Upbeat</span><span>Energetic</span>
+                        </div>
                     </div>
                     <button class="btn btn-primary" onclick="nextOnboarding()">Next →</button>
-                </div>
-            `;
+                </div>`;
             break;
 
         case 'privacy':
@@ -1182,20 +1418,15 @@ function renderOnboardingStep() {
                 <div class="onboarding-step">
                     <div class="emoji-big">🔒</div>
                     <h2>Your Privacy</h2>
-                    <p>Here's the deal:</p>
                     <div class="card" style="text-align:left;">
-                        <p style="margin-bottom:10px;">✅ Everything you enter stays <strong>on this device only</strong></p>
-                        <p style="margin-bottom:10px;">✅ No account, no cloud, no tracking</p>
-                        <p style="margin-bottom:10px;">✅ AI helps you think — but it <strong>doesn't keep your info</strong></p>
-                        <p style="margin-bottom:10px;">✅ Each conversation is stateless — the AI forgets after each chat</p>
+                        <p style="margin-bottom:8px;">✅ Everything stays <strong>on this device only</strong></p>
+                        <p style="margin-bottom:8px;">✅ No account, no cloud, no tracking</p>
+                        <p style="margin-bottom:8px;">✅ AI helps you think — it <strong>doesn't keep your info</strong></p>
+                        <p style="margin-bottom:8px;">✅ Photos are processed & forgotten (not stored)</p>
                         <p>✅ You can export or delete everything anytime</p>
                     </div>
-                    <p style="margin-top:15px;color:var(--text-muted);font-size:0.85rem;">
-                        The AI is a tool, like a calculator. It processes and responds — it doesn't store or judge.
-                    </p>
                     <button class="btn btn-primary" onclick="nextOnboarding()">Got it →</button>
-                </div>
-            `;
+                </div>`;
             break;
 
         case 'done':
@@ -1203,30 +1434,31 @@ function renderOnboardingStep() {
                 <div class="onboarding-step">
                     <div class="emoji-big">🎉</div>
                     <h2>You're all set, ${state.profile.name}!</h2>
-                    <p>Home Brain is ready. Here's what you can do:</p>
                     <div class="card" style="text-align:left;">
-                        <p style="margin-bottom:8px;">🏠 <strong>My Space</strong> — see your rooms & storage</p>
-                        <p style="margin-bottom:8px;">🧠 <strong>Help Me</strong> — ask anything, show photos</p>
-                        <p style="margin-bottom:8px;">✅ <strong>Focus</strong> — timed tasks, tiny steps</p>
-                        <p style="margin-bottom:8px;">♻️ <strong>Let Go</strong> — when you're ready to release things</p>
-                        <p>🏆 <strong>Stars</strong> — celebrate your wins</p>
+                        <p style="margin-bottom:6px;">🏠 <strong>Space</strong> — your rooms & storage</p>
+                        <p style="margin-bottom:6px;">🧠 <strong>Help</strong> — ask anything, show photos</p>
+                        <p style="margin-bottom:6px;">✅ <strong>Focus</strong> — timed tasks, tiny steps</p>
+                        <p style="margin-bottom:6px;">📦 <strong>Items</strong> — sort into buckets</p>
+                        <p style="margin-bottom:6px;">♻️ <strong>Let Go</strong> — when you're ready</p>
+                        <p>🏆 <strong>Stars</strong> — celebrate wins</p>
                     </div>
                     <button class="btn btn-primary" onclick="finishOnboarding()">Let's Go! 🚀</button>
-                </div>
-            `;
+                </div>`;
             break;
     }
 }
 
-function nextOnboarding() {
-    onboardingStep++;
-    renderOnboardingStep();
-    saveState();
+function nextOnboarding() { onboardingStep++; renderOnboardingStep(); saveState(); }
+
+function saveObApiKey() {
+    const key = document.getElementById('ob-apikey').value.trim();
+    if (key) localStorage.setItem('homeBrain_apiKey', key);
+    nextOnboarding();
 }
 
 function saveName() {
     const name = document.getElementById('ob-name').value.trim();
-    if (!name) { alert('Please enter a name!'); return; }
+    if (!name) return;
     state.profile.name = name;
     saveState();
     nextOnboarding();
@@ -1235,38 +1467,77 @@ function saveName() {
 function selectGoal(goal) {
     state.profile.goal = goal;
     saveState();
-    document.querySelectorAll('#onboarding .option-btn').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
     event.target.closest('.option-btn').classList.add('selected');
-    document.getElementById('goal-next').classList.remove('hidden');
+    document.getElementById('goal-next-btn').classList.remove('hidden');
 }
 
 function selectSpace(type) {
     state.profile.spaceType = type;
     saveState();
-    document.querySelectorAll('#onboarding .option-btn').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
     event.target.closest('.option-btn').classList.add('selected');
-    document.getElementById('space-next').classList.remove('hidden');
+    document.getElementById('space-next-btn').classList.remove('hidden');
 }
 
-function getSuggestedRooms() {
-    const base = ['Bedroom', 'Bathroom', 'Kitchen', 'Living Room'];
-    if (state.profile.spaceType === 'room') return ['Bedroom', 'Closet', 'Desk Area'];
-    if (state.profile.spaceType === 'apartment') return [...base, 'Hall Closet', 'Balcony/Patio'];
-    if (state.profile.spaceType === 'house') return [...base, 'Bedroom 2', 'Bathroom 2', 'Garage', 'Hall Closet', 'Laundry Room', 'Dining Room'];
-    if (state.profile.spaceType === 'mobile') return [...base, 'Bedroom 2', 'Bathroom 2', 'Hall Closet', 'Outdoor Storage/Shed', 'Porch'];
-    return base;
+function getRoomSuggestionHTML() {
+    let suggestions = [];
+    const type = state.profile.spaceType;
+    if (type === 'room') suggestions = ['Bedroom','Closet','Desk Area','Bathroom'];
+    else if (type === 'apartment') suggestions = ['Bedroom','Bathroom','Kitchen','Living Room','Hall Closet','Balcony/Patio'];
+    else if (type === 'house') suggestions = ['Bedroom','Bathroom','Kitchen','Living Room','Dining Room','Garage','Hall Closet','Laundry Room','Office'];
+    else if (type === 'mobile') suggestions = ['Bedroom','Bathroom','Kitchen','Living Room','Hall Closet','Porch','Outdoor Storage'];
+    else suggestions = ['Bedroom','Bathroom','Kitchen','Living Room'];
+
+    return suggestions.map(r => {
+        const isMultiple = ['Bedroom','Bathroom','Closet','Hall Closet'].includes(r);
+        return `<span class="tag ${state.profile.rooms.includes(r)?'selected':''}" onclick="toggleRoomOb('${r}', ${isMultiple})">${r}</span>`;
+    }).join('');
 }
 
-function toggleRoom(room) {
-    const idx = state.profile.rooms.indexOf(room);
-    if (idx > -1) state.profile.rooms.splice(idx, 1);
-    else state.profile.rooms.push(room);
+function toggleRoomOb(room, isMultiple) {
+    if (state.profile.rooms.includes(room)) {
+        state.profile.rooms = state.profile.rooms.filter(r => r !== room && !r.startsWith(room + ' '));
+    } else if (isMultiple) {
+        // Ask how many
+        showModal('confirm', {
+            title: `How many ${room}s?`,
+            message: `<div class="option-grid" style="margin-top:10px;">
+                ${[1,2,3,4].map(n => `<button class="option-btn" onclick="addMultipleRooms('${room}',${n})">${n}</button>`).join('')}
+            </div>`,
+            confirmText: '',
+            onConfirm: ''
+        });
+        // Override modal with custom content
+        const modal = document.querySelector('.modal');
+        if (modal) {
+            modal.querySelector('.modal-actions').innerHTML = `<button class="btn btn-secondary" onclick="closeModal()">Cancel</button>`;
+        }
+        return;
+    } else {
+        state.profile.rooms.push(room);
+    }
     saveState();
     renderOnboardingStep();
 }
 
-function addCustomRoom() {
-    const input = document.getElementById('custom-room');
+function addMultipleRooms(base, count) {
+    // Remove any existing versions
+    state.profile.rooms = state.profile.rooms.filter(r => r !== base && !r.startsWith(base + ' '));
+    if (count === 1) {
+        state.profile.rooms.push(base);
+    } else {
+        for (let i = 1; i <= count; i++) {
+            state.profile.rooms.push(`${base} ${i}`);
+        }
+    }
+    saveState();
+    closeModal();
+    renderOnboardingStep();
+}
+
+function addCustomRoomOb() {
+    const input = document.getElementById('custom-room-input');
     const room = input.value.trim();
     if (room && !state.profile.rooms.includes(room)) {
         state.profile.rooms.push(room);
@@ -1276,32 +1547,34 @@ function addCustomRoom() {
     }
 }
 
-function generateStorageChecklist() {
-    const storageTypes = [
-        { id: 'closets', label: '🚪 Closets (reach-in)', icon: '' },
-        { id: 'walkin', label: '🚶 Walk-in closet', icon: '' },
-        { id: 'dressers', label: '🗄️ Dressers/Drawer units', icon: '' },
-        { id: 'builtins', label: '📐 Built-in drawers/cabinets', icon: '' },
-        { id: 'bookshelves', label: '📚 Bookshelves/Display shelves', icon: '' },
-        { id: 'underbed', label: '🛏️ Under-bed space', icon: '' },
-        { id: 'hallcloset', label: '🚪 Hall/Linen closet', icon: '' },
-        { id: 'pantry', label: '🥫 Pantry', icon: '' },
-        { id: 'laundry', label: '🧺 Laundry room/area with storage', icon: '' },
-        { id: 'garage', label: '🚗 Garage', icon: '' },
-        { id: 'shed', label: '🏚️ Outdoor shed', icon: '' },
-        { id: 'attic', label: '🏠 Attic (accessible)', icon: '' },
-        { id: 'basement', label: '⬇️ Basement', icon: '' },
-        { id: 'porch', label: '🪑 Porch/patio storage', icon: '' },
-        { id: 'cabinets', label: '🗃️ Kitchen/Bathroom cabinets', icon: '' }
+function removeRoomOb(room) {
+    state.profile.rooms = state.profile.rooms.filter(r => r !== room);
+    saveState();
+    renderOnboardingStep();
+}
+
+function getStorageHTML() {
+    const types = [
+        {id:'closets',label:'🚪 Closets (reach-in)'},
+        {id:'walkin',label:'🚶 Walk-in closet'},
+        {id:'dressers',label:'🗄️ Dressers/Drawer units'},
+        {id:'builtins',label:'📐 Built-in drawers/cabinets'},
+        {id:'bookshelves',label:'📚 Bookshelves/Display shelves'},
+        {id:'underbed',label:'🛏️ Under-bed space'},
+        {id:'hallcloset',label:'🚪 Hall/Linen closet'},
+        {id:'pantry',label:'🥫 Pantry'},
+        {id:'laundry',label:'🧺 Laundry room storage'},
+        {id:'garage',label:'🚗 Garage'},
+        {id:'shed',label:'🏚️ Outdoor shed'},
+        {id:'attic',label:'🏠 Attic'},
+        {id:'basement',label:'⬇️ Basement'},
+        {id:'cabinets',label:'🗃️ Kitchen/Bath cabinets'}
     ];
-
     if (!state.profile.storage) state.profile.storage = {};
-
-    return storageTypes.map(s => `
-        <div class="check-item">
-            <input type="checkbox" id="storage-${s.id}" ${state.profile.storage[s.id]?'checked':''} 
-                onchange="state.profile.storage['${s.id}']=this.checked;saveState();">
-            <label for="storage-${s.id}">${s.label}</label>
+    return types.map(s => `
+        <div class="step-item">
+            <input type="checkbox" id="st-${s.id}" ${state.profile.storage[s.id]?'checked':''} onchange="state.profile.storage['${s.id}']=this.checked;saveState();">
+            <label for="st-${s.id}">${s.label}</label>
         </div>
     `).join('');
 }
@@ -1313,73 +1586,54 @@ function selectSpaceFeel(feel) {
     event.target.closest('.option-btn').classList.add('selected');
 }
 
-function saveStorage() {
-    nextOnboarding();
-}
-
 function selectHousemates(type) {
     state.profile.housemates = type;
     saveState();
     document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
     event.target.closest('.option-btn').classList.add('selected');
-    document.getElementById('housemates-next').classList.remove('hidden');
+    document.getElementById('housemates-next-btn').classList.remove('hidden');
 }
 
-function addPetType(type) {
-    state.profile.pets.push({ type, count: 1, size: 'medium', roam: 'full', dedicatedSpace: '' });
+function addPet(type) {
+    state.profile.pets.push({type, count:1, size:'medium', roam:'full', dedicatedSpace:''});
     saveState();
-    document.getElementById('pets-next').classList.remove('hidden');
-    renderPetSummary();
+    document.getElementById('pets-next-btn').classList.remove('hidden');
+    document.getElementById('pet-list-ob').innerHTML = renderPetListOb();
 }
 
-function noPets() {
-    state.profile.pets = [];
-    saveState();
-    nextOnboarding(); // Skip pet details
-    onboardingStep++; // Extra skip
-}
+function noPets() { state.profile.pets = []; saveState(); nextOnboarding(); onboardingStep++; }
 
-function renderPetSummary() {
-    const container = document.getElementById('pet-summary');
-    if (!container) return;
-    if (state.profile.pets.length === 0) {
-        container.innerHTML = '';
-        return;
-    }
-    container.innerHTML = state.profile.pets.map((p, i) => `
-        <span class="tag selected">${p.type === 'dog' ? '🐕' : p.type === 'cat' ? '🐈' : '🐾'} ${p.type}
-            <span onclick="event.stopPropagation();removePet(${i})" style="cursor:pointer;margin-left:5px;">✕</span>
-        </span>
+function renderPetListOb() {
+    return state.profile.pets.map((p,i) => `
+        <span class="tag selected">${p.type==='dog'?'🐕':p.type==='cat'?'🐈':'🐾'} ${p.type} <span onclick="event.stopPropagation();removePetOb(${i})" style="cursor:pointer;">✕</span></span>
     `).join('');
 }
 
-function removePet(index) {
-    state.profile.pets.splice(index, 1);
+function removePetOb(i) {
+    state.profile.pets.splice(i,1);
     saveState();
-    renderPetSummary();
-    if (state.profile.pets.length === 0) {
-        document.getElementById('pets-next').classList.add('hidden');
-    }
+    document.getElementById('pet-list-ob').innerHTML = renderPetListOb();
+    if (!state.profile.pets.length) document.getElementById('pets-next-btn').classList.add('hidden');
 }
 
-function updatePet(index, field, value) {
-    state.profile.pets[index][field] = field === 'count' ? parseInt(value) : value;
+function updatePetOb(i, field, val) {
+    state.profile.pets[i][field] = field==='count' ? parseInt(val) : val;
     saveState();
 }
 
 function toggleCollection(item) {
     const idx = state.profile.collections.indexOf(item);
-    if (idx > -1) state.profile.collections.splice(idx, 1);
+    if (idx > -1) state.profile.collections.splice(idx,1);
     else state.profile.collections.push(item);
     saveState();
     renderOnboardingStep();
 }
 
-function addCustomCollection() {
-    const input = document.getElementById('custom-collection');
-    const collection = input.value.trim();
-    if (collection && !state.profile.collections.includes(collection)) {
-        state.profile.collections.push(collection);
+function addCustomCollectionOb() {
+    const input = document.getElementById('custom-collection-input');
+    const val = input.value.trim();
+    if (val && !state.profile.collections.includes(val)) {
+        state.profile.collections.push(val);
         saveState();
         input.value = '';
         renderOnboardingStep();
@@ -1387,8 +1641,7 @@ function addCustomCollection() {
 }
 
 function saveLocation() {
-    const loc = document.getElementById('ob-location').value.trim();
-    state.profile.location = loc;
+    state.profile.location = document.getElementById('ob-location').value.trim();
     saveState();
     nextOnboarding();
 }
@@ -1397,7 +1650,8 @@ function selectTheme(theme) {
     state.profile.theme = theme;
     saveState();
     applyTheme();
-    renderOnboardingStep();
+    document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+    event.target.closest('.option-btn').classList.add('selected');
 }
 
 function finishOnboarding() {
@@ -1412,49 +1666,39 @@ function showMainApp() {
     document.getElementById('onboarding').classList.remove('active');
     document.getElementById('main-app').classList.remove('hidden');
     document.getElementById('main-nav').classList.remove('hidden');
-
-    // Check streak
     updateStreak();
-
-    // Show daily check-in
     navigate('checkin');
 }
 
 function navigate(view) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('#main-app .view').forEach(v => v.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
 
-    document.getElementById(`view-${view}`).classList.add('active');
+    const el = document.getElementById(`view-${view}`);
+    if (el) el.classList.add('active');
 
-    // Highlight nav
-    const navBtns = document.querySelectorAll('.nav-btn');
-    const navMap = { home: 0, help: 1, focus: 2, letgo: 3, progress: 4, settings: 5 };
-    if (navMap[view] !== undefined) navBtns[navMap[view]].classList.add('active');
+    const navMap = {home:0, help:1, focus:2, buckets:3, letgo:4, progress:5, settings:6};
+    if (navMap[view] !== undefined) document.querySelectorAll('.nav-btn')[navMap[view]]?.classList.add('active');
 
-    // Render view content
     switch(view) {
         case 'checkin': renderCheckin(); break;
         case 'home': renderHome(); break;
-        case 'help': renderHelp(); break;
         case 'focus': renderFocus(); break;
+        case 'buckets': renderBuckets(); break;
         case 'letgo': renderLetGo(); break;
         case 'progress': renderProgress(); break;
         case 'settings': renderSettings(); break;
+        case 'help': renderHelp(); break;
     }
 }
 
-// ======================== STREAK & MOOD ========================
+// ======================== STREAK ========================
 function updateStreak() {
     const today = new Date().toDateString();
     const yesterday = new Date(Date.now() - 86400000).toDateString();
-
-    if (state.lastActive === today) {
-        // Already active today
-    } else if (state.lastActive === yesterday) {
-        state.streak++;
-    } else if (state.lastActive !== today) {
-        state.streak = 1;
-    }
+    if (state.lastActive === today) return;
+    else if (state.lastActive === yesterday) state.streak++;
+    else state.streak = 1;
     state.lastActive = today;
     saveState();
 }
@@ -1464,99 +1708,212 @@ function setMood(mood) {
     saveState();
     document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
     document.querySelector(`[data-mood="${mood}"]`).classList.add('active');
-
-    setTimeout(() => navigate('home'), 500);
+    setTimeout(() => navigate('home'), 400);
 }
 
 function renderCheckin() {
-    document.getElementById('greeting-text').textContent = getGreeting();
-    if (state.streak > 1) {
-        document.getElementById('streak-display').classList.remove('hidden');
-        document.getElementById('streak-display').innerHTML = `
-            <span class="streak-badge">🔥 ${state.streak} day streak!</span>
-        `;
-    }
-}
-
-function getGreeting() {
     const hour = new Date().getHours();
     const name = state.profile.name;
-    if (hour < 12) return `Good morning, ${name}! ☀️`;
-    if (hour < 17) return `Hey ${name}! 👋`;
-    return `Evening, ${name} 🌙`;
+    let greeting = hour < 12 ? `Good morning, ${name}! ☀️` : hour < 17 ? `Hey ${name}! 👋` : `Evening, ${name} 🌙`;
+    document.getElementById('greeting-text').textContent = greeting;
+    document.getElementById('streak-display').innerHTML = state.streak > 1 
+        ? `<span class="streak-badge">🔥 ${state.streak} day streak!</span>` : '';
 }
 
-// ======================== HOME / MY SPACE ========================
+// ======================== MY SPACE ========================
 function renderHome() {
-    const container = document.getElementById('rooms-list');
-    if (state.profile.rooms.length === 0) {
-        container.innerHTML = `<p style="text-align:center;color:var(--text-muted);padding:30px;">No rooms set up yet. Add some!</p>`;
+    const grid = document.getElementById('rooms-grid');
+    if (!state.profile.rooms.length) {
+        grid.innerHTML = `<p style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:20px;">No rooms yet!</p>`;
         return;
     }
-
-    container.innerHTML = state.profile.rooms.map((room, i) => {
-        const items = state.items.filter(item => item.room === room);
-        return `
-            <div class="card" onclick="viewRoom('${room}')">
-                <h3>${getRoomEmoji(room)} ${room}</h3>
-                <p>${items.length} items tracked</p>
-            </div>
-        `;
+    grid.innerHTML = state.profile.rooms.map(room => {
+        const count = state.items.filter(i => i.room === room && i.bucket === 'keep').length;
+        return `<div class="room-tile" onclick="viewRoom('${room}')">
+            <span class="emoji">${getRoomEmoji(room)}</span>
+            <div class="name">${room}</div>
+            <div class="count">${count} item${count!==1?'s':''}</div>
+        </div>`;
     }).join('');
 }
 
 function getRoomEmoji(room) {
-    const map = {
-        'Bedroom': '🛏️', 'Bathroom': '🛁', 'Kitchen': '🍳', 'Living Room': '🛋️',
-        'Garage': '🚗', 'Closet': '🚪', 'Hall Closet': '🚪', 'Laundry Room': '🧺',
-        'Dining Room': '🍽️', 'Office': '💻', 'Porch': '🪑', 'Shed': '🏚️',
-        'Attic': '📦', 'Basement': '⬇️', 'Balcony/Patio': '🌿', 'Desk Area': '💻'
-    };
-    for (let key in map) {
-        if (room.toLowerCase().includes(key.toLowerCase())) return map[key];
-    }
+    const r = room.toLowerCase();
+    if (r.includes('bedroom') || r.includes('bed')) return '🛏️';
+    if (r.includes('bathroom') || r.includes('bath')) return '🛁';
+    if (r.includes('kitchen')) return '🍳';
+    if (r.includes('living')) return '🛋️';
+    if (r.includes('garage')) return '🚗';
+    if (r.includes('closet')) return '🚪';
+    if (r.includes('laundry')) return '🧺';
+    if (r.includes('dining')) return '🍽️';
+    if (r.includes('office') || r.includes('desk')) return '💻';
+    if (r.includes('porch') || r.includes('patio') || r.includes('balcony')) return '🪑';
+    if (r.includes('shed') || r.includes('storage')) return '🏚️';
+    if (r.includes('attic')) return '📦';
+    if (r.includes('basement')) return '⬇️';
     return '📍';
 }
 
 function viewRoom(room) {
-    const items = state.items.filter(item => item.room === room);
+    const items = state.items.filter(i => i.room === room);
     const container = document.getElementById('room-detail-content');
     container.innerHTML = `
         <div class="view-header">
             <h2>${getRoomEmoji(room)} ${room}</h2>
-            <p>${items.length} items</p>
+            <p>${items.length} item${items.length!==1?'s':''}</p>
         </div>
-        ${items.length > 0 ? items.map((item, i) => `
-            <div class="card">
-                <h3>${item.name}</h3>
-                <p>📍 ${item.location || 'No specific spot'}</p>
-                ${item.notes ? `<p style="margin-top:5px;font-size:0.85rem;">${item.notes}</p>` : ''}
-            </div>
-        `).join('') : '<p style="text-align:center;color:var(--text-muted);padding:20px;">No items tracked here yet.</p>'}
-        <button class="btn btn-primary" onclick="addItemToRoom('${room}')">+ Add Item</button>
+        ${items.length ? items.map((item, idx) => {
+            const globalIdx = state.items.indexOf(item);
+            return `<div class="item-card">
+                <div class="item-name">${item.name}</div>
+                <div class="item-meta">${item.location ? '📍 '+item.location : ''} ${item.bucket ? '• '+getBucketLabel(item.bucket) : ''}</div>
+                ${item.tags?.length ? `<div class="item-tags">${item.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
+                <div class="item-actions">
+                    <button onclick="showModal('editItem',{item:state.items[${globalIdx}],index:${globalIdx}})">✏️ Edit</button>
+                    <button onclick="moveItemRoom(${globalIdx})">🚚 Move</button>
+                    <button onclick="confirmDeleteItem(${globalIdx})">🗑️</button>
+                </div>
+            </div>`;
+        }).join('') : '<p style="color:var(--text-muted);text-align:center;padding:20px;">Nothing here yet.</p>'}
+        <button class="btn btn-primary" onclick="addItemToRoom('${room}')">+ Add Item Here</button>
         <button class="btn btn-secondary" onclick="photoScanRoom('${room}')">📸 Scan This Space</button>
-        <button class="btn btn-secondary" onclick="navigate('home')">← Back</button>
     `;
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('#main-app .view').forEach(v => v.classList.remove('active'));
     document.getElementById('view-room').classList.add('active');
 }
 
-function showAddRoom() {
-    const room = prompt('Room name:');
-    if (room && !state.profile.rooms.includes(room)) {
-        state.profile.rooms.push(room);
-        saveState();
-        renderHome();
-    }
+function addItemToRoom(room) {
+    selectedBucket = 'keep';
+    showModal('addItem');
+    // Pre-fill room after modal renders
+    setTimeout(() => {
+        const roomSelect = document.getElementById('modal-item-room');
+        if (roomSelect) roomSelect.value = room;
+    }, 50);
 }
 
-function addItemToRoom(room) {
-    const name = prompt('What item(s)?');
-    if (!name) return;
-    const location = prompt('Where specifically? (e.g., "top shelf", "under sink")') || '';
-    state.items.push({ name, room, location, notes: '', added: new Date().toISOString() });
+function moveItemRoom(index) {
+    // Simple room move via modal
+    const item = state.items[index];
+    const html = `
+        <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+            <div class="modal">
+                <h3>Move "${item.name}" to...</h3>
+                ${state.profile.rooms.map(r => `
+                    <button class="btn btn-secondary" style="margin-bottom:6px;" onclick="state.items[${index}].room='${r}';saveState();closeModal();viewRoom('${r}');">${getRoomEmoji(r)} ${r}</button>
+                `).join('')}
+                <button class="btn btn-secondary" onclick="closeModal()" style="margin-top:5px;">Cancel</button>
+            </div>
+        </div>`;
+    document.getElementById('modal-container').innerHTML = html;
+}
+
+function getBucketLabel(bucket) {
+    return {keep:'🏠 Keep', give:'🎁 Give', toss:'🗑️ Toss', unsure:'🤷 Unsure'}[bucket] || bucket;
+}
+
+// ======================== BUCKETS ========================
+function renderBuckets() {
+    const buckets = ['keep','give','toss','unsure'];
+    const labels = {keep:'Keep',give:'Give Away',toss:'Toss',unsure:'Unsure'};
+    const emojis = {keep:'🏠',give:'🎁',toss:'🗑️',unsure:'🤷'};
+
+    const grid = document.getElementById('bucket-grid');
+    grid.innerHTML = buckets.map(b => {
+        const count = state.items.filter(i => i.bucket === b && !i.completed).length;
+        return `<div class="bucket-tile" onclick="renderBucketDetail('${b}')">
+            <span class="emoji">${emojis[b]}</span>
+            <div class="label">${labels[b]}</div>
+            <div class="count">${count} item${count!==1?'s':''}</div>
+        </div>`;
+    }).join('');
+}
+
+function renderBucketDetail(bucket) {
+    const labels = {keep:'🏠 Keep',give:'🎁 Give Away',toss:'🗑️ Toss',unsure:'🤷 Unsure'};
+    const items = state.items.filter(i => i.bucket === bucket && !i.completed);
+
+    // Get unique tags for filtering
+    const allTags = [...new Set(items.flatMap(i => i.tags || []))];
+
+    const container = document.getElementById('bucket-detail-content');
+    container.innerHTML = `
+        <div class="view-header">
+            <h2>${labels[bucket]}</h2>
+            <p>${items.length} item${items.length!==1?'s':''}</p>
+        </div>
+        ${allTags.length ? `
+            <div style="margin-bottom:12px;overflow-x:auto;white-space:nowrap;">
+                <span class="tag selected" onclick="filterBucketTag('${bucket}','')">All</span>
+                ${allTags.map(t => `<span class="tag" onclick="filterBucketTag('${bucket}','${t}')">${t}</span>`).join('')}
+            </div>
+        ` : ''}
+        <div id="bucket-items-list">
+            ${items.map((item, idx) => {
+                const globalIdx = state.items.indexOf(item);
+                return `<div class="item-card">
+                    <div class="item-name">${item.name}</div>
+                    ${item.tags?.length ? `<div class="item-tags">${item.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
+                    <div class="item-actions">
+                        <button onclick="showModal('editItem',{item:state.items[${globalIdx}],index:${globalIdx}})">✏️</button>
+                        ${bucket === 'unsure' ? `<button onclick="helpDecide(${globalIdx})">🧠 Help</button>` : ''}
+                        ${bucket !== 'keep' ? `<button onclick="moveItemBucket(${globalIdx},'keep')">🏠</button>` : ''}
+                        ${bucket !== 'give' ? `<button onclick="moveItemBucket(${globalIdx},'give')">🎁</button>` : ''}
+                        ${bucket !== 'toss' ? `<button onclick="moveItemBucket(${globalIdx},'toss')">🗑️</button>` : ''}
+                        ${bucket !== 'unsure' ? `<button onclick="moveItemBucket(${globalIdx},'unsure')">🤷</button>` : ''}
+                    </div>
+                </div>`;
+            }).join('')}
+        </div>
+        ${items.length > 0 ? `<button class="btn btn-primary mt-10" onclick="signOffBucket('${bucket}')">✅ All Done! Mark Complete</button>` : ''}
+    `;
+
+    document.querySelectorAll('#main-app .view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-bucket-detail').classList.add('active');
+}
+
+function moveItemBucket(index, newBucket) {
+    state.items[index].bucket = newBucket;
     saveState();
-    viewRoom(room);
+    renderBucketDetail(newBucket);
+}
+
+function signOffBucket(bucket) {
+    const items = state.items.filter(i => i.bucket === bucket && !i.completed);
+    items.forEach(item => {
+        item.completed = true;
+        if (bucket === 'give' || bucket === 'toss') {
+            state.releasedItems.push({name: item.name, released: new Date().toISOString()});
+        }
+    });
+    state.stars += items.length;
+    saveState();
+    celebrate();
+    navigate('buckets');
+}
+
+function helpDecide(index) {
+    const item = state.items[index];
+    navigate('help');
+    sendChatMessage(`Help me decide about: "${item.name}". I'm not sure if I should keep it, give it away, or toss it. Ask me questions to help me figure it out.`);
+}
+
+function filterBucketTag(bucket, tag) {
+    // Simple filter re-render
+    const items = state.items.filter(i => i.bucket === bucket && !i.completed && (!tag || (i.tags||[]).includes(tag)));
+    const listEl = document.getElementById('bucket-items-list');
+    listEl.innerHTML = items.map((item) => {
+        const globalIdx = state.items.indexOf(item);
+        return `<div class="item-card">
+            <div class="item-name">${item.name}</div>
+            ${item.tags?.length ? `<div class="item-tags">${item.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
+            <div class="item-actions">
+                <button onclick="showModal('editItem',{item:state.items[${globalIdx}],index:${globalIdx}})">✏️</button>
+                ${bucket === 'unsure' ? `<button onclick="helpDecide(${globalIdx})">🧠 Help</button>` : ''}
+            </div>
+        </div>`;
+    }).join('') || '<p style="color:var(--text-muted);text-align:center;">No items with this tag.</p>';
 }
 
 // ======================== HELP ME (AI CHAT) ========================
@@ -1564,16 +1921,10 @@ let chatMessages = [];
 
 function renderHelp() {
     const container = document.getElementById('chat-container');
-    if (chatMessages.length === 0) {
-        container.innerHTML = `
-            <div class="chat-bubble ai">
-                Hey ${state.profile.name}! 👋 I know your space — ask me anything. Where should something go? Need help deciding? Show me a photo? I'm here.
-            </div>
-        `;
+    if (!chatMessages.length) {
+        container.innerHTML = `<div class="chat-bubble ai">Hey ${state.profile.name}! 👋 Ask me anything about your space. Where should something go? Need help deciding? Show me a photo?</div>`;
     } else {
-        container.innerHTML = chatMessages.map(m => `
-            <div class="chat-bubble ${m.role === 'user' ? 'user' : 'ai'}">${m.content}</div>
-        `).join('');
+        container.innerHTML = chatMessages.map(m => `<div class="chat-bubble ${m.role==='user'?'user':'ai'}">${formatMessage(m.content)}</div>`).join('');
     }
     container.scrollTop = container.scrollHeight;
 }
@@ -1583,106 +1934,85 @@ function quickPrompt(type) {
     switch(type) {
         case 'where': input.value = "Where should I put "; input.focus(); break;
         case 'decide': input.value = "Help me decide between "; input.focus(); break;
-        case 'overwhelm': input.value = "I'm feeling overwhelmed. "; sendChatMessage("I'm feeling overwhelmed and don't know where to start."); break;
-        case 'photo': document.getElementById('help-photo-input').click(); break;
+        case 'overwhelm': sendChatMessage("I'm feeling overwhelmed and don't know where to start."); break;
+        case 'photo':
+            if (!state.photoDisclaimer) { showModal('photoDisclaimer'); return; }
+            document.getElementById('help-photo-input').click();
+            break;
     }
 }
 
 async function sendChat() {
     const input = document.getElementById('chat-input');
-    const message = input.value.trim();
-    if (!message) return;
+    const msg = input.value.trim();
+    if (!msg) return;
     input.value = '';
-    await sendChatMessage(message);
+    await sendChatMessage(msg);
 }
 
 async function sendChatMessage(message, imageBase64 = null) {
     const apiKey = localStorage.getItem('homeBrain_apiKey');
     if (!apiKey) {
-        alert('Please set your API key in Settings first!');
-        navigate('settings');
+        showModal('confirm', {title:'API Key Needed', message:'Go to Settings to add your OpenAI API key.', confirmText:'Go to Settings', onConfirm:"closeModal();navigate('settings')"});
         return;
     }
 
-    chatMessages.push({ role: 'user', content: message });
+    chatMessages.push({role:'user', content: message});
     renderHelp();
 
-    // Add loading
     const container = document.getElementById('chat-container');
-    container.innerHTML += `<div class="chat-bubble ai" id="typing-indicator"><div class="spinner" style="width:20px;height:20px;border-width:2px;"></div></div>`;
+    container.innerHTML += `<div class="chat-bubble ai" id="typing"><div class="spinner"></div></div>`;
     container.scrollTop = container.scrollHeight;
 
     try {
         const systemPrompt = buildSystemPrompt();
-        const messages = [
-            { role: 'system', content: systemPrompt },
-            ...chatMessages.slice(-10).map(m => ({
-                role: m.role === 'user' ? 'user' : 'assistant',
-                content: m.content
-            }))
-        ];
+        const msgs = [{role:'system',content:systemPrompt}, ...chatMessages.slice(-10).map(m => ({role: m.role==='user'?'user':'assistant', content: m.content}))];
 
-        // If there's an image, modify the last user message
         if (imageBase64) {
-            messages[messages.length - 1] = {
-                role: 'user',
-                content: [
-                    { type: 'text', text: message },
-                    { type: 'image_url', image_url: { url: imageBase64 } }
-                ]
-            };
+            msgs[msgs.length-1] = {role:'user', content:[{type:'text',text:message},{type:'image_url',image_url:{url:imageBase64}}]};
         }
 
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                model: imageBase64 ? 'gpt-4o-mini' : 'gpt-4o-mini',
-                messages,
-                max_tokens: 1000
-            })
+        const res = await fetch('https://api.openai.com/v1/chat/completions', {
+            method:'POST',
+            headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},
+            body: JSON.stringify({model:'gpt-4o-mini', messages:msgs, max_tokens:1000})
         });
 
-        const data = await response.json();
-        const reply = data.choices[0].message.content;
+        const data = await res.json();
+        document.getElementById('typing')?.remove();
 
-        // Remove typing indicator
-        document.getElementById('typing-indicator')?.remove();
-
-        chatMessages.push({ role: 'ai', content: reply });
+        if (data.choices?.[0]?.message?.content) {
+            chatMessages.push({role:'ai', content: data.choices[0].message.content});
+        } else {
+            chatMessages.push({role:'ai', content:'Sorry, something went wrong. Try again?'});
+        }
         renderHelp();
-
-    } catch (error) {
-        document.getElementById('typing-indicator')?.remove();
-        chatMessages.push({ role: 'ai', content: "Sorry, I had trouble connecting. Check your API key in settings or try again." });
+    } catch(e) {
+        document.getElementById('typing')?.remove();
+        chatMessages.push({role:'ai', content:'Connection error. Check your internet or API key.'});
         renderHelp();
     }
 }
 
 async function handleHelpPhoto(event) {
+    if (!state.photoDisclaimer) { showModal('photoDisclaimer'); return; }
     const file = event.target.files[0];
     if (!file) return;
     const base64 = await toBase64(file);
-    const message = prompt("What would you like help with for this photo?") || "What do you see here? Help me organize or sort these items.";
-    await sendChatMessage(message, base64);
+    await sendChatMessage("Here's a photo. Help me identify and organize what you see.", base64);
     event.target.value = '';
 }
 
 async function photoScanRoom(room) {
-    // Create a file input dynamically
+    if (!state.photoDisclaimer) { showModal('photoDisclaimer'); return; }
     const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.capture = 'environment';
-    input.onchange = async (e) => {
+    input.type = 'file'; input.accept = 'image/*'; input.capture = 'environment';
+    input.onchange = async(e) => {
         const file = e.target.files[0];
         if (!file) return;
         const base64 = await toBase64(file);
         chatMessages = [];
-        await sendChatMessage(`I'm showing you my ${room}. Help me identify what's here and suggest how to organize it. Remember my storage setup and what I've told you about my space.`, base64);
+        await sendChatMessage(`I'm showing you my ${room}. Help me identify what's here and suggest how to organize it based on my space and storage.`, base64);
         navigate('help');
     };
     input.click();
@@ -1700,59 +2030,41 @@ function toBase64(file) {
 function buildSystemPrompt() {
     const p = state.profile;
     const mood = state.mood || 'okay';
-    const vibeNum = parseInt(p.vibe);
-    let toneInstruction = '';
+    const vibe = parseInt(p.vibe);
+    let tone = vibe < 20 ? 'Very calm and gentle. Short sentences. No pressure.' :
+               vibe < 40 ? 'Calm and supportive. Soft encouragement.' :
+               vibe < 60 ? 'Warm and friendly. Balanced energy.' :
+               vibe < 80 ? 'Upbeat and encouraging! Positive energy.' :
+               'Enthusiastic and celebratory! Hype them up!';
 
-    if (vibeNum < 30) toneInstruction = 'Be very calm, gentle, and soothing. Short sentences. No pressure.';
-    else if (vibeNum < 70) toneInstruction = 'Be warm, supportive, and friendly. Balanced energy.';
-    else toneInstruction = 'Be enthusiastic, encouraging, and celebratory! Use exclamation points and hype them up!';
+    if (mood === 'rough') tone = 'Extra gentle today. They are having a hard day. Tiny steps only. Validate everything.';
+    if (mood === 'great') tone += ' They are feeling good — match their energy!';
 
-    if (mood === 'rough') toneInstruction = 'Be extra gentle today. They\'re having a hard day. Small steps only. Validate everything. No pressure at all.';
-    if (mood === 'great') toneInstruction += ' They\'re feeling good today — match their energy!';
+    const pets = p.pets.map(pet => `${pet.count} ${pet.size||''} ${pet.type}(s), ${pet.roam} roam${pet.dedicatedSpace?', dedicated: '+pet.dedicatedSpace:''}`).join('; ');
+    const storage = Object.entries(p.storage||{}).filter(([k,v])=>v).map(([k])=>k).join(', ');
+    const items = state.items.filter(i=>i.room&&i.bucket==='keep').slice(-30).map(i=>`${i.name} in ${i.room}${i.location?' ('+i.location+')':''}`).join('; ');
 
-    const petInfo = p.pets.map(pet => 
-        `${pet.count} ${pet.size || ''} ${pet.type}(s), ${pet.roam} roam${pet.dedicatedSpace ? `, dedicated space: ${pet.dedicatedSpace}` : ''}`
-    ).join('; ');
+    return `You are Home Brain — a personal home organization assistant for someone with ADHD.
 
-    const storageList = Object.entries(p.storage || {}).filter(([k,v]) => v).map(([k]) => k).join(', ');
+USER: ${p.name} | Goal: ${p.goal} | Space: ${p.spaceType} | Rooms: ${p.rooms.join(', ')} | Storage: ${storage||'not specified'} | Space feels: ${p.spaceFeel||'not specified'} | Lives with: ${p.housemates||'not specified'} | Pets: ${pets||'none'} | Collections (NEVER suggest removing): ${p.collections.join(', ')||'none'} | Location: ${p.location||'not specified'} | Mood today: ${mood} | Items tracked: ${items||'none yet'}
 
-    const itemsList = state.items.slice(-50).map(i => `${i.name} in ${i.room} (${i.location})`).join('; ');
-
-    return `You are Home Brain — a personal home organization assistant for someone with ADHD. 
-
-ABOUT THE USER:
-- Name: ${p.name}
-- Goal: ${p.goal} (scratch = organizing from zero, maintain = keeping things tidy, declutter = reducing stuff, purge = major clean-out)
-- Space: ${p.spaceType}
-- Rooms: ${p.rooms.join(', ')}
-- Storage available: ${storageList || 'not specified'}
-- Space feels: ${p.spaceFeel || 'not specified'}
-- Lives with: ${p.housemates || 'not specified'}
-- Pets: ${petInfo || 'none'}
-- Collections (RESPECT THESE, never suggest getting rid of unless they bring it up): ${p.collections.join(', ') || 'none'}
-- Location: ${p.location || 'not specified'}
-- Current mood: ${mood}
-- Items already tracked: ${itemsList || 'none yet'}
-
-TONE: ${toneInstruction}
+TONE: ${tone}
 
 RULES:
-1. NEVER suggest getting rid of collections unless they explicitly ask
-2. NEVER call anything "junk" or imply hoarding
-3. NEVER rush them or create pressure
-4. Give practical, specific suggestions based on THEIR space
-5. If they show you a photo, identify items and suggest logical groupings and placements in THEIR rooms/storage
-6. Include helpful tips when relevant (like bobby pin magnets, expired product info, etc.)
-7. If they're overwhelmed, make things tiny and doable
-8. Remember their pets when suggesting storage (things up high if dogs roam, dedicated pet spaces, etc.)
-9. For donations, suggest specific places in ${p.location || 'their area'} AND provide a Google Maps search link
-10. Celebrate wins, no matter how small
-11. Keep responses concise but warm — they have ADHD, walls of text are overwhelming
-12. Use emoji naturally but don't overdo it
-13. Ask clarifying questions when needed — one at a time, not a list
-14. If they mention duplicates or excess, gently ask if they want to think about it — don't push
-
-Format donation links like: [Search: "query" near location](https://www.google.com/maps/search/query+near+location)`;
+1. NEVER suggest removing collections unless they bring it up
+2. NEVER call anything junk or imply hoarding
+3. NEVER rush or pressure
+4. Give practical suggestions based on THEIR specific space/storage
+5. For photos: identify items, suggest groupings, suggest placements in their rooms
+6. Include helpful tips (expiration dates, storage hacks, etc.)
+7. If overwhelmed: make things tiny and doable
+8. Account for pets (things up high if dogs roam, dedicated pet spaces)
+9. For donations: suggest specific places in ${p.location||'their area'} AND provide Google Maps search links formatted as [Search: query](https://www.google.com/maps/search/query+near+${encodeURIComponent(p.location||'me')})
+10. For bulk/hazardous disposal: mention city services (bulk pickup, hazardous waste days) specific to their location
+11. Celebrate wins
+12. Keep responses concise — ADHD means walls of text are overwhelming
+13. Use emoji naturally, don't overdo
+14. Ask ONE clarifying question at a time`;
 }
 
 // ======================== FOCUS MODE ========================
@@ -1760,92 +2072,102 @@ let focusTimer = null;
 let focusTimeLeft = 0;
 let focusSteps = [];
 let currentFocusStep = 0;
+let focusRoom = '';
 
 function renderFocus() {
-    document.getElementById('focus-time-select').classList.remove('hidden');
+    document.getElementById('focus-setup').classList.remove('hidden');
     document.getElementById('focus-active').classList.add('hidden');
     document.getElementById('focus-complete').classList.add('hidden');
-    document.getElementById('focus-subtitle').textContent = 'How much time do you have?';
+
+    const grid = document.getElementById('focus-room-grid');
+    grid.innerHTML = state.profile.rooms.map(room => `
+        <div class="room-tile ${focusRoom===room?'selected':''}" onclick="selectFocusRoom('${room}')" style="${focusRoom===room?'border-color:var(--accent);':''}">
+            <span class="emoji">${getRoomEmoji(room)}</span>
+            <div class="name" style="font-size:0.8rem;">${room}</div>
+        </div>
+    `).join('') + `
+        <div class="room-tile ${focusRoom==='anywhere'?'selected':''}" onclick="selectFocusRoom('anywhere')" style="${focusRoom==='anywhere'?'border-color:var(--accent);':''}">
+            <span class="emoji">🎲</span>
+            <div class="name" style="font-size:0.8rem;">Anywhere</div>
+        </div>`;
 }
 
-async function startFocus(minutes) {
+function selectFocusRoom(room) {
+    focusRoom = room;
+    renderFocus();
+}
+
+async function selectFocusTime(minutes) {
+    if (!focusRoom) { focusRoom = 'anywhere'; }
+
     const apiKey = localStorage.getItem('homeBrain_apiKey');
     if (!apiKey) {
-        alert('Please set your API key in Settings first!');
-        navigate('settings');
+        showModal('confirm',{title:'API Key Needed',message:'Add your key in Settings.',confirmText:'Settings',onConfirm:"closeModal();navigate('settings')"});
         return;
     }
 
-    document.getElementById('focus-time-select').classList.add('hidden');
+    document.getElementById('focus-setup').classList.add('hidden');
     document.getElementById('focus-active').classList.remove('hidden');
-    document.getElementById('focus-subtitle').textContent = minutes ? `${minutes} minute session` : 'Just one thing';
 
-    // Start timer
-    if (minutes > 0) {
+    // Timer
+    if (minutes > 0 && state.profile.showTimer !== false) {
         focusTimeLeft = minutes * 60;
-        updateTimerDisplay();
+        updateTimer();
         focusTimer = setInterval(() => {
             focusTimeLeft--;
-            updateTimerDisplay();
-            if (focusTimeLeft <= 0) {
-                clearInterval(focusTimer);
-                completeFocus();
-            }
+            updateTimer();
+            if (focusTimeLeft <= 0) { clearInterval(focusTimer); completeFocus(); }
         }, 1000);
     } else {
-        document.getElementById('timer-display').textContent = '🐢';
+        document.getElementById('timer-display').textContent = minutes === 0 ? '🐢' : '';
     }
 
-    // Get steps from AI
+    // Keep screen awake
+    if (state.profile.screenAwake !== false && navigator.wakeLock) {
+        try { await navigator.wakeLock.request('screen'); } catch(e) {}
+    }
+
+    // Get tasks from AI
     try {
         const p = state.profile;
-        const mood = state.mood || 'okay';
-        const prompt = minutes === 0 
-            ? `Give me ONE tiny, easy task for someone with ADHD who is having a ${mood} day. Their space is a ${p.spaceType} with rooms: ${p.rooms.join(', ')}. Their goal is: ${p.goal}. Make it specific and achievable in under 2 minutes. Return as JSON: {"steps": ["one tiny step"]}`
-            : `Give me ${Math.min(Math.ceil(minutes/5), 8)} small, specific tasks for a ${minutes}-minute organizing session. The person has ADHD, mood is ${mood}, space is ${p.spaceType} with rooms: ${p.rooms.join(', ')}. Goal: ${p.goal}. ${p.pets.length > 0 ? 'They have pets: ' + p.pets.map(pet => pet.count + ' ' + pet.type).join(', ') : ''}. Make each step clear and actionable. Return as JSON: {"steps": ["step 1", "step 2", ...]}`;
+        const roomContext = focusRoom === 'anywhere' ? `any room (they have: ${p.rooms.join(', ')})` : focusRoom;
+        const prompt = minutes === 0
+            ? `Give ONE tiny task for someone with ADHD in their ${roomContext}. Their goal is: ${p.goal}. Make it achievable in under 2 minutes. Return JSON: {"steps":["one step"]}`
+            : `Give ${Math.min(Math.ceil(minutes/5),8)} small tasks for a ${minutes}-min session in ${roomContext}. Person has ADHD, goal: ${p.goal}. Pets: ${p.pets.map(pet=>pet.count+' '+pet.type).join(',')||'none'}. Make each step clear and specific. Return JSON: {"steps":["step1","step2",...]}`;
 
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                model: 'gpt-4o-mini',
-                messages: [{ role: 'user', content: prompt }],
-                max_tokens: 500
-            })
+        const res = await fetch('https://api.openai.com/v1/chat/completions', {
+            method:'POST',
+            headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},
+            body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'user',content:prompt}],max_tokens:500})
         });
 
-        const data = await response.json();
-        const content = data.choices[0].message.content;
-        const jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-        const parsed = JSON.parse(jsonStr);
-        focusSteps = parsed.steps;
-        currentFocusStep = 0;
-        showFocusStep();
-
-    } catch (error) {
-        focusSteps = ['Pick up 3 things and put them where they belong', 'Wipe down one surface', 'Take out one piece of trash'];
-        currentFocusStep = 0;
-        showFocusStep();
+        const data = await res.json();
+        const content = data.choices[0].message.content.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+        focusSteps = JSON.parse(content).steps;
+    } catch(e) {
+        focusSteps = ['Pick up 3 things and put them away','Wipe one surface','Take out one piece of trash'];
     }
+
+    currentFocusStep = 0;
+    renderFocusSteps();
 }
 
-function showFocusStep() {
-    const display = document.getElementById('focus-step-display');
-    display.innerHTML = `
-        <div class="step-number">Step ${currentFocusStep + 1} of ${focusSteps.length}</div>
-        <div class="step-text">${focusSteps[currentFocusStep]}</div>
-    `;
+function renderFocusSteps() {
+    const list = document.getElementById('focus-steps-list');
+    list.innerHTML = focusSteps.map((step, i) => `
+        <div class="step-item ${i < currentFocusStep ? 'completed' : ''}" ${i === currentFocusStep ? 'style="font-weight:600;"' : ''}>
+            <input type="checkbox" ${i < currentFocusStep ? 'checked disabled' : 'disabled'}>
+            <span>${step}</span>
+        </div>
+    `).join('');
 }
 
-function nextFocusStep() {
+function completeFocusStep() {
     currentFocusStep++;
     if (currentFocusStep >= focusSteps.length) {
         completeFocus();
     } else {
-        showFocusStep();
+        renderFocusSteps();
     }
 }
 
@@ -1854,238 +2176,155 @@ function completeFocus() {
     document.getElementById('focus-active').classList.add('hidden');
     document.getElementById('focus-complete').classList.remove('hidden');
 
-    const starsEarned = Math.max(1, Math.ceil(currentFocusStep / 2));
-    state.stars += starsEarned;
-    state.focusHistory.push({ date: new Date().toISOString(), steps: currentFocusStep + 1 });
+    const earned = Math.max(1, currentFocusStep);
+    state.stars += earned;
+    state.focusHistory.push({date:new Date().toISOString(), steps:currentFocusStep, room:focusRoom});
     saveState();
 
-    document.getElementById('focus-complete-msg').textContent = 
-        `You completed ${currentFocusStep + 1} step${currentFocusStep > 0 ? 's' : ''}! That's real progress.`;
-    document.getElementById('stars-earned').textContent = '⭐'.repeat(starsEarned) + ` +${starsEarned}`;
+    document.getElementById('focus-complete').innerHTML = `
+        <div style="font-size:4rem;">🎉</div>
+        <h2 style="margin:10px 0;">Amazing!</h2>
+        <p style="color:var(--text-secondary);">You completed ${currentFocusStep} step${currentFocusStep!==1?'s':''}!</p>
+        <p style="color:var(--star);font-size:1.5rem;margin:10px 0;">${'⭐'.repeat(Math.min(earned,5))} +${earned}</p>
+        <button class="btn btn-primary" onclick="resetFocus()">Done!</button>
+    `;
 
-    // Confetti!
-    launchConfetti();
+    celebrate();
 }
 
 function endFocus() {
-    if (confirm('End session? You still get credit for what you did!')) {
-        completeFocus();
-    }
+    showModal('confirm', {
+        title: 'End session?',
+        message: 'You still get credit for what you did!',
+        confirmText: 'End it',
+        onConfirm: 'closeModal();completeFocus()'
+    });
 }
 
 function resetFocus() {
-    currentFocusStep = 0;
     focusSteps = [];
+    currentFocusStep = 0;
+    focusRoom = '';
     renderFocus();
 }
 
-function updateTimerDisplay() {
-    const mins = Math.floor(focusTimeLeft / 60);
-    const secs = focusTimeLeft % 60;
-    document.getElementById('timer-display').textContent = 
-        `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+function updateTimer() {
+    const m = Math.floor(focusTimeLeft/60);
+    const s = focusTimeLeft%60;
+    document.getElementById('timer-display').textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
 }
 
 // ======================== LETTING GO ========================
 let letGoChatMessages = [];
 
 function renderLetGo() {
-    // Show thinking list
-    const thinkingContainer = document.getElementById('thinking-list');
-    if (state.thinkingList.length > 0) {
-        document.getElementById('letgo-thinking').classList.remove('hidden');
-        thinkingContainer.innerHTML = state.thinkingList.map((item, i) => `
-            <div class="check-item">
-                <input type="checkbox" onchange="releaseItem(${i})">
-                <label>${item.name} <span style="font-size:0.8rem;color:var(--text-muted);">(added ${new Date(item.added).toLocaleDateString()})</span></label>
-            </div>
-        `).join('');
-    } else {
-        document.getElementById('letgo-thinking').classList.add('hidden');
-    }
-
-    // Update released count
-    document.getElementById('released-count').textContent = `${state.releasedItems.length} items freed so far`;
-    const progress = Math.min(100, state.releasedItems.length * 2);
-    document.getElementById('released-progress').style.width = `${progress}%`;
-}
-
-function addToThinkingList() {
-    const name = prompt("What are you thinking about letting go?");
-    if (name) {
-        state.thinkingList.push({ name, added: new Date().toISOString() });
-        saveState();
-        renderLetGo();
-    }
-}
-
-function releaseItem(index) {
-    const item = state.thinkingList[index];
-    state.releasedItems.push({ ...item, released: new Date().toISOString() });
-    state.thinkingList.splice(index, 1);
-    state.stars += 1;
-    saveState();
-    renderLetGo();
-    launchConfetti();
+    document.getElementById('released-count').textContent = `${state.releasedItems.length} items freed`;
+    document.getElementById('released-progress').style.width = `${Math.min(100, state.releasedItems.length * 3)}%`;
 }
 
 function letGoMode(mode) {
-    document.getElementById('letgo-chat-container').classList.remove('hidden');
-    letGoChatMessages = [];
-
-    let prompt = '';
-    switch(mode) {
-        case 'permission':
-            prompt = "I need permission and reassurance to let go of some things. Be gentle, validate me, tell me it's okay.";
-            break;
-        case 'logic':
-            prompt = "I need logical reasoning to help me decide what to keep and what to let go. Give me facts and practical thinking.";
-            break;
-        case 'hype':
-            prompt = "Hype me up! I want to feel excited and empowered about decluttering. Be my cheerleader!";
-            break;
-        case 'tiny':
-            prompt = "I'm overwhelmed. Make letting go of things as tiny and non-threatening as possible. One micro-step at a time.";
-            break;
-        case 'photo':
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.capture = 'environment';
-            input.onchange = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const base64 = await toBase64(file);
-                await sendLetGoChatMessage("Here's what I'm looking at. Help me sort through these items — what to keep, what might be time to let go, and where the keepers should live in my space.", base64);
-            };
-            input.click();
-            return;
+    if (mode === 'photo') {
+        if (!state.photoDisclaimer) { showModal('photoDisclaimer'); return; }
+        const input = document.createElement('input');
+        input.type='file';input.accept='image/*';input.capture='environment';
+        input.onchange = async(e) => {
+            const file = e.target.files[0]; if(!file)return;
+            const base64 = await toBase64(file);
+            await sendLetGoChatMsg("Here's what I'm looking at. Help me sort — what to keep, what to let go, where keepers should live.", base64);
+        };
+        input.click();
+        return;
     }
 
-    sendLetGoChatMessage(prompt);
+    let msg = '';
+    switch(mode) {
+        case 'permission': msg = "I need permission to let go of things. Be gentle, validate me."; break;
+        case 'logic': msg = "Give me logical reasons to help decide what to keep vs let go."; break;
+        case 'hype': msg = "Hype me up! Make me excited about decluttering!"; break;
+        case 'tiny': msg = "I'm overwhelmed. Make letting go tiny and non-threatening."; break;
+    }
+    letGoChatMessages = [];
+    sendLetGoChatMsg(msg);
 }
 
 async function sendLetGoChat() {
     const input = document.getElementById('letgo-input');
-    const message = input.value.trim();
-    if (!message) return;
+    const msg = input.value.trim(); if(!msg)return;
     input.value = '';
-    await sendLetGoChatMessage(message);
+    await sendLetGoChatMsg(msg);
 }
 
-async function sendLetGoChatMessage(message, imageBase64 = null) {
+async function sendLetGoChatMsg(message, imageBase64=null) {
     const apiKey = localStorage.getItem('homeBrain_apiKey');
-    if (!apiKey) {
-        alert('Please set your API key in Settings first!');
-        navigate('settings');
-        return;
-    }
+    if (!apiKey) { showModal('confirm',{title:'API Key Needed',message:'Add key in Settings.',confirmText:'Settings',onConfirm:"closeModal();navigate('settings')"}); return; }
 
-    letGoChatMessages.push({ role: 'user', content: message });
+    letGoChatMessages.push({role:'user',content:message});
     renderLetGoChat();
 
     const container = document.getElementById('letgo-chat');
-    container.innerHTML += `<div class="chat-bubble ai" id="letgo-typing"><div class="spinner" style="width:20px;height:20px;border-width:2px;"></div></div>`;
+    container.innerHTML += `<div class="chat-bubble ai" id="letgo-typing"><div class="spinner"></div></div>`;
     container.scrollTop = container.scrollHeight;
 
     try {
-        const systemPrompt = buildSystemPrompt() + `\n\nADDITIONAL CONTEXT: You are in "Letting Go" mode. The user is trying to release items they no longer need. 
+        const sysPrompt = buildSystemPrompt() + `\n\nYou are in LETTING GO mode. Help them release items. Rules: Never push. Validate difficulty. Ask thoughtful questions one at a time. Suggest donations in ${state.profile.location||'their area'} with Google Maps links. For hazardous/bulk items, mention city services. Celebrate every release. Collections (${state.profile.collections.join(',')||'none'}) are OFF LIMITS unless they bring them up.`;
 
-RULES FOR THIS MODE:
-- Never push or pressure
-- Validate the difficulty of letting go
-- If they mention an item, ask thoughtful questions: When did you last use it? Does it bring joy or guilt? Could someone else benefit from it?
-- Suggest donation options specific to ${state.profile.location || 'their area'} when appropriate
-- Include Google Maps search links for donation spots
-- For hazardous items (paint, batteries, electronics), provide proper disposal guidance
-- Celebrate every single item they release
-- If they say "not today" for any item — that's completely fine, say so
-- Offer to add items to their "Thinking About" list if they're not ready
-- Remember: collections (${state.profile.collections.join(', ')}) are OFF LIMITS unless they specifically bring them up`;
+        const msgs = [{role:'system',content:sysPrompt}, ...letGoChatMessages.slice(-10).map(m=>({role:m.role==='user'?'user':'assistant',content:m.content}))];
+        if (imageBase64) msgs[msgs.length-1] = {role:'user',content:[{type:'text',text:message},{type:'image_url',image_url:{url:imageBase64}}]};
 
-        const messages = [
-            { role: 'system', content: systemPrompt },
-            ...letGoChatMessages.slice(-10).map(m => ({
-                role: m.role === 'user' ? 'user' : 'assistant',
-                content: m.content
-            }))
-        ];
-
-        if (imageBase64) {
-            messages[messages.length - 1] = {
-                role: 'user',
-                content: [
-                    { type: 'text', text: message },
-                    { type: 'image_url', image_url: { url: imageBase64 } }
-                ]
-            };
-        }
-
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                model: 'gpt-4o-mini',
-                messages,
-                max_tokens: 1000
-            })
+        const res = await fetch('https://api.openai.com/v1/chat/completions', {
+            method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},
+            body:JSON.stringify({model:'gpt-4o-mini',messages:msgs,max_tokens:1000})
         });
 
-        const data = await response.json();
-        const reply = data.choices[0].message.content;
-
+        const data = await res.json();
         document.getElementById('letgo-typing')?.remove();
-        letGoChatMessages.push({ role: 'ai', content: reply });
+        letGoChatMessages.push({role:'ai',content:data.choices?.[0]?.message?.content || 'Error. Try again.'});
         renderLetGoChat();
-
-    } catch (error) {
+    } catch(e) {
         document.getElementById('letgo-typing')?.remove();
-        letGoChatMessages.push({ role: 'ai', content: "Sorry, I had trouble connecting. Try again?" });
+        letGoChatMessages.push({role:'ai',content:'Connection error. Try again?'});
         renderLetGoChat();
     }
 }
 
 function renderLetGoChat() {
     const container = document.getElementById('letgo-chat');
-    container.innerHTML = letGoChatMessages.map(m => `
-        <div class="chat-bubble ${m.role === 'user' ? 'user' : 'ai'}">${formatMessage(m.content)}</div>
-    `).join('');
+    container.innerHTML = letGoChatMessages.map(m => `<div class="chat-bubble ${m.role==='user'?'user':'ai'}">${formatMessage(m.content)}</div>`).join('');
     container.scrollTop = container.scrollHeight;
 }
 
 // ======================== PROGRESS ========================
 function renderProgress() {
-    const container = document.getElementById('progress-content');
-    const totalSteps = state.focusHistory.reduce((sum, f) => sum + f.steps, 0);
-
-    container.innerHTML = `
-        <div class="card" style="text-align:center;">
+    const total = state.focusHistory.reduce((s,f) => s+f.steps, 0);
+    document.getElementById('progress-content').innerHTML = `
+        <div class="card text-center">
             <div style="font-size:3rem;">⭐</div>
-            <h3 style="font-size:2rem;margin:10px 0;">${state.stars}</h3>
+            <h3 style="font-size:2rem;margin:8px 0;">${state.stars}</h3>
             <p>Stars Earned</p>
         </div>
-        <div class="card" style="text-align:center;">
-            <div style="font-size:2rem;">🔥</div>
-            <h3>${state.streak} day${state.streak !== 1 ? 's' : ''}</h3>
-            <p>Current Streak</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div class="card text-center">
+                <div style="font-size:1.5rem;">🔥</div>
+                <h3>${state.streak}</h3>
+                <p style="font-size:0.8rem;">Day Streak</p>
+            </div>
+            <div class="card text-center">
+                <div style="font-size:1.5rem;">♻️</div>
+                <h3>${state.releasedItems.length}</h3>
+                <p style="font-size:0.8rem;">Released</p>
+            </div>
         </div>
         <div class="card">
             <h3>📊 Stats</h3>
-            <p style="margin:5px 0;">Focus sessions: ${state.focusHistory.length}</p>
-            <p style="margin:5px 0;">Total steps completed: ${totalSteps}</p>
-            <p style="margin:5px 0;">Items released: ${state.releasedItems.length}</p>
-            <p style="margin:5px 0;">Items tracked: ${state.items.length}</p>
-            <p style="margin:5px 0;">Rooms set up: ${state.profile.rooms.length}</p>
+            <p style="margin:4px 0;">Focus sessions: ${state.focusHistory.length}</p>
+            <p style="margin:4px 0;">Steps completed: ${total}</p>
+            <p style="margin:4px 0;">Items tracked: ${state.items.length}</p>
+            <p style="margin:4px 0;">Rooms set up: ${state.profile.rooms.length}</p>
         </div>
-        ${state.releasedItems.length > 0 ? `
+        ${state.releasedItems.length ? `
             <div class="card">
                 <h3>🌟 Recently Released</h3>
-                ${state.releasedItems.slice(-5).reverse().map(item => `
-                    <p style="margin:5px 0;color:var(--text-secondary);">✓ ${item.name}</p>
-                `).join('')}
+                ${state.releasedItems.slice(-5).reverse().map(i => `<p style="margin:3px 0;color:var(--text-secondary);">✓ ${i.name}</p>`).join('')}
             </div>
         ` : ''}
     `;
@@ -2093,44 +2332,59 @@ function renderProgress() {
 
 // ======================== SETTINGS ========================
 function renderSettings() {
-    const container = document.getElementById('settings-content');
-    container.innerHTML = `
+    document.getElementById('settings-content').innerHTML = `
         <div class="card">
             <h3>🔑 API Key</h3>
-            <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:10px;">Needed for AI features</p>
-            <input type="password" id="settings-api-key" placeholder="sk-..." value="${localStorage.getItem('homeBrain_apiKey') || ''}">
-            <button class="btn btn-primary" onclick="saveApiKey()">Save Key</button>
+            <input type="password" id="set-api-key" placeholder="sk-..." value="${localStorage.getItem('homeBrain_apiKey')||''}">
+            <button class="btn btn-primary" onclick="localStorage.setItem('homeBrain_apiKey',document.getElementById('set-api-key').value.trim());showModal('confirm',{title:'Saved!',message:'API key updated.',confirmText:'OK',onConfirm:'closeModal()'})">Save Key</button>
         </div>
-
         <div class="card">
             <h3>🎨 Theme</h3>
-            <div class="option-grid" style="margin-top:10px;">
-                <button class="option-btn ${state.profile.theme==='meadow'?'selected':''}" onclick="changeTheme('meadow')"><span class="emoji">🌿</span>Meadow</button>
-                <button class="option-btn ${state.profile.theme==='reef'?'selected':''}" onclick="changeTheme('reef')"><span class="emoji">🐠</span>Reef</button>
-                <button class="option-btn ${state.profile.theme==='golden'?'selected':''}" onclick="changeTheme('golden')"><span class="emoji">🌅</span>Golden</button>
-                <button class="option-btn ${state.profile.theme==='chibi'?'selected':''}" onclick="changeTheme('chibi')"><span class="emoji">⚡</span>Chibi</button>
-                <button class="option-btn ${state.profile.theme==='tome'?'selected':''}" onclick="changeTheme('tome')"><span class="emoji">📚</span>Tome</button>
-                <button class="option-btn ${state.profile.theme==='midnight'?'selected':''}" onclick="changeTheme('midnight')"><span class="emoji">🌙</span>Midnight</button>
+            <div class="option-grid">
+                ${['meadow','reef','golden','chibi','tome','midnight'].map(t => `
+                    <button class="option-btn ${state.profile.theme===t?'selected':''}" onclick="state.profile.theme='${t}';saveState();applyTheme();renderSettings();">
+                        <span class="emoji">${{meadow:'🌿',reef:'🐠',golden:'🌅',chibi:'⚡',tome:'📚',midnight:'🌙'}[t]}</span>${t}
+                    </button>
+                `).join('')}
             </div>
-            <button class="btn btn-small btn-secondary" style="margin-top:10px;" onclick="setCustomBg()">📷 Custom Background</button>
-            <input type="file" id="custom-bg-input" accept="image/*" style="display:none" onchange="applyCustomBg(event)">
+            <button class="btn btn-small btn-secondary mt-10" onclick="document.getElementById('custom-bg-file').click()">📷 Custom Background</button>
+            <input type="file" id="custom-bg-file" accept="image/*" style="display:none" onchange="setCustomBg(event)">
         </div>
-
         <div class="card">
             <h3>🎚️ Vibe</h3>
-            <div class="slider-container">
-                <label><span>🧘 Chill</span><span>🎉 Hype</span></label>
-                <input type="range" min="0" max="100" value="${state.profile.vibe}" onchange="state.profile.vibe=this.value;saveState();">
+            <div class="vibe-slider">
+                <div class="vibe-labels"><span>🧘 Chill</span><span>🎉 Hype</span></div>
+                <input type="range" min="0" max="100" value="${state.profile.vibe}" onchange="state.profile.vibe=parseInt(this.value);saveState();">
+                <div class="vibe-notches"><span>Calm</span><span>Gentle</span><span>Balanced</span><span>Upbeat</span><span>Energetic</span></div>
             </div>
         </div>
-
+        <div class="card">
+            <h3>🎆 Celebrations</h3>
+            <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:8px;">When you complete something:</p>
+            <div class="option-grid">
+                <button class="option-btn ${state.profile.celebrationStyle==='confetti'?'selected':''}" onclick="state.profile.celebrationStyle='confetti';saveState();renderSettings();"><span class="emoji">🎊</span>Confetti</button>
+                <button class="option-btn ${state.profile.celebrationStyle==='fireworks'?'selected':''}" onclick="state.profile.celebrationStyle='fireworks';saveState();renderSettings();"><span class="emoji">🎆</span>Fireworks</button>
+                <button class="option-btn ${state.profile.celebrationStyle==='starburst'?'selected':''}" onclick="state.profile.celebrationStyle='starburst';saveState();renderSettings();"><span class="emoji">🌟</span>Starburst</button>
+                <button class="option-btn ${state.profile.celebrationStyle==='none'?'selected':''}" onclick="state.profile.celebrationStyle='none';saveState();renderSettings();"><span class="emoji">🔇</span>Subtle</button>
+            </div>
+        </div>
+        <div class="card">
+            <h3>⏱️ Focus Mode</h3>
+            <div class="step-item">
+                <input type="checkbox" ${state.profile.screenAwake!==false?'checked':''} onchange="state.profile.screenAwake=this.checked;saveState();">
+                <span>Keep screen awake during focus</span>
+            </div>
+            <div class="step-item">
+                <input type="checkbox" ${state.profile.showTimer!==false?'checked':''} onchange="state.profile.showTimer=this.checked;saveState();">
+                <span>Show countdown timer</span>
+            </div>
+        </div>
         <div class="card">
             <h3>📍 Location</h3>
-            <input type="text" value="${state.profile.location}" placeholder="City, State" onchange="state.profile.location=this.value;saveState();">
+            <input type="text" value="${state.profile.location}" placeholder="City, State" onchange="state.profile.location=this.value.trim();saveState();">
         </div>
-
         <div class="card">
-            <h3>🎯 My Goal</h3>
+            <h3>🎯 Goal</h3>
             <select onchange="state.profile.goal=this.value;saveState();">
                 <option value="scratch" ${state.profile.goal==='scratch'?'selected':''}>Organize from scratch</option>
                 <option value="maintain" ${state.profile.goal==='maintain'?'selected':''}>Help me maintain</option>
@@ -2138,150 +2392,166 @@ function renderSettings() {
                 <option value="purge" ${state.profile.goal==='purge'?'selected':''}>Full purge mode</option>
             </select>
         </div>
-
         <div class="card">
             <h3>💾 Data</h3>
-            <button class="btn btn-secondary" onclick="exportAllData()">Export Everything (JSON)</button>
-            <button class="btn btn-secondary" onclick="importData()">Import Data</button>
-            <button class="btn btn-danger" style="margin-top:10px;" onclick="resetEverything()">⚠️ Delete All Data</button>
+            <button class="btn btn-secondary" onclick="exportData()">Export Backup (JSON)</button>
+            <button class="btn btn-secondary" onclick="importData()">Import Backup</button>
+            <button class="btn btn-danger mt-10" onclick="showModal('confirm',{title:'Delete Everything?',message:'This cannot be undone!',danger:true,confirmText:'Delete All',onConfirm:'resetAll()'})">⚠️ Delete All Data</button>
         </div>
-
         <div class="card">
-            <h3>🔄 Re-do Setup</h3>
-            <button class="btn btn-secondary" onclick="redoOnboarding()">Start Onboarding Over</button>
+            <h3>🔄 Redo Setup</h3>
+            <button class="btn btn-secondary" onclick="showModal('confirm',{title:'Redo Onboarding?',message:'Your items and progress stay. Just re-does the profile setup.',confirmText:'Redo',onConfirm:'redoSetup()'})">Start Setup Over</button>
         </div>
-
-        <div class="privacy-badge">
-            All data stored locally on this device only. AI calls are stateless — nothing is saved on any server.
-        </div>
+        <div class="privacy-badge">🔒 All data stored locally on this device only.</div>
     `;
 }
 
-function saveApiKey() {
-    const key = document.getElementById('settings-api-key').value.trim();
-    if (key) {
-        localStorage.setItem('homeBrain_apiKey', key);
-        alert('Key saved! ✅');
-    }
-}
-
-function changeTheme(theme) {
-    state.profile.theme = theme;
-    saveState();
-    applyTheme();
-    renderSettings();
-}
-
-function setCustomBg() {
-    document.getElementById('custom-bg-input').click();
-}
-
-function applyCustomBg(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+function setCustomBg(event) {
+    const file = event.target.files[0]; if(!file)return;
     const reader = new FileReader();
     reader.onload = (e) => {
-        document.body.style.backgroundImage = `url(${e.target.result})`;
         localStorage.setItem('homeBrain_customBg', e.target.result);
+        document.body.style.backgroundImage = `url(${e.target.result})`;
     };
     reader.readAsDataURL(file);
 }
 
-function exportAllData() {
-    const data = JSON.stringify(state, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
+function exportData() {
+    const blob = new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
     const a = document.createElement('a');
-    a.href = url;
+    a.href = URL.createObjectURL(blob);
     a.download = `home-brain-backup-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
-    URL.revokeObjectURL(url);
 }
 
 function importData() {
     const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
+    input.type='file';input.accept='.json';
     input.onchange = (e) => {
-        const file = e.target.files[0];
         const reader = new FileReader();
         reader.onload = (ev) => {
             try {
                 const imported = JSON.parse(ev.target.result);
-                if (confirm('This will replace all current data. Are you sure?')) {
-                    state = imported;
-                    saveState();
-                    location.reload();
-                }
-            } catch (err) {
-                alert('Invalid file format.');
+                state = imported;
+                saveState();
+                location.reload();
+            } catch(err) {
+                showModal('confirm',{title:'Error',message:'Invalid file.',confirmText:'OK',onConfirm:'closeModal()'});
             }
         };
-        reader.readAsText(file);
+        reader.readAsText(e.target.files[0]);
     };
     input.click();
 }
 
-function resetEverything() {
-    if (confirm('⚠️ Delete ALL data? This cannot be undone!')) {
-        if (confirm('Really really sure?')) {
-            localStorage.removeItem('homeBrainState');
-            localStorage.removeItem('homeBrain_apiKey');
-            localStorage.removeItem('homeBrain_customBg');
-            location.reload();
-        }
-    }
+function resetAll() {
+    localStorage.removeItem('homeBrainState');
+    localStorage.removeItem('homeBrain_apiKey');
+    localStorage.removeItem('homeBrain_customBg');
+    closeModal();
+    location.reload();
 }
 
-function redoOnboarding() {
-    if (confirm('Re-do setup? Your items and progress will be kept, just the profile setup will restart.')) {
-        state.onboarded = false;
-        saveState();
-        location.reload();
-    }
+function redoSetup() {
+    state.onboarded = false;
+    saveState();
+    closeModal();
+    location.reload();
 }
 
-// ======================== UTILITIES ========================
-function formatMessage(text) {
-    // Basic markdown-ish formatting
-    return text
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/\n/g, '<br>')
-        .replace(/\[(.*?)\]\((https?:\/\/.*?)\)/g, '<a href="$2" target="_blank" style="color:var(--accent);">$1</a>');
-}
+// ======================== CELEBRATIONS ========================
+function celebrate() {
+    const style = state.profile.celebrationStyle || 'confetti';
+    if (style === 'none') return;
+    playChime();
 
-function launchConfetti() {
     const container = document.createElement('div');
-    container.className = 'confetti-container';
+    container.className = 'celebration-container';
     document.body.appendChild(container);
 
-    const colors = [
-        getComputedStyle(document.documentElement).getPropertyValue('--confetti1'),
-        getComputedStyle(document.documentElement).getPropertyValue('--confetti2'),
-        getComputedStyle(document.documentElement).getPropertyValue('--confetti3'),
-        getComputedStyle(document.documentElement).getPropertyValue('--confetti4')
-    ];
-
-    for (let i = 0; i < 50; i++) {
-        const piece = document.createElement('div');
-        piece.className = 'confetti-piece';
-        piece.style.left = Math.random() * 100 + '%';
-        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        piece.style.animationDelay = Math.random() * 0.5 + 's';
-        piece.style.animationDuration = (2 + Math.random() * 2) + 's';
-        container.appendChild(piece);
+    if (style === 'confetti') {
+        for (let i = 0; i < 50; i++) {
+            const piece = document.createElement('div');
+            piece.className = 'confetti-piece';
+            piece.style.left = Math.random()*100+'%';
+            piece.style.backgroundColor = getRandomColor();
+            piece.style.animationDelay = Math.random()*0.5+'s';
+            piece.style.animationDuration = (2+Math.random()*2)+'s';
+            container.appendChild(piece);
+        }
+    } else if (style === 'fireworks') {
+        for (let burst = 0; burst < 3; burst++) {
+            const cx = 20 + Math.random()*60;
+            const cy = 20 + Math.random()*40;
+            setTimeout(() => {
+                for (let i = 0; i < 20; i++) {
+                    const spark = document.createElement('div');
+                    spark.className = 'firework';
+                    spark.style.left = cx+'%';
+                    spark.style.top = cy+'%';
+                    spark.style.backgroundColor = getRandomColor();
+                    const angle = (i/20)*Math.PI*2;
+                    const dist = 50+Math.random()*80;
+                    spark.style.setProperty('--tx', Math.cos(angle)*dist+'px');
+                    spark.style.setProperty('--ty', Math.sin(angle)*dist+'px');
+                    spark.style.animationDelay = '0s';
+                    container.appendChild(spark);
+                }
+            }, burst*400);
+        }
+    } else if (style === 'starburst') {
+        for (let i = 0; i < 15; i++) {
+            const star = document.createElement('div');
+            star.className = 'starburst';
+            star.textContent = ['⭐','✨','🌟','💫'][Math.floor(Math.random()*4)];
+            star.style.left = '50%';
+            star.style.top = '40%';
+            const angle = (i/15)*Math.PI*2;
+            const dist = 80+Math.random()*120;
+            star.style.setProperty('--tx', Math.cos(angle)*dist+'px');
+            star.style.setProperty('--ty', Math.sin(angle)*dist+'px');
+            star.style.animationDelay = Math.random()*0.3+'s';
+            container.appendChild(star);
+        }
     }
 
     setTimeout(() => container.remove(), 4000);
 }
 
-// ======================== INIT ON LOAD ========================
-// Load custom background if exists
-const savedBg = localStorage.getItem('homeBrain_customBg');
-if (savedBg) {
-    document.body.style.backgroundImage = `url(${savedBg})`;
+function getRandomColor() {
+    const colors = ['#ff6b6b','#ffd93d','#6bcf7f','#4ecdc4','#a78bfa','#f472b6','#fb923c'];
+    return colors[Math.floor(Math.random()*colors.length)];
 }
+
+function playChime() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(523, ctx.currentTime); // C5
+        osc.frequency.setValueAtTime(659, ctx.currentTime + 0.1); // E5
+        osc.frequency.setValueAtTime(784, ctx.currentTime + 0.2); // G5
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.8);
+    } catch(e) {}
+}
+
+// ======================== UTILITIES ========================
+function formatMessage(text) {
+    return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>')
+        .replace(/\[(.*?)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;">$1</a>');
+}
+
+// ======================== START ========================
+const savedBg = localStorage.getItem('homeBrain_customBg');
+if (savedBg) document.body.style.backgroundImage = `url(${savedBg})`;
 
 init();
 </script>
