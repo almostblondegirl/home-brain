@@ -327,9 +327,12 @@ function applyTheme(){
     document.body.setAttribute('data-theme',t);
     const op=(100-(state.profile.bgIntensity||60))/100;
     document.documentElement.style.setProperty('--opacity',op.toFixed(2));
-    document.body.style.backgroundImage=`url(bg-${t}.png)`;
-    const cb=localStorage.getItem('homeBrain_customBg');
-    if(cb)document.body.style.backgroundImage=`url(${cb})`;
+    if(state.profile.customBg){
+        document.body.style.backgroundImage=`url(${localStorage.getItem('homeBrain_customBg')})`;
+    } else {
+        document.body.style.backgroundImage=`url(bg-${t}.png)`;
+    }
+}
 }
 
 // ============ MODAL ============
@@ -621,7 +624,7 @@ function renderProgress(){
 function renderSettings(){
     document.getElementById('view-settings').innerHTML=`<div class="view-header"><h2>⚙️ Settings</h2></div>
     <div class="card"><h3>🔑 API Key</h3><input type="password" id="s-key" placeholder="sk-..." value="${localStorage.getItem('homeBrain_apiKey')||''}"><button class="btn btn-primary" onclick="localStorage.setItem('homeBrain_apiKey',document.getElementById('s-key').value.trim());showModal('confirm',{title:'Saved!',message:'Key updated.',confirmText:'OK',onConfirm:'closeModal()'})">Save</button></div>
-    <div class="card"><h3>🎨 Theme</h3><div class="option-grid">${[['meadow','🌿'],['reef','🐠'],['golden','🌅'],['chibi','⚡'],['tome','📚'],['midnight','🌙']].map(([t,e])=>`<button class="option-btn ${state.profile.theme===t?'selected':''}" onclick="state.profile.theme='${t}';saveState();applyTheme();renderSettings();"><span class="emoji">${e}</span>${t}</button>`).join('')}</div><p style="font-size:0.82rem;margin-top:8px;">Background visibility:</p><div class="vibe-slider"><div class="vibe-labels"><span>Subtle</span><span>Vibrant</span></div><input type="range" min="20" max="80" value="${state.profile.bgIntensity||60}" onchange="state.profile.bgIntensity=parseInt(this.value);saveState();applyTheme();"></div><button class="btn btn-small btn-secondary mt-10" onclick="document.getElementById('s-bg').click()">📷 Custom Background</button><input type="file" id="s-bg" accept="image/*" style="display:none" onchange="setCustBg(event)"></div>
+    <div class="card"><h3>🎨 Theme</h3><div class="option-grid">${[['meadow','🌿'],['reef','🐠'],['golden','🌅'],['chibi','⚡'],['tome','📚'],['midnight','🌙']].map(([t,e])=>`<button class="option-btn ${state.profile.theme===t?'selected':''}" onclick="state.profile.theme='${t}';state.profile.customBg=false;saveState();applyTheme();renderSettings();"><span class="emoji">${e}</span>${t}</button>`).join('')}</div><p style="font-size:0.82rem;margin-top:8px;">Background visibility:</p><div class="vibe-slider"><div class="vibe-labels"><span>Subtle</span><span>Vibrant</span></div><input type="range" min="20" max="80" value="${state.profile.bgIntensity||60}" onchange="state.profile.bgIntensity=parseInt(this.value);saveState();applyTheme();"></div><button class="btn btn-small btn-secondary mt-10" onclick="document.getElementById('s-bg').click()">📷 Custom Background</button><input type="file" id="s-bg" accept="image/*" style="display:none" onchange="setCustBg(event)"></div>
     <div class="card"><h3>🎚️ Vibe</h3><div class="vibe-slider"><div class="vibe-labels"><span>🧘 Chill</span><span>🎉 Hype</span></div><input type="range" min="0" max="100" value="${state.profile.vibe}" onchange="state.profile.vibe=parseInt(this.value);saveState();"><div class="vibe-notches"><span>Calm</span><span>Gentle</span><span>Balanced</span><span>Upbeat</span><span>Energetic</span></div></div></div>
     <div class="card"><h3>🎆 Celebrations</h3><div class="option-grid">${[['confetti','🎊','Confetti'],['fireworks','🎆','Fireworks'],['starburst','🌟','Starburst'],['none','🔇','Subtle']].map(([v,e,l])=>`<button class="option-btn ${state.profile.celebrationStyle===v?'selected':''}" onclick="state.profile.celebrationStyle='${v}';saveState();renderSettings();"><span class="emoji">${e}</span>${l}</button>`).join('')}</div></div>
     <div class="card"><h3>⏱️ Focus</h3><div class="step-item"><input type="checkbox" ${state.profile.screenAwake!==false?'checked':''} onchange="state.profile.screenAwake=this.checked;saveState();"><span>Screen awake</span></div><div class="step-item"><input type="checkbox" ${state.profile.showTimer!==false?'checked':''} onchange="state.profile.showTimer=this.checked;saveState();"><span>Show countdown</span></div></div>
@@ -632,7 +635,7 @@ function renderSettings(){
     <div class="privacy-badge">🔒 All data on this device only.</div>`;
 }
 
-function setCustBg(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{localStorage.setItem('homeBrain_customBg',ev.target.result);document.body.style.backgroundImage=`url(${ev.target.result})`;};r.readAsDataURL(f);}
+function setCustBg(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{localStorage.setItem('homeBrain_customBg',ev.target.result);state.profile.customBg=true;saveState();document.body.style.backgroundImage=`url(${ev.target.result})`;};r.readAsDataURL(f);}
 
 function exportCSV(){
     const h=['Name','Bucket','Current Room','Destination','Spot','Give To','Tags','Added','Done','Moved'];
@@ -661,7 +664,7 @@ function toB64(f){return new Promise((res,rej)=>{const r=new FileReader();r.read
 function fmtMsg(t){if(!t)return'';return t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br>').replace(/\[(.*?)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" style="color:var(--accent);text-decoration:underline;">$1</a>');}
 
 // ============ START ============
-const sb=localStorage.getItem('homeBrain_customBg');if(sb)document.body.style.backgroundImage=`url(${sb})`;
+if(state.profile.customBg){const sb=localStorage.getItem('homeBrain_customBg');if(sb)document.body.style.backgroundImage=`url(${sb})`;}
 // ============ BRAIN DUMP SYSTEM ============
 
 function openBrainDump(){
