@@ -252,7 +252,6 @@
 .quick-sort-overlay .qs-skip { margin-top:16px; background:none; border:none; color:var(--text-muted); font-size:0.88rem; cursor:pointer; padding:12px; }
 
 .toast-msg { position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:var(--accent); color:white; padding:12px 22px; border-radius:24px; font-size:0.88rem; font-weight:600; z-index:9999; box-shadow:0 4px 12px rgba(0,0,0,0.2); animation:fadeIn 0.3s; }
-.toast-msg { position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:var(--accent); color:white; padding:12px 22px; border-radius:24px; font-size:0.88rem; font-weight:600; z-index:9999; box-shadow:0 4px 12px rgba(0,0,0,0.2); animation:fadeIn 0.3s; }
 
 /* ============ TABLET / IPAD RESPONSIVE ============ */
 @media (min-width: 768px) {
@@ -564,7 +563,7 @@ function viewRoom(room){
     const bkts=['keep','give','toss','unsure'],bLbl={keep:'🏠 Keep',give:'🎁 Give Away',toss:'🗑️ Toss',unsure:'🤷 Unsure'};
     let html='';
     bkts.forEach(b=>{const bi=items.filter(i=>i.bucket===b);if(bi.length){html+=`<h3 style="margin:12px 0 6px;font-size:0.9rem;color:var(--accent);">${bLbl[b]} (${bi.length})</h3>`;bi.forEach(it=>{html+=itemCard(it);});}});
-    document.getElementById('view-room').innerHTML=`<button class="back-btn" onclick="navigate('home')">← Back</button><div class="view-header"><h2>${roomEmoji(room)} ${room}</h2><p>${items.length} item${items.length!==1?'s':''}</p></div>${html||'<p style="color:var(--text-muted);text-align:center;padding:20px;">Nothing here yet.</p>'}<button class="btn btn-primary mt-10" onclick="showModal('addItem')">+ Add Item</button><button class="btn btn-secondary" onclick="scanRoom('${room}')">📸 Scan This Space</button>`;
+    document.getElementById('view-room').innerHTML=`<button class="back-btn" onclick="navigate('home')">← Back</button><div class="view-header"><h2>${roomEmoji(room)} ${room}</h2><p>${items.length} item${items.length!==1?'s':''}</p></div>${html||'<p style="color:var(--text-muted);text-align:center;padding:20px;">Nothing here yet.</p>'}<button class="btn btn-primary mt-10" onclick="showModal('addItem')">+ Add Item</button><button class="btn btn-secondary" onclick="openAIScanRoom('${room}')">📸 Scan This Space</button>`;
     document.querySelectorAll('#main-app .view').forEach(v=>v.classList.remove('active'));document.getElementById('view-room').classList.add('active');
 }
 
@@ -831,7 +830,7 @@ function renderUnsorted(){
     const unsorted=getUnsortedItems();
     let html=`<div class="unsorted-header"><h2>📥 Unsorted<span class="count-badge">${unsorted.length}</span></h2><p class="subtitle">No rush. Sort when you're ready. Or don't.</p></div>`;
     
-    html+=`<div class="unsorted-actions"><button class="btn btn-small btn-primary" onclick="openQuickSort()">⚡ Quick Sort</button><button class="btn btn-small btn-secondary" onclick="openBrainDump()">+ Dump More</button></div>`;
+    html+=`<div class="unsorted-actions"><button class="btn btn-small btn-primary" onclick="openQuickSort()">⚡ Quick Sort</button><button class="btn btn-small btn-secondary" onclick="openBrainDump()">+ Dump More</button><button class="btn btn-small btn-secondary" onclick="openAIScan()">📸 Scan</button></div>`;
     
     if(unsorted.length===0){
         html+=`<div class="card text-center"><p style="font-size:1.5rem;margin-bottom:8px;">🎉</p><p>Nothing to sort! Dump more items whenever.</p></div>`;
@@ -965,6 +964,329 @@ function closeQuickSort(){
     document.getElementById('quick-sort-container').innerHTML='';
     updateDumpBadge();
     renderUnsorted();
+}
+// ============ AI CAMERA SCAN ============
+
+function openAIScan(){
+    if(!state.photoDisclaimer){showModal('photoDisclaimer');return;}
+    const inp=document.createElement('input');
+    inp.type='file';
+    inp.accept='image/*';
+    inp.capture='environment';
+    inp.onchange=async e=>{
+        const f=e.target.files[0];
+        if(!f)return;
+        const b64=await toB64(f);
+        showScanProcessing(b64);
+        await processScan(b64);
+    };
+    inp.click();
+}
+
+function showScanProcessing(imgSrc){
+    document.getElementById('brain-dump-container').innerHTML=`
+    <div class="brain-dump-overlay">
+        <div class="brain-dump-sheet">
+            <h3>📸 Scanning...</h3>
+            <p class="subtitle">AI is identifying items in your photo</p>
+            <div style="border-radius:12px;overflow:hidden;margin-bottom:14px;max-height:200px;">
+                <img src="${imgSrc}" style="width:100%;display:block;object-fit:cover;">
+            </div>
+            <div style="text-align:center;padding:20px 0;">
+                <div class="spinner"></div>
+                <p style="margin-top:10px;color:var(--text-muted);font-size:0.85rem;">Looking for items...</p>
+            </div>
+        </div>
+    </div>`;
+}
+
+async function processScan(imgSrc){
+    const apiKey=localStorage.getItem('homeBrain_apiKey');
+    if(!apiKey){
+        closeBrainDump();
+        showModal('confirm',{title:'API Key Needed',message:'Add in Settings.',confirmText:'Settings',onConfirm:"closeModal();navigate('settings')"});
+        return;
+    }
+    
+    try{
+        const prompt=`Look at this photo and list every distinct ITEM/OBJECT you can identify. Only physical objects that someone owns — not walls, floors, ceilings, or built-in fixtures.
+
+Return ONLY valid JSON in this exact format:
+{"items":["item 1","item 2","item 3"]}
+
+Be specific but concise. For example: "blue ceramic mug" not just "mug". If you see multiples, list them as one entry like "stack of books (about 12)" or "3 throw pillows".
+
+If you cannot identify any items, return: {"items":[]}`;
+
+        const res=await fetch('https://api.openai.com/v1/chat/completions',{
+            method:'POST',
+            headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},
+            body:JSON.stringify({
+                model:'gpt-4o-mini',
+                messages:[{role:'user',content:[
+                    {type:'text',text:prompt},
+                    {type:'image_url',image_url:{url:imgSrc}}
+                ]}],
+                max_tokens:1000
+            })
+        });
+        
+        const data=await res.json();
+        const raw=data.choices[0].message.content.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+        const parsed=JSON.parse(raw);
+        const items=parsed.items||[];
+        
+        if(items.length===0){
+            showScanResults([],imgSrc);
+        } else {
+            showScanResults(items,imgSrc);
+        }
+    }catch(e){
+        document.getElementById('brain-dump-container').innerHTML=`
+        <div class="brain-dump-overlay" onclick="if(event.target===this)closeBrainDump()">
+            <div class="brain-dump-sheet">
+                <h3>😕 Scan Failed</h3>
+                <p class="subtitle">Couldn't process the image. Try again with better lighting or a clearer angle.</p>
+                <div class="actions">
+                    <button class="btn btn-secondary" onclick="closeBrainDump()">Cancel</button>
+                    <button class="btn btn-primary" onclick="closeBrainDump();openAIScan();">Try Again</button>
+                </div>
+            </div>
+        </div>`;
+    }
+}
+
+function showScanResults(items,imgSrc){
+    if(items.length===0){
+        document.getElementById('brain-dump-container').innerHTML=`
+        <div class="brain-dump-overlay" onclick="if(event.target===this)closeBrainDump()">
+            <div class="brain-dump-sheet">
+                <h3>📸 No Items Found</h3>
+                <p class="subtitle">AI couldn't identify distinct items. Try a clearer photo with better lighting.</p>
+                <div class="actions">
+                    <button class="btn btn-secondary" onclick="closeBrainDump()">Cancel</button>
+                    <button class="btn btn-primary" onclick="closeBrainDump();openAIScan();">Try Again</button>
+                </div>
+            </div>
+        </div>`;
+        return;
+    }
+    
+    const checkboxes=items.map((item,i)=>`
+        <div class="step-item">
+            <input type="checkbox" id="scan-item-${i}" checked>
+            <span>${escHtml(item)}</span>
+        </div>
+    `).join('');
+    
+    document.getElementById('brain-dump-container').innerHTML=`
+    <div class="brain-dump-overlay" onclick="if(event.target===this)closeBrainDump()">
+        <div class="brain-dump-sheet">
+            <h3>📸 Found ${items.length} items!</h3>
+            <p class="subtitle">Uncheck anything that's not an item. Then add them all.</p>
+            <div style="border-radius:12px;overflow:hidden;margin-bottom:14px;max-height:150px;">
+                <img src="${imgSrc}" style="width:100%;display:block;object-fit:cover;">
+            </div>
+            <div id="scan-results" style="max-height:35vh;overflow-y:auto;margin-bottom:14px;">
+                ${checkboxes}
+            </div>
+            <div class="actions">
+                <button class="btn btn-secondary" onclick="closeBrainDump()" style="flex:0.4;">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmScanItems()" style="flex:1;">✓ Add ${items.length} Items</button>
+            </div>
+        </div>
+    </div>`;
+    
+    // Store items for confirmation
+    window._scanItems=items;
+}
+
+function confirmScanItems(){
+    const items=window._scanItems||[];
+    const confirmed=[];
+    
+    items.forEach((item,i)=>{
+        const cb=document.getElementById(`scan-item-${i}`);
+        if(cb&&cb.checked)confirmed.push(item);
+    });
+    
+    if(confirmed.length===0){
+        closeBrainDump();
+        showToast('No items selected.');
+        return;
+    }
+    
+    confirmed.forEach(name=>{
+        state.items.push({
+            id:Date.now()+Math.random(),
+            name:name,
+            bucket:null,
+            origin:'',
+            destination:'',
+            spot:'',
+            giveTo:'',
+            tags:['📸 scanned'],
+            added:new Date().toISOString(),
+            completed:false,
+            moved:false
+        });
+    });
+    
+    saveState();
+    closeBrainDump();
+    updateDumpBadge();
+    window._scanItems=null;
+    showToast(`📸 ${confirmed.length} item${confirmed.length>1?'s':''} scanned in! Sort whenever.`);
+}
+function openAIScanRoom(room){
+    if(!state.photoDisclaimer){showModal('photoDisclaimer');return;}
+    const inp=document.createElement('input');
+    inp.type='file';
+    inp.accept='image/*';
+    inp.capture='environment';
+    inp.onchange=async e=>{
+        const f=e.target.files[0];
+        if(!f)return;
+        const b64=await toB64(f);
+        showScanProcessing(b64);
+        await processScanRoom(b64,room);
+    };
+    inp.click();
+}
+
+async function processScanRoom(imgSrc,room){
+    const apiKey=localStorage.getItem('homeBrain_apiKey');
+    if(!apiKey){
+        closeBrainDump();
+        showModal('confirm',{title:'API Key Needed',message:'Add in Settings.',confirmText:'Settings',onConfirm:"closeModal();navigate('settings')"});
+        return;
+    }
+    
+    try{
+        const prompt=`Look at this photo of a ${room} and list every distinct ITEM/OBJECT you can identify. Only physical objects that someone owns — not walls, floors, ceilings, or built-in fixtures.
+
+Return ONLY valid JSON in this exact format:
+{"items":["item 1","item 2","item 3"]}
+
+Be specific but concise. If you see multiples, list them as one entry like "stack of books (about 12)" or "3 throw pillows".
+
+If you cannot identify any items, return: {"items":[]}`;
+
+        const res=await fetch('https://api.openai.com/v1/chat/completions',{
+            method:'POST',
+            headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},
+            body:JSON.stringify({
+                model:'gpt-4o-mini',
+                messages:[{role:'user',content:[
+                    {type:'text',text:prompt},
+                    {type:'image_url',image_url:{url:imgSrc}}
+                ]}],
+                max_tokens:1000
+            })
+        });
+        
+        const data=await res.json();
+        const raw=data.choices[0].message.content.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+        const parsed=JSON.parse(raw);
+        const items=parsed.items||[];
+        
+        showScanResultsRoom(items,imgSrc,room);
+    }catch(e){
+        document.getElementById('brain-dump-container').innerHTML=`
+        <div class="brain-dump-overlay" onclick="if(event.target===this)closeBrainDump()">
+            <div class="brain-dump-sheet">
+                <h3>😕 Scan Failed</h3>
+                <p class="subtitle">Couldn't process the image. Try again.</p>
+                <div class="actions">
+                    <button class="btn btn-secondary" onclick="closeBrainDump()">Cancel</button>
+                    <button class="btn btn-primary" onclick="closeBrainDump();openAIScanRoom('${room}');">Try Again</button>
+                </div>
+            </div>
+        </div>`;
+    }
+}
+
+function showScanResultsRoom(items,imgSrc,room){
+    if(items.length===0){
+        document.getElementById('brain-dump-container').innerHTML=`
+        <div class="brain-dump-overlay" onclick="if(event.target===this)closeBrainDump()">
+            <div class="brain-dump-sheet">
+                <h3>📸 No Items Found</h3>
+                <p class="subtitle">Try a clearer photo with better lighting.</p>
+                <div class="actions">
+                    <button class="btn btn-secondary" onclick="closeBrainDump()">Cancel</button>
+                    <button class="btn btn-primary" onclick="closeBrainDump();openAIScanRoom('${room}');">Try Again</button>
+                </div>
+            </div>
+        </div>`;
+        return;
+    }
+    
+    const checkboxes=items.map((item,i)=>`
+        <div class="step-item">
+            <input type="checkbox" id="scan-item-${i}" checked>
+            <span>${escHtml(item)}</span>
+        </div>
+    `).join('');
+    
+    document.getElementById('brain-dump-container').innerHTML=`
+    <div class="brain-dump-overlay" onclick="if(event.target===this)closeBrainDump()">
+        <div class="brain-dump-sheet">
+            <h3>📸 Found ${items.length} items in ${room}!</h3>
+            <p class="subtitle">Uncheck anything wrong. These will be tagged with this room.</p>
+            <div style="border-radius:12px;overflow:hidden;margin-bottom:14px;max-height:150px;">
+                <img src="${imgSrc}" style="width:100%;display:block;object-fit:cover;">
+            </div>
+            <div id="scan-results" style="max-height:35vh;overflow-y:auto;margin-bottom:14px;">
+                ${checkboxes}
+            </div>
+            <div class="actions">
+                <button class="btn btn-secondary" onclick="closeBrainDump()" style="flex:0.4;">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmScanItemsRoom('${room}')" style="flex:1;">✓ Add to ${room}</button>
+            </div>
+        </div>
+    </div>`;
+    
+    window._scanItems=items;
+}
+
+function confirmScanItemsRoom(room){
+    const items=window._scanItems||[];
+    const confirmed=[];
+    
+    items.forEach((item,i)=>{
+        const cb=document.getElementById(`scan-item-${i}`);
+        if(cb&&cb.checked)confirmed.push(item);
+    });
+    
+    if(confirmed.length===0){
+        closeBrainDump();
+        showToast('No items selected.');
+        return;
+    }
+    
+    confirmed.forEach(name=>{
+        state.items.push({
+            id:Date.now()+Math.random(),
+            name:name,
+            bucket:null,
+            origin:room,
+            destination:'',
+            spot:'',
+            giveTo:'',
+            tags:['📸 scanned'],
+            added:new Date().toISOString(),
+            completed:false,
+            moved:false
+        });
+    });
+    
+    saveState();
+    closeBrainDump();
+    updateDumpBadge();
+    window._scanItems=null;
+    showToast(`📸 ${confirmed.length} item${confirmed.length>1?'s':''} added to ${room}!`);
+    viewRoom(room);
 }
 init();
 </script>
