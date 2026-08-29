@@ -409,7 +409,19 @@ let state = JSON.parse(localStorage.getItem('homeBrainState')||'null') || {
 function saveState(){localStorage.setItem('homeBrainState',JSON.stringify(state))}
 
 // ============ INIT ============
-function init(){applyTheme();if(!state.onboarded)startOb();else showApp();}
+function init(){
+    applyTheme();
+    if(!state.onboarded)startOb();
+    else{
+        showApp();
+        // Check if coming from floor plan with a room to open
+        const params=new URLSearchParams(window.location.search);
+        const openRoom=params.get('room');
+        if(openRoom&&state.profile.rooms.includes(openRoom)){
+            setTimeout(()=>viewRoom(openRoom),100);
+        }
+    }
+}
 
 // ============ THEME ============
 function applyTheme(){
