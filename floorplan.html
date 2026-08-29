@@ -16,14 +16,14 @@
         [data-theme="midnight"] { --bg-primary:rgba(15,15,40,var(--opacity));--bg-card:rgba(25,25,55,0.82);--bg-input:rgba(20,20,50,0.92);--accent:#b39ddb;--accent-secondary:#80cbc4;--text-primary:#e8e0f0;--text-secondary:#b0a8c0;--text-muted:#7a7290;--border:rgba(179,157,219,0.25);--shadow:rgba(0,0,0,0.2);--danger:#e74c3c; }
 
         * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+        html, body { height:100%; overflow:hidden; }
         body {
             font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
             background-color:#2d5a3d; background-size:cover; background-position:center;
-            background-repeat:no-repeat; color:var(--text-primary); min-height:100vh;
-            overflow:hidden; touch-action:none;
+            background-repeat:no-repeat; color:var(--text-primary);
         }
         .fp-container {
-            min-height:100vh; background:var(--bg-primary);
+            height:100%; background:var(--bg-primary);
             display:flex; flex-direction:column;
         }
 
@@ -33,7 +33,7 @@
             display:flex; justify-content:space-between; align-items:center;
             background:var(--bg-card); border-bottom:1px solid var(--border);
             backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-            z-index:100;
+            z-index:100; flex-shrink:0;
         }
         .fp-header h2 { font-size:1.1rem; color:var(--accent); }
         .fp-back { background:none; border:none; color:var(--accent); font-size:0.9rem; font-weight:600; cursor:pointer; padding:8px 12px; }
@@ -41,11 +41,12 @@
 
         /* Canvas area */
         .fp-canvas {
-            flex:1; position:relative; overflow:hidden;
+            flex:1; position:relative; overflow:hidden; min-height:0;
             background-image:
                 linear-gradient(var(--border) 1px, transparent 1px),
                 linear-gradient(90deg, var(--border) 1px, transparent 1px);
             background-size:40px 40px;
+            touch-action:none;
         }
 
         /* Room blocks */
@@ -64,24 +65,24 @@
 
         /* Resize handle */
         .fp-resize {
-            position:absolute; bottom:0; right:0; width:20px; height:20px;
+            position:absolute; bottom:0; right:0; width:24px; height:24px;
             cursor:nwse-resize; display:flex; align-items:center; justify-content:center;
         }
         .fp-resize::after {
-            content:''; width:8px; height:8px; border-right:2px solid var(--accent);
-            border-bottom:2px solid var(--accent); opacity:0.5;
+            content:''; width:10px; height:10px; border-right:2px solid var(--accent);
+            border-bottom:2px solid var(--accent); opacity:0.6;
         }
 
         /* Bottom toolbar */
         .fp-toolbar {
-            padding:10px 16px; padding-bottom:max(10px,env(safe-area-inset-bottom));
+            padding:12px 16px; padding-bottom:max(16px,calc(env(safe-area-inset-bottom) + 10px));
             background:var(--bg-card); border-top:1px solid var(--border);
             backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-            display:flex; gap:8px; overflow-x:auto; z-index:100;
+            display:flex; gap:8px; overflow-x:auto; z-index:100; flex-shrink:0;
         }
         .fp-tool-btn {
             background:var(--bg-input); border:1px solid var(--border); border-radius:10px;
-            padding:8px 14px; font-size:0.8rem; font-weight:600; color:var(--text-primary);
+            padding:10px 16px; font-size:0.85rem; font-weight:600; color:var(--text-primary);
             cursor:pointer; white-space:nowrap; flex-shrink:0;
         }
         .fp-tool-btn:active { transform:scale(0.95); }
@@ -97,7 +98,9 @@
         @media (min-width:768px) {
             .fp-room .fp-room-emoji { font-size:1.8rem; }
             .fp-room .fp-room-name { font-size:0.8rem; }
+            .fp-room .fp-room-count { font-size:0.7rem; }
             .fp-header h2 { font-size:1.3rem; }
+            .fp-tool-btn { padding:12px 20px; font-size:0.9rem; }
         }
     </style>
 </head>
@@ -159,7 +162,6 @@ function roomEmoji(r){
 
 // ============ CANVAS & ROOMS ============
 const canvas=document.getElementById('fp-canvas');
-let rooms=[];
 let activeRoom=null;
 let offsetX=0,offsetY=0;
 let isResizing=false;
@@ -186,7 +188,6 @@ function createRoomEl(room){
         <div class="fp-resize" data-resize="true"></div>
     `;
     
-    // Touch events
     el.addEventListener('touchstart',onTouchStart,{passive:false});
     el.addEventListener('mousedown',onMouseDown);
     
@@ -195,7 +196,6 @@ function createRoomEl(room){
 }
 
 function renderRooms(){
-    // Clear existing
     canvas.querySelectorAll('.fp-room').forEach(el=>el.remove());
     
     const roomNames=state.profile.rooms||[];
@@ -204,7 +204,6 @@ function renderRooms(){
         return;
     }
     
-    // Check if we have layout data
     const hasLayout=Object.keys(layout).length>0&&roomNames.some(r=>layout[r]);
     
     if(hasLayout){
@@ -219,7 +218,7 @@ function renderRooms(){
     }
 }
 
-// ============ DRAG & RESIZE LOGIC ============
+// ============ TOUCH DRAG & RESIZE ============
 function onTouchStart(e){
     const touch=e.touches[0];
     const el=e.currentTarget;
@@ -255,18 +254,14 @@ function onTouchMove(e){
     if(isResizing){
         const dx=touch.clientX-startX;
         const dy=touch.clientY-startY;
-        const newW=Math.max(80,startW+dx);
-        const newH=Math.max(60,startH+dy);
-        activeRoom.style.width=newW+'px';
-        activeRoom.style.height=newH+'px';
+        activeRoom.style.width=Math.max(80,startW+dx)+'px';
+        activeRoom.style.height=Math.max(60,startH+dy)+'px';
     } else {
         const canvasRect=canvas.getBoundingClientRect();
         let x=touch.clientX-canvasRect.left-offsetX;
         let y=touch.clientY-canvasRect.top-offsetY;
-        // Snap to grid
         x=Math.round(x/20)*20;
         y=Math.round(y/20)*20;
-        // Bounds
         x=Math.max(0,Math.min(x,canvasRect.width-activeRoom.offsetWidth));
         y=Math.max(0,Math.min(y,canvasRect.height-activeRoom.offsetHeight));
         activeRoom.style.left=x+'px';
@@ -285,7 +280,7 @@ function onTouchEnd(){
     document.removeEventListener('touchend',onTouchEnd);
 }
 
-// Mouse events (for desktop testing)
+// ============ MOUSE DRAG & RESIZE ============
 function onMouseDown(e){
     const el=e.currentTarget;
     const resize=e.target.dataset.resize;
@@ -370,7 +365,6 @@ function addAllRooms(){
     
     document.getElementById('fp-instructions').style.display='none';
     
-    // Auto-arrange in grid
     const canvasRect=canvas.getBoundingClientRect();
     const cols=Math.ceil(Math.sqrt(roomNames.length));
     const roomW=Math.min(150,Math.floor((canvasRect.width-40)/cols)-20);
@@ -391,6 +385,7 @@ function addAllRooms(){
     
     localStorage.setItem('homeBrain_floorplan',JSON.stringify(layout));
     renderRooms();
+    showToast('🏠 Rooms added! Drag to arrange.');
 }
 
 function autoArrange(){
