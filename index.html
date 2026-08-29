@@ -206,7 +206,54 @@
         .spinner { width:24px; height:24px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto; }
         @keyframes spin { to{transform:rotate(360deg)} }
 
-        .hidden { display:none !important; }
+        /* ============ BRAIN DUMP ============ */
+.brain-dump-overlay { position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(0,0,0,0.5); display:flex; align-items:flex-end; justify-content:center; z-index:2000; animation:fadeIn 0.2s; }
+.brain-dump-sheet { background:var(--bg-card); width:100%; max-width:500px; border-radius:20px 20px 0 0; padding:22px; max-height:85vh; overflow-y:auto; backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid var(--border); border-bottom:none; animation:slideUp 0.3s ease; }
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.brain-dump-sheet h3 { color:var(--accent); margin-bottom:4px; }
+.brain-dump-sheet .subtitle { color:var(--text-muted); font-size:0.82rem; margin-bottom:14px; }
+.brain-dump-sheet textarea { min-height:160px; font-size:1rem; }
+.brain-dump-sheet .actions { display:flex; gap:10px; margin-top:14px; }
+.brain-dump-sheet .actions .btn { margin-bottom:0; }
+
+.fab-dump { position:fixed; bottom:80px; left:15px; width:52px; height:52px; border-radius:50%; background:var(--accent); color:white; border:none; font-size:1.4rem; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 15px rgba(0,0,0,0.2); z-index:900; }
+.fab-dump:active { transform:scale(0.9); }
+.fab-dump .badge { position:absolute; top:-2px; right:-2px; background:var(--danger); color:white; border-radius:50%; width:20px; height:20px; font-size:0.65rem; display:flex; align-items:center; justify-content:center; font-weight:700; }
+
+.unsorted-header { text-align:center; padding:10px 0 15px; }
+.unsorted-header .count-badge { background:var(--accent); color:white; border-radius:12px; padding:2px 10px; font-size:0.8rem; font-weight:700; margin-left:6px; vertical-align:middle; }
+.unsorted-header .subtitle { color:var(--text-muted); font-size:0.82rem; margin-top:4px; }
+.unsorted-actions { display:flex; gap:8px; justify-content:center; margin-bottom:14px; }
+
+.item-action-bar { display:flex; gap:5px; margin-top:8px; flex-wrap:wrap; }
+.item-action-bar button { padding:6px 10px; border-radius:8px; border:2px solid var(--border); background:var(--bg-input); color:var(--text-primary); font-size:0.75rem; cursor:pointer; transition:all 0.15s; flex:1; min-width:55px; text-align:center; }
+.item-action-bar button:active { transform:scale(0.95); }
+.item-action-bar button.sel-keep { background:var(--accent); color:white; border-color:var(--accent); }
+.item-action-bar button.sel-give { background:#4361ee; color:white; border-color:#4361ee; }
+.item-action-bar button.sel-toss { background:var(--danger); color:white; border-color:var(--danger); }
+.item-action-bar button.sel-sell { background:#f4a261; color:white; border-color:#f4a261; }
+.item-action-bar button.sel-unsure { background:var(--text-muted); color:white; border-color:var(--text-muted); }
+
+.item-room-select { margin-top:8px; }
+.item-room-select select { margin-bottom:0; padding:10px; font-size:0.85rem; }
+
+.quick-sort-overlay { position:fixed; top:0;left:0;right:0;bottom:0; background:var(--bg-card); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; }
+.quick-sort-overlay .qs-header { text-align:center; margin-bottom:30px; width:100%; }
+.quick-sort-overlay .qs-header h2 { margin-bottom:4px; }
+.quick-sort-overlay .qs-progress { color:var(--text-muted); font-size:0.85rem; }
+.quick-sort-overlay .qs-card { background:var(--bg-input); border:1px solid var(--border); border-radius:16px; padding:36px; width:85%; max-width:300px; text-align:center; box-shadow:0 4px 16px var(--shadow); margin-bottom:30px; transition:transform 0.2s, opacity 0.2s; }
+.quick-sort-overlay .qs-card .qs-name { font-size:1.4rem; font-weight:700; color:var(--accent); }
+.quick-sort-overlay .qs-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; width:85%; max-width:300px; }
+.quick-sort-overlay .qs-btn { border:none; border-radius:12px; padding:18px 10px; font-size:0.9rem; font-weight:600; cursor:pointer; transition:transform 0.1s; }
+.quick-sort-overlay .qs-btn:active { transform:scale(0.93); }
+.quick-sort-overlay .qs-btn.keep { background:rgba(74,158,92,0.15); color:var(--accent); }
+.quick-sort-overlay .qs-btn.give { background:rgba(67,97,238,0.12); color:#4361ee; }
+.quick-sort-overlay .qs-btn.toss { background:rgba(231,76,60,0.12); color:var(--danger); }
+.quick-sort-overlay .qs-btn.sell { background:rgba(244,162,97,0.15); color:#e65100; }
+.quick-sort-overlay .qs-skip { margin-top:16px; background:none; border:none; color:var(--text-muted); font-size:0.88rem; cursor:pointer; padding:12px; }
+
+.toast-msg { position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:var(--accent); color:white; padding:12px 22px; border-radius:24px; font-size:0.88rem; font-weight:600; z-index:9999; box-shadow:0 4px 12px rgba(0,0,0,0.2); animation:fadeIn 0.3s; }
+.hidden { display:none !important; }
         .text-center { text-align:center; }
         .mt-10 { margin-top:10px; }
         .privacy-badge { text-align:center; padding:10px; font-size:0.72rem; color:var(--text-muted); margin-top:15px; }
@@ -227,17 +274,20 @@
     <div id="view-letgo" class="view"></div>
     <div id="view-progress" class="view"></div>
     <div id="view-settings" class="view"></div>
+    <div id="view-unsorted" class="view"></div>
 </div>
 
 <nav class="nav-bar hidden" id="main-nav">
     <button class="nav-btn" onclick="navigate('home')"><span class="icon">🏠</span>Space</button>
     <button class="nav-btn" onclick="navigate('focus')"><span class="icon">✅</span>Focus</button>
+    <button class="nav-btn" onclick="navigate('unsorted')"><span class="icon">📥</span>Inbox</button>
     <button class="nav-btn" onclick="navigate('items')"><span class="icon">📦</span>Items</button>
     <button class="nav-btn" onclick="navigate('letgo')"><span class="icon">♻️</span>Let Go</button>
     <button class="nav-btn" onclick="navigate('progress')"><span class="icon">🏆</span>Stars</button>
     <button class="nav-btn" onclick="navigate('settings')"><span class="icon">⚙️</span>More</button>
 </nav>
 
+<button class="fab-dump hidden" id="fab-dump" onclick="openBrainDump()">📦<span class="badge hidden" id="dump-badge">0</span></button>
 <button class="help-fab hidden" id="help-fab" onclick="toggleHelp()">🧠</button>
 <div class="help-drawer" id="help-drawer">
     <div class="help-drawer-header"><h3>🧠 Help Me</h3><button class="help-drawer-close" onclick="toggleHelp()">✕</button></div>
@@ -254,6 +304,8 @@
     </div>
 </div>
 
+<div id="brain-dump-container"></div>
+<div id="quick-sort-container"></div>
 <div id="modal-container"></div>
 </div>
 
@@ -370,6 +422,8 @@ function showApp(){
     document.getElementById('main-app').classList.remove('hidden');
     document.getElementById('main-nav').classList.remove('hidden');
     document.getElementById('help-fab').classList.remove('hidden');
+    document.getElementById('fab-dump').classList.remove('hidden');
+    updateDumpBadge();
     updateStreak();navigate('checkin');
 }
 
@@ -377,9 +431,9 @@ function navigate(view){
     document.querySelectorAll('#main-app .view').forEach(v=>v.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
     const el=document.getElementById(`view-${view}`);if(el)el.classList.add('active');
-    const map={home:0,focus:1,items:2,letgo:3,progress:4,settings:5};
+    const map={home:0,focus:1,unsorted:2,items:3,letgo:4,progress:5,settings:6};
     if(map[view]!==undefined)document.querySelectorAll('.nav-btn')[map[view]]?.classList.add('active');
-    if(view==='checkin')renderCheckin();else if(view==='home')renderHome();else if(view==='focus')renderFocus();else if(view==='items')renderItems();else if(view==='letgo')renderLetGo();else if(view==='progress')renderProgress();else if(view==='settings')renderSettings();
+    if(view==='checkin')renderCheckin();else if(view==='home')renderHome();else if(view==='focus')renderFocus();else if(view==='items')renderItems();else if(view==='unsorted')renderUnsorted();else if(view==='letgo')renderLetGo();else if(view==='progress')renderProgress();else if(view==='settings')renderSettings();
 }
 
 // ============ STREAK (1-day grace) ============
@@ -433,8 +487,9 @@ function aiDecide(ix){sendHelpMsg(`Help me decide about "${state.items[ix].name}
 // ============ ITEMS VIEW ============
 let itemsView='bucket';
 function renderItems(){
-    const active=state.items.filter(i=>!i.completed),bE={keep:'🏠',give:'🎁',toss:'🗑️',unsure:'🤷'},bL={keep:'Keep',give:'Give Away',toss:'Toss',unsure:'Unsure'};
-    let html=`<div class="view-header"><h2>📦 All Items</h2><p>${active.length} active</p></div><div class="view-toggle"><button class="${itemsView==='bucket'?'active':''}" onclick="itemsView='bucket';renderItems();">By Bucket</button><button class="${itemsView==='room'?'active':''}" onclick="itemsView='room';renderItems();">By Room</button></div>`;
+    const active=state.items.filter(i=>!i.completed&&i.bucket!==null),bE={keep:'🏠',give:'🎁',toss:'🗑️',unsure:'🤷'},bL={keep:'Keep',give:'Give Away',toss:'Toss',unsure:'Unsure'};
+    const unsortedCount=getUnsortedItems().length;
+let html=`${unsortedCount>0?`<div class="card" onclick="navigate('unsorted')" style="cursor:pointer;border-color:var(--accent);margin-bottom:14px;"><div style="display:flex;justify-content:space-between;align-items:center;"><div><h3 style="margin:0;">📥 Unsorted Inbox</h3><p style="margin:0;font-size:0.82rem;">${unsortedCount} item${unsortedCount!==1?'s':''} to sort</p></div><span style="font-size:1.3rem;">→</span></div></div>`:''}<div class="view-header"><h2>📦 All Items</h2><p>${active.length} active</p></div><div class="view-toggle"><button class="${itemsView==='bucket'?'active':''}" onclick="itemsView='bucket';renderItems();">By Bucket</button><button class="${itemsView==='room'?'active':''}" onclick="itemsView='room';renderItems();">By Room</button></div>`;
     if(itemsView==='bucket')html+=`<div class="bucket-grid">${['keep','give','toss','unsure'].map(b=>`<div class="bucket-tile" onclick="viewBucket('${b}')"><span class="emoji">${bE[b]}</span><div class="label">${bL[b]}</div><div class="count">${active.filter(i=>i.bucket===b).length}</div></div>`).join('')}</div>`;
     else html+=state.profile.rooms.map(rm=>{const ri=active.filter(i=>i.origin===rm||i.destination===rm);if(!ri.length)return'';return`<div class="card" onclick="viewRoom('${rm}')"><h3>${roomEmoji(rm)} ${rm}</h3><p>${ri.length} items</p></div>`;}).join('');
     html+=`<button class="btn btn-primary mt-10" onclick="showModal('addItem')">+ Add Item</button>`;
@@ -607,6 +662,217 @@ function fmtMsg(t){if(!t)return'';return t.replace(/\*\*(.*?)\*\*/g,'<strong>$1<
 
 // ============ START ============
 const sb=localStorage.getItem('homeBrain_customBg');if(sb)document.body.style.backgroundImage=`url(${sb})`;
+// ============ BRAIN DUMP SYSTEM ============
+
+function openBrainDump(){
+    document.getElementById('brain-dump-container').innerHTML=`
+    <div class="brain-dump-overlay" onclick="if(event.target===this)closeBrainDump()">
+        <div class="brain-dump-sheet">
+            <h3>📦 Brain Dump</h3>
+            <p class="subtitle">One item per line. Don't think. Just dump.</p>
+            <textarea id="dump-textarea" placeholder="old blender\nchristmas lights\nthat weird cable\nkids art supplies\nbroken vacuum..."></textarea>
+            <div class="actions">
+                <button class="btn btn-secondary" onclick="closeBrainDump()" style="flex:0.4;">Cancel</button>
+                <button class="btn btn-primary" onclick="submitBrainDump()" style="flex:1;">Done — Sort Later →</button>
+            </div>
+        </div>
+    </div>`;
+    setTimeout(()=>document.getElementById('dump-textarea').focus(),100);
+}
+
+function closeBrainDump(){
+    document.getElementById('brain-dump-container').innerHTML='';
+}
+
+function submitBrainDump(){
+    const text=document.getElementById('dump-textarea').value;
+    const lines=text.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
+    if(lines.length===0){closeBrainDump();return;}
+    
+    lines.forEach(line=>{
+        state.items.push({
+            id:Date.now()+Math.random(),
+            name:line,
+            bucket:null,  // null = unsorted (different from 'unsure' which is a deliberate choice)
+            origin:'',
+            destination:'',
+            spot:'',
+            giveTo:'',
+            tags:[],
+            added:new Date().toISOString(),
+            completed:false,
+            moved:false
+        });
+    });
+    
+    saveState();
+    closeBrainDump();
+    updateDumpBadge();
+    showToast(`📦 ${lines.length} item${lines.length>1?'s':''} dumped! Sort whenever.`);
+}
+
+function getUnsortedItems(){
+    return state.items.filter(i=>i.bucket===null && !i.completed);
+}
+
+function updateDumpBadge(){
+    const count=getUnsortedItems().length;
+    const badge=document.getElementById('dump-badge');
+    if(badge){
+        badge.textContent=count;
+        badge.classList.toggle('hidden',count===0);
+    }
+}
+
+function showToast(msg){
+    const t=document.createElement('div');
+    t.className='toast-msg';
+    t.textContent=msg;
+    document.body.appendChild(t);
+    setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity 0.3s';setTimeout(()=>t.remove(),300);},2500);
+}
+
+// ============ UNSORTED INBOX VIEW ============
+
+function renderUnsorted(){
+    const unsorted=getUnsortedItems();
+    let html=`<div class="unsorted-header"><h2>📥 Unsorted<span class="count-badge">${unsorted.length}</span></h2><p class="subtitle">No rush. Sort when you're ready. Or don't.</p></div>`;
+    
+    html+=`<div class="unsorted-actions"><button class="btn btn-small btn-primary" onclick="openQuickSort()">⚡ Quick Sort</button><button class="btn btn-small btn-secondary" onclick="openBrainDump()">+ Dump More</button></div>`;
+    
+    if(unsorted.length===0){
+        html+=`<div class="card text-center"><p style="font-size:1.5rem;margin-bottom:8px;">🎉</p><p>Nothing to sort! Dump more items whenever.</p></div>`;
+    } else {
+        unsorted.forEach(it=>{
+            const ix=state.items.indexOf(it);
+            html+=renderUnsortedCard(it,ix);
+        });
+    }
+    
+    document.getElementById('view-unsorted').innerHTML=html;
+}
+
+function renderUnsortedCard(it,ix){
+    const selClass=(b)=>it.bucket===b?`sel-${b}`:'';
+    const showRoom=it.bucket==='keep';
+    const roomOpts=state.profile.rooms.map(r=>`<option value="${r}" ${it.destination===r?'selected':''}>${r}</option>`).join('');
+    const tagHtml=(it.tags||[]).map((t,ti)=>`<span class="tag selected" onclick="removeUnsortedTag(${ix},${ti})">${escHtml(t)} ✕</span>`).join('')+`<span class="tag" onclick="addUnsortedTag(${ix})">+ tag</span>`;
+    
+    return`<div class="item-card">
+        <div class="item-name">${escHtml(it.name)}</div>
+        <div class="item-action-bar">
+            <button class="${selClass('keep')}" onclick="setUnsortedAction(${ix},'keep')">✅ Keep</button>
+            <button class="${selClass('give')}" onclick="setUnsortedAction(${ix},'give')">🎁 Give</button>
+            <button class="${selClass('toss')}" onclick="setUnsortedAction(${ix},'toss')">🗑️ Toss</button>
+            <button class="${selClass('sell')}" onclick="setUnsortedAction(${ix},'sell')">💰 Sell</button>
+            <button class="${selClass('unsure')}" onclick="setUnsortedAction(${ix},'unsure')">🤷 Unsure</button>
+        </div>
+        <div class="item-tags" style="margin-top:8px;">${tagHtml}</div>
+        ${showRoom?`<div class="item-room-select"><select onchange="assignUnsortedRoom(${ix},this.value)"><option value="">Assign to room...</option>${roomOpts}</select></div>`:''}
+    </div>`;
+}
+
+function setUnsortedAction(ix,action){
+    const it=state.items[ix];
+    // If same action tapped again, set back to null (unsorted)
+    if(it.bucket===action){
+        it.bucket=null;
+    } else {
+        it.bucket=action;
+    }
+    // Clear room if not keep
+    if(action!=='keep'){it.destination='';it.spot='';}
+    saveState();
+    updateDumpBadge();
+    renderUnsorted();
+}
+
+function assignUnsortedRoom(ix,room){
+    state.items[ix].destination=room;
+    saveState();
+}
+
+function addUnsortedTag(ix){
+    const tag=prompt('Add a tag:');
+    if(!tag||!tag.trim())return;
+    const t=tag.trim();
+    if(!state.items[ix].tags)state.items[ix].tags=[];
+    state.items[ix].tags.push(t);
+    if(!state.tags.includes(t))state.tags.push(t);
+    saveState();
+    renderUnsorted();
+}
+
+function removeUnsortedTag(ix,tagIndex){
+    state.items[ix].tags.splice(tagIndex,1);
+    saveState();
+    renderUnsorted();
+}
+
+function escHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
+
+// ============ QUICK SORT ============
+
+let qsQueue=[],qsIndex=0;
+
+function openQuickSort(){
+    qsQueue=getUnsortedItems();
+    qsIndex=0;
+    if(qsQueue.length===0){showToast('🎉 Nothing to sort!');return;}
+    renderQuickSortCard();
+}
+
+function renderQuickSortCard(){
+    if(qsIndex>=qsQueue.length){
+        document.getElementById('quick-sort-container').innerHTML='';
+        showToast(`⚡ Done! Sorted ${qsQueue.length} items.`);
+        state.stars+=Math.ceil(qsQueue.length/2);
+        saveState();
+        celebrate();
+        updateDumpBadge();
+        renderUnsorted();
+        return;
+    }
+    const it=qsQueue[qsIndex];
+    document.getElementById('quick-sort-container').innerHTML=`
+    <div class="quick-sort-overlay">
+        <div class="qs-header">
+            <h2>⚡ Quick Sort</h2>
+            <div class="qs-progress">${qsIndex+1} of ${qsQueue.length}</div>
+            <button class="back-btn" onclick="closeQuickSort()" style="position:absolute;top:20px;right:20px;">✕ Done</button>
+        </div>
+        <div class="qs-card" id="qs-card">
+            <div class="qs-name">${escHtml(it.name)}</div>
+        </div>
+        <div class="qs-actions">
+            <button class="qs-btn toss" onclick="quickSortAction('toss')">🗑️ Toss</button>
+            <button class="qs-btn give" onclick="quickSortAction('give')">🎁 Give</button>
+            <button class="qs-btn keep" onclick="quickSortAction('keep')">✅ Keep</button>
+            <button class="qs-btn sell" onclick="quickSortAction('sell')">💰 Sell</button>
+        </div>
+        <button class="qs-skip" onclick="quickSortAction('unsure')">🤷 Skip — Unsure</button>
+    </div>`;
+}
+
+function quickSortAction(action){
+    const it=qsQueue[qsIndex];
+    const ix=state.items.indexOf(it);
+    if(ix>-1){
+        state.items[ix].bucket=action;
+    }
+    saveState();
+    
+    // Animate
+    const card=document.getElementById('qs-card');
+    if(card){card.style.transform='scale(0.8)';card.style.opacity='0';}
+    setTimeout(()=>{qsIndex++;renderQuickSortCard();},200);
+}
+
+function closeQuickSort(){
+    document.getElementById('quick-sort-container').innerHTML='';
+    updateDumpBadge();
+    renderUnsorted();
+}
 init();
 </script>
 </body>
