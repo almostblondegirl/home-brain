@@ -27,7 +27,6 @@
             display:flex; flex-direction:column;
         }
 
-        /* Header */
         .fp-header {
             padding:12px 16px; padding-top:max(12px,env(safe-area-inset-top));
             display:flex; justify-content:space-between; align-items:center;
@@ -39,7 +38,6 @@
         .fp-back { background:none; border:none; color:var(--accent); font-size:0.9rem; font-weight:600; cursor:pointer; padding:8px 12px; }
         .fp-save { background:var(--accent); color:white; border:none; border-radius:10px; padding:8px 14px; font-size:0.85rem; font-weight:600; cursor:pointer; }
 
-        /* Canvas area */
         .fp-canvas {
             flex:1; position:relative; overflow:hidden; min-height:0;
             background-image:
@@ -49,21 +47,20 @@
             touch-action:none;
         }
 
-        /* Room blocks */
         .fp-room {
-            position:absolute; background:var(--bg-card); border:2px solid var(--accent);
+            position:absolute; background:var(--bg-card); border:2px solid var(--border);
             border-radius:12px; cursor:grab; user-select:none; -webkit-user-select:none;
             display:flex; flex-direction:column; align-items:center; justify-content:center;
-            box-shadow:0 2px 12px var(--shadow); transition:box-shadow 0.2s;
+            box-shadow:0 2px 12px var(--shadow); transition:box-shadow 0.2s, border-color 0.2s;
             min-width:80px; min-height:60px;
         }
-        .fp-room:active { cursor:grabbing; box-shadow:0 4px 20px rgba(0,0,0,0.15); }
-        .fp-room.dragging { opacity:0.8; z-index:1000; }
+        .fp-room:active { cursor:grabbing; }
+        .fp-room.dragging { opacity:0.8; z-index:1000; box-shadow:0 4px 20px rgba(0,0,0,0.15); }
+        .fp-room.selected { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent); }
         .fp-room .fp-room-emoji { font-size:1.5rem; pointer-events:none; }
         .fp-room .fp-room-name { font-size:0.7rem; font-weight:600; color:var(--text-primary); pointer-events:none; margin-top:2px; text-align:center; padding:0 4px; }
         .fp-room .fp-room-count { font-size:0.6rem; color:var(--text-muted); pointer-events:none; }
 
-        /* Resize handle */
         .fp-resize {
             position:absolute; bottom:0; right:0; width:24px; height:24px;
             cursor:nwse-resize; display:flex; align-items:center; justify-content:center;
@@ -73,7 +70,6 @@
             border-bottom:2px solid var(--accent); opacity:0.6;
         }
 
-        /* Bottom toolbar */
         .fp-toolbar {
             padding:12px 16px; padding-bottom:max(16px,calc(env(safe-area-inset-bottom) + 10px));
             background:var(--bg-card); border-top:1px solid var(--border);
@@ -87,6 +83,8 @@
         }
         .fp-tool-btn:active { transform:scale(0.95); }
         .fp-tool-btn.primary { background:var(--accent); color:white; border-color:var(--accent); }
+        .fp-tool-btn.active { background:var(--accent); color:white; border-color:var(--accent); }
+        .fp-tool-btn:disabled { opacity:0.4; pointer-events:none; }
 
         .fp-instructions {
             position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
@@ -94,6 +92,12 @@
             pointer-events:none;
         }
         .fp-instructions .emoji { font-size:2.5rem; margin-bottom:10px; display:block; }
+
+        .fp-select-hint {
+            position:absolute; top:10px; left:50%; transform:translateX(-50%);
+            background:var(--accent); color:white; padding:8px 16px; border-radius:20px;
+            font-size:0.8rem; font-weight:600; z-index:50; box-shadow:0 2px 8px rgba(0,0,0,0.15);
+        }
 
         @media (min-width:768px) {
             .fp-room .fp-room-emoji { font-size:1.8rem; }
@@ -117,20 +121,67 @@
             <span class="emoji">🏠</span>
             <p>Tap <b>+ Add All Rooms</b> below to start building your floor plan.</p>
             <p style="margin-top:8px;font-size:0.8rem;">Drag to move · Pull corners to resize</p>
+            <p style="margin-top:4px;font-size:0.8rem;">Tap Select to move multiple rooms together</p>
         </div>
     </div>
 
     <div class="fp-toolbar">
         <button class="fp-tool-btn primary" onclick="addAllRooms()">+ Add All Rooms</button>
+        <button class="fp-tool-btn" id="btn-select" onclick="toggleSelectMode()">☐ Select</button>
+        <button class="fp-tool-btn" id="btn-undo" onclick="undo()" disabled>↩ Undo</button>
+        <button class="fp-tool-btn" onclick="autoArrange()">✨ Auto</button>
         <button class="fp-tool-btn" onclick="resetLayout()">↺ Reset</button>
-        <button class="fp-tool-btn" onclick="autoArrange()">✨ Auto Arrange</button>
     </div>
 </div>
 
 <script>
-// ============ LOAD STATE FROM MAIN APP ============
+// ============ LOAD STATE ============
 let state = JSON.parse(localStorage.getItem('homeBrainState')||'null') || {profile:{rooms:[],theme:'meadow',bgIntensity:60}};
 let layout = JSON.parse(localStorage.getItem('homeBrain_floorplan')||'null') || {};
+
+// Undo history
+let undoStack=[];
+const MAX_UNDO=20;
+
+function pushUndo(){
+    undoStack.push(JSON.stringify(layout));
+    if(undoStack.length>MAX_UNDO)undoStack.shift();
+    document.getElementById('btn-undo').disabled=false;
+}
+
+function undo(){
+    if(undoStack.length===0)return;
+    layout=JSON.parse(undoStack.pop());
+    localStorage.setItem('homeBrain_floorplan',JSON.stringify(layout));
+    renderRooms();
+    if(undoStack.length===0)document.getElementById('btn-undo').disabled=true;
+    showToast('↩ Undone');
+}
+
+// Select mode
+let selectMode=false;
+let selectedRooms=new Set();
+
+function toggleSelectMode(){
+    selectMode=!selectMode;
+    const btn=document.getElementById('btn-select');
+    btn.classList.toggle('active',selectMode);
+    btn.textContent=selectMode?'✓ Select':'☐ Select';
+    
+    if(!selectMode){
+        // Clear selections
+        selectedRooms.clear();
+        canvas.querySelectorAll('.fp-room.selected').forEach(el=>el.classList.remove('selected'));
+        const hint=document.querySelector('.fp-select-hint');
+        if(hint)hint.remove();
+    } else {
+        const hint=document.createElement('div');
+        hint.className='fp-select-hint';
+        hint.textContent='Tap rooms to select, then drag any selected room to move all';
+        canvas.appendChild(hint);
+        setTimeout(()=>{if(hint.parentNode)hint.remove();},3000);
+    }
+}
 
 // Apply theme
 function applyTheme(){
@@ -147,7 +198,7 @@ function applyTheme(){
 }
 applyTheme();
 
-// ============ ROOM EMOJI HELPER ============
+// ============ ROOM EMOJI ============
 function roomEmoji(r){
     r=r.toLowerCase();
     if(r.includes('bed'))return'🛏️';if(r.includes('bath'))return'🛁';
@@ -166,6 +217,7 @@ let activeRoom=null;
 let offsetX=0,offsetY=0;
 let isResizing=false;
 let startW=0,startH=0,startX=0,startY=0;
+let groupStartPositions={};
 
 function getItemCount(roomName){
     return(state.items||[]).filter(i=>(i.origin===roomName||i.destination===roomName)&&!i.completed).length;
@@ -174,6 +226,7 @@ function getItemCount(roomName){
 function createRoomEl(room){
     const el=document.createElement('div');
     el.className='fp-room';
+    if(selectedRooms.has(room.name))el.classList.add('selected');
     el.style.left=room.x+'px';
     el.style.top=room.y+'px';
     el.style.width=room.w+'px';
@@ -218,14 +271,51 @@ function renderRooms(){
     }
 }
 
-// ============ TOUCH DRAG & RESIZE ============
+// ============ TOUCH EVENTS ============
 function onTouchStart(e){
     const touch=e.touches[0];
     const el=e.currentTarget;
     const resize=e.target.dataset.resize;
+    const name=el.dataset.name;
+    
+    // Select mode: tap to toggle selection
+    if(selectMode&&!resize){
+        e.preventDefault();
+        if(selectedRooms.has(name)){
+            selectedRooms.delete(name);
+            el.classList.remove('selected');
+        } else {
+            selectedRooms.add(name);
+            el.classList.add('selected');
+        }
+        
+        // If dragging a selected room, move all selected
+        if(selectedRooms.has(name)&&selectedRooms.size>0){
+            activeRoom=el;
+            isResizing=false;
+            const rect=el.getBoundingClientRect();
+            offsetX=touch.clientX-rect.left;
+            offsetY=touch.clientY-rect.top;
+            
+            // Store start positions of all selected rooms
+            groupStartPositions={};
+            selectedRooms.forEach(rn=>{
+                const rEl=canvas.querySelector(`[data-name="${rn}"]`);
+                if(rEl)groupStartPositions[rn]={x:parseInt(rEl.style.left),y:parseInt(rEl.style.top)};
+            });
+            startX=touch.clientX;
+            startY=touch.clientY;
+            
+            pushUndo();
+            document.addEventListener('touchmove',onTouchMoveGroup,{passive:false});
+            document.addEventListener('touchend',onTouchEndGroup);
+        }
+        return;
+    }
     
     if(resize){
         e.preventDefault();
+        pushUndo();
         isResizing=true;
         activeRoom=el;
         startW=el.offsetWidth;
@@ -234,6 +324,7 @@ function onTouchStart(e){
         startY=touch.clientY;
     } else {
         e.preventDefault();
+        pushUndo();
         activeRoom=el;
         isResizing=false;
         const rect=el.getBoundingClientRect();
@@ -280,12 +371,76 @@ function onTouchEnd(){
     document.removeEventListener('touchend',onTouchEnd);
 }
 
-// ============ MOUSE DRAG & RESIZE ============
+// Group move (touch)
+function onTouchMoveGroup(e){
+    if(!activeRoom)return;
+    e.preventDefault();
+    const touch=e.touches[0];
+    const dx=touch.clientX-startX;
+    const dy=touch.clientY-startY;
+    const canvasRect=canvas.getBoundingClientRect();
+    
+    selectedRooms.forEach(rn=>{
+        const rEl=canvas.querySelector(`[data-name="${rn}"]`);
+        if(rEl&&groupStartPositions[rn]){
+            let x=groupStartPositions[rn].x+dx;
+            let y=groupStartPositions[rn].y+dy;
+            x=Math.round(x/20)*20;
+            y=Math.round(y/20)*20;
+            x=Math.max(0,Math.min(x,canvasRect.width-rEl.offsetWidth));
+            y=Math.max(0,Math.min(y,canvasRect.height-rEl.offsetHeight));
+            rEl.style.left=x+'px';
+            rEl.style.top=y+'px';
+        }
+    });
+}
+
+function onTouchEndGroup(){
+    updateLayout();
+    activeRoom=null;
+    document.removeEventListener('touchmove',onTouchMoveGroup);
+    document.removeEventListener('touchend',onTouchEndGroup);
+}
+
+// ============ MOUSE EVENTS ============
 function onMouseDown(e){
     const el=e.currentTarget;
     const resize=e.target.dataset.resize;
+    const name=el.dataset.name;
+    
+    if(selectMode&&!resize){
+        if(selectedRooms.has(name)){
+            selectedRooms.delete(name);
+            el.classList.remove('selected');
+        } else {
+            selectedRooms.add(name);
+            el.classList.add('selected');
+        }
+        
+        if(selectedRooms.has(name)&&selectedRooms.size>0){
+            activeRoom=el;
+            isResizing=false;
+            const rect=el.getBoundingClientRect();
+            offsetX=e.clientX-rect.left;
+            offsetY=e.clientY-rect.top;
+            
+            groupStartPositions={};
+            selectedRooms.forEach(rn=>{
+                const rEl=canvas.querySelector(`[data-name="${rn}"]`);
+                if(rEl)groupStartPositions[rn]={x:parseInt(rEl.style.left),y:parseInt(rEl.style.top)};
+            });
+            startX=e.clientX;
+            startY=e.clientY;
+            
+            pushUndo();
+            document.addEventListener('mousemove',onMouseMoveGroup);
+            document.addEventListener('mouseup',onMouseUpGroup);
+        }
+        return;
+    }
     
     if(resize){
+        pushUndo();
         isResizing=true;
         activeRoom=el;
         startW=el.offsetWidth;
@@ -293,6 +448,7 @@ function onMouseDown(e){
         startX=e.clientX;
         startY=e.clientY;
     } else {
+        pushUndo();
         activeRoom=el;
         isResizing=false;
         const rect=el.getBoundingClientRect();
@@ -337,6 +493,34 @@ function onMouseUp(){
     document.removeEventListener('mouseup',onMouseUp);
 }
 
+function onMouseMoveGroup(e){
+    if(!activeRoom)return;
+    const dx=e.clientX-startX;
+    const dy=e.clientY-startY;
+    const canvasRect=canvas.getBoundingClientRect();
+    
+    selectedRooms.forEach(rn=>{
+        const rEl=canvas.querySelector(`[data-name="${rn}"]`);
+        if(rEl&&groupStartPositions[rn]){
+            let x=groupStartPositions[rn].x+dx;
+            let y=groupStartPositions[rn].y+dy;
+            x=Math.round(x/20)*20;
+            y=Math.round(y/20)*20;
+            x=Math.max(0,Math.min(x,canvasRect.width-rEl.offsetWidth));
+            y=Math.max(0,Math.min(y,canvasRect.height-rEl.offsetHeight));
+            rEl.style.left=x+'px';
+            rEl.style.top=y+'px';
+        }
+    });
+}
+
+function onMouseUpGroup(){
+    updateLayout();
+    activeRoom=null;
+    document.removeEventListener('mousemove',onMouseMoveGroup);
+    document.removeEventListener('mouseup',onMouseUpGroup);
+}
+
 // ============ LAYOUT MANAGEMENT ============
 function updateLayout(){
     canvas.querySelectorAll('.fp-room').forEach(el=>{
@@ -363,6 +547,7 @@ function addAllRooms(){
         return;
     }
     
+    pushUndo();
     document.getElementById('fp-instructions').style.display='none';
     
     const canvasRect=canvas.getBoundingClientRect();
@@ -392,6 +577,7 @@ function autoArrange(){
     const roomNames=state.profile.rooms||[];
     if(roomNames.length===0)return;
     
+    pushUndo();
     const canvasRect=canvas.getBoundingClientRect();
     const cols=Math.ceil(Math.sqrt(roomNames.length));
     const roomW=Math.min(150,Math.floor((canvasRect.width-40)/cols)-20);
@@ -416,6 +602,7 @@ function autoArrange(){
 
 function resetLayout(){
     if(!confirm('Reset floor plan layout?'))return;
+    pushUndo();
     layout={};
     localStorage.removeItem('homeBrain_floorplan');
     renderRooms();
