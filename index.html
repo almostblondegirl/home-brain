@@ -160,8 +160,8 @@
         .help-fab { position:fixed; bottom:80px; right:15px; width:52px; height:52px; border-radius:50%; background:var(--accent); color:white; border:none; font-size:1.4rem; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 15px rgba(0,0,0,0.2); z-index:900; }
         .help-fab:active { transform:scale(0.9); }
 
-        .help-drawer { position:fixed; bottom:0; left:0; right:0; background:var(--bg-card); border-top-left-radius:20px; border-top-right-radius:20px; border:1px solid var(--border); border-bottom:none; z-index:1500; transform:translateY(100%); transition:transform 0.3s ease; max-height:70vh; display:flex; flex-direction:column; backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); box-shadow:0 -5px 30px rgba(0,0,0,0.15); }
-        .help-drawer.open { transform:translateY(0); }
+        .help-drawer { position:fixed; bottom:0; left:0; right:0; background:var(--bg-card); border-top-left-radius:20px; border-top-right-radius:20px; border:1px solid var(--border); border-bottom:none; z-index:1500; transform:translateY(101%); visibility:hidden; transition:transform 0.3s ease, visibility 0.3s; max-height:70vh; display:flex; flex-direction:column; backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); box-shadow:0 -5px 30px rgba(0,0,0,0.15); }
+        .help-drawer.open { transform:translateY(0); visibility:visible; }
         .help-drawer-header { padding:12px 18px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
         .help-drawer-header h3 { font-size:1rem; color:var(--accent); }
         .help-drawer-close { background:none; border:none; font-size:1.5rem; color:var(--text-muted); cursor:pointer; }
@@ -407,7 +407,18 @@ let state = JSON.parse(localStorage.getItem('homeBrainState')||'null') || {
     profile:{name:'',goal:'',spaceType:'',rooms:[],storage:{},pets:[],housemates:'',collections:[],location:'',vibe:50,theme:'meadow',bgIntensity:60,spaceFeel:'',celebrationStyle:'confetti',screenAwake:true,showTimer:true},
     items:[],tags:[],stars:0,streak:0,lastActive:null,focusHistory:[],releasedItems:[],mood:null,photoDisclaimer:false,helpMessages:[]
 };
-function saveState(){localStorage.setItem('homeBrainState',JSON.stringify(state))}
+function saveState(){
+    try{
+        localStorage.setItem('homeBrainState',JSON.stringify(state));
+        return true;
+    }catch(e){
+        // Bug 6: the ~5MB cap was blown silently and EVERY later save failed
+        // with no warning. Loud failure beats quiet data loss.
+        console.error('Save failed',e);
+        if(typeof showToast==='function')showToast('⚠️ Couldn\'t save — storage full. Export a backup in Settings.');
+        return false;
+    }
+}
 
 // ============ INIT ============
 function init(){
@@ -444,8 +455,8 @@ function showModal(type,data={}){
     const c=document.getElementById('modal-container');
     let h='';
     if(type==='addRoom')h=`<h3>Add a Room</h3><input type="text" id="m-room" placeholder="Room name"><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doAddRoom()">Add</button></div>`;
-    else if(type==='addItem')h=`<h3>Add an Item</h3><input type="text" id="m-iname" placeholder="What is it?"><label style="font-size:0.78rem;color:var(--text-muted)">Where is it now?</label><select id="m-iorigin"><option value="">Select room...</option>${state.profile.rooms.map(r=>`<option value="${r}">${r}</option>`).join('')}</select><p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;">What to do?</p><div class="option-grid" id="m-bkts"><button class="option-btn" onclick="mBkt('keep',this)"><span class="emoji">🏠</span>Keep</button><button class="option-btn" onclick="mBkt('give',this)"><span class="emoji">🎁</span>Give</button><button class="option-btn" onclick="mBkt('toss',this)"><span class="emoji">🗑️</span>Toss</button><button class="option-btn" onclick="mBkt('unsure',this)"><span class="emoji">🤷</span>Unsure</button></div><div id="m-keep-fields" class="hidden"><label style="font-size:0.78rem;color:var(--text-muted)">Where should it go?</label><select id="m-idest"><option value="">AI will suggest! Or pick:</option>${state.profile.rooms.map(r=>`<option value="${r}">${r}</option>`).join('')}</select><input type="text" id="m-ispot" placeholder="Specific spot (shelf, drawer...)"></div><div id="m-give-fields" class="hidden"><input type="text" id="m-igiveto" placeholder="Who/where? (Jenn, Goodwill...)"></div><input type="text" id="m-itags" placeholder="Tags (comma separated)"><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doAddItem()">Add</button></div>`;
-    else if(type==='editItem'){const it=data.item,ix=data.index;h=`<h3>Edit Item</h3><input type="text" id="m-ename" value="${it.name}"><label style="font-size:0.78rem;color:var(--text-muted)">Currently in:</label><select id="m-eorigin"><option value="">None</option>${state.profile.rooms.map(r=>`<option value="${r}" ${it.origin===r?'selected':''}>${r}</option>`).join('')}</select><label style="font-size:0.78rem;color:var(--text-muted)">Should go to:</label><select id="m-edest"><option value="">Not set</option>${state.profile.rooms.map(r=>`<option value="${r}" ${it.destination===r?'selected':''}>${r}</option>`).join('')}</select><input type="text" id="m-espot" placeholder="Specific spot" value="${it.spot||''}"><input type="text" id="m-etags" placeholder="Tags" value="${(it.tags||[]).join(', ')}"><p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;">Bucket:</p><div class="option-grid" id="m-ebkts"><button class="option-btn ${it.bucket==='keep'?'selected':''}" onclick="mEBkt('keep',this)"><span class="emoji">🏠</span>Keep</button><button class="option-btn ${it.bucket==='give'?'selected':''}" onclick="mEBkt('give',this)"><span class="emoji">🎁</span>Give</button><button class="option-btn ${it.bucket==='toss'?'selected':''}" onclick="mEBkt('toss',this)"><span class="emoji">🗑️</span>Toss</button><button class="option-btn ${it.bucket==='unsure'?'selected':''}" onclick="mEBkt('unsure',this)"><span class="emoji">🤷</span>Unsure</button></div><div class="modal-actions"><button class="btn btn-danger btn-small" onclick="doDelItem(${ix})">🗑️</button><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doSaveItem(${ix})">Save</button></div>`;}
+    else if(type==='addItem')h=`<h3>Add an Item</h3><input type="text" id="m-iname" placeholder="What is it?"><label style="font-size:0.78rem;color:var(--text-muted)">Where is it now?</label><select id="m-iorigin"><option value="">Select room...</option>${state.profile.rooms.map(r=>`<option value="${escAttr(r)}" ${currentRoom===r?'selected':''}>${escHtml(r)}</option>`).join('')}</select><p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;">What to do?</p><div class="option-grid" id="m-bkts"><button class="option-btn" onclick="mBkt('keep',this)"><span class="emoji">🏠</span>Keep</button><button class="option-btn" onclick="mBkt('give',this)"><span class="emoji">🎁</span>Give</button><button class="option-btn" onclick="mBkt('toss',this)"><span class="emoji">🗑️</span>Toss</button><button class="option-btn" onclick="mBkt('unsure',this)"><span class="emoji">🤷</span>Unsure</button></div><div id="m-keep-fields" class="hidden"><label style="font-size:0.78rem;color:var(--text-muted)">Where should it go?</label><select id="m-idest"><option value="">AI will suggest! Or pick:</option>${state.profile.rooms.map(r=>`<option value="${escAttr(r)}">${escHtml(r)}</option>`).join('')}</select><input type="text" id="m-ispot" placeholder="Specific spot (shelf, drawer...)"></div><div id="m-give-fields" class="hidden"><input type="text" id="m-igiveto" placeholder="Who/where? (Jenn, Goodwill...)"></div><input type="text" id="m-itags" placeholder="Tags (comma separated)"><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doAddItem()">Add</button></div>`;
+    else if(type==='editItem'){const it=data.item,ix=data.index;h=`<h3>Edit Item</h3><input type="text" id="m-ename" value="${escAttr(it.name)}"><label style="font-size:0.78rem;color:var(--text-muted)">Currently in:</label><select id="m-eorigin"><option value="">None</option>${state.profile.rooms.map(r=>`<option value="${escAttr(r)}" ${it.origin===r?'selected':''}>${escHtml(r)}</option>`).join('')}</select><label style="font-size:0.78rem;color:var(--text-muted)">Should go to:</label><select id="m-edest"><option value="">Not set</option>${state.profile.rooms.map(r=>`<option value="${escAttr(r)}" ${it.destination===r?'selected':''}>${escHtml(r)}</option>`).join('')}</select><input type="text" id="m-espot" placeholder="Specific spot" value="${escAttr(it.spot||'')}"><input type="text" id="m-etags" placeholder="Tags" value="${escAttr((it.tags||[]).join(', '))}"><p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;">Bucket:</p><div class="option-grid" id="m-ebkts"><button class="option-btn ${it.bucket==='keep'?'selected':''}" onclick="mEBkt('keep',this)"><span class="emoji">🏠</span>Keep</button><button class="option-btn ${it.bucket==='give'?'selected':''}" onclick="mEBkt('give',this)"><span class="emoji">🎁</span>Give</button><button class="option-btn ${it.bucket==='toss'?'selected':''}" onclick="mEBkt('toss',this)"><span class="emoji">🗑️</span>Toss</button><button class="option-btn ${it.bucket==='unsure'?'selected':''}" onclick="mEBkt('unsure',this)"><span class="emoji">🤷</span>Unsure</button></div><div class="modal-actions"><button class="btn btn-danger btn-small" onclick="doDelItem(${ix})">🗑️</button><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doSaveItem(${ix})">Save</button></div>`;}
     else if(type==='photoDisclaimer')h=`<h3>📸 Photo Privacy</h3><p>Photos sent securely to AI:</p><div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.6"><p>• Encrypted (HTTPS)</p><p>• Not saved/trained on</p><p>• No human sees it</p><p>• Only you see results</p></div><div class="modal-actions"><button class="btn btn-primary" onclick="state.photoDisclaimer=true;saveState();closeModal();">Got it!</button></div>`;
     else if(type==='confirm')h=`<h3>${data.title||'Confirm'}</h3><p>${data.message||''}</p><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn ${data.danger?'btn-danger':'btn-primary'}" onclick="${data.onConfirm}">${data.confirmText||'OK'}</button></div>`;
     c.innerHTML=`<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal">${h}</div></div>`;
@@ -465,15 +476,21 @@ function doAddItem(){
     if(item.giveTo&&!item.tags.includes(item.giveTo))item.tags.push(item.giveTo);
     state.items.push(item);item.tags.forEach(t=>{if(!state.tags.includes(t))state.tags.push(t);});
     saveState();closeModal();mBucket='unsure';
-    if(state.profile.goal==='scratch'&&item.bucket==='keep'&&!item.destination){sendHelpMsg(`I just added "${name}" to keep. Where should I put it?`);openHelp();}
-    else renderItems();
+    // Bug 4: this force-opened the Help drawer, which looked like Add had
+    // failed (§9 — well-intentioned, experienced as a bug). The item now just
+    // saves. itemCard offers 🧠 when a Keep item has no destination, so help is
+    // one tap away instead of unavoidable.
+    renderItems();
+    if(state.profile.goal==='scratch'&&item.bucket==='keep'&&!item.destination){
+        showToast('Added! Tap 🧠 on the card if you want help placing it.');
+    }
 }
 
 function doSaveItem(ix){
     const it=state.items[ix];it.name=document.getElementById('m-ename').value.trim();it.origin=document.getElementById('m-eorigin').value;it.destination=document.getElementById('m-edest').value;it.spot=document.getElementById('m-espot').value.trim();it.tags=document.getElementById('m-etags').value.split(',').map(t=>t.trim()).filter(t=>t);if(mEBucket)it.bucket=mEBucket;
     it.tags.forEach(t=>{if(!state.tags.includes(t))state.tags.push(t);});saveState();closeModal();mEBucket='';renderItems();
 }
-function doDelItem(ix){showModal('confirm',{title:'Delete?',message:`Remove "${state.items[ix].name}"?`,danger:true,confirmText:'Delete',onConfirm:`state.items.splice(${ix},1);saveState();closeModal();renderItems();`});}
+function doDelItem(ix){showModal('confirm',{title:'Delete?',message:`Remove "${escHtml(state.items[ix].name)}"?`,danger:true,confirmText:'Delete',onConfirm:`state.items.splice(${ix},1);saveState();closeModal();renderItems();`});}
 // ============ ONBOARDING ============
 let obStep=0;
 const obSteps=['welcome','apikey','name','goal','spaceType','rooms','storage','housemates','pets','petDetails','collections','location','theme','vibe','privacy','done'];
@@ -485,7 +502,7 @@ function renderOb(){
     const c=document.getElementById('ob-content'),step=obSteps[obStep];
     if(step==='welcome')c.innerHTML=`<div class="ob-step"><div class="emoji-big">🧠🏠</div><h2>Welcome to Home Brain</h2><p>Your personal space organizer, decision helper, and gentle coach.</p><p style="color:var(--text-muted);font-size:0.8rem;">Your data stays on this device only.</p><button class="btn btn-primary" onclick="obNext()">Let's Get Started →</button></div>`;
     else if(step==='apikey')c.innerHTML=`<div class="ob-step"><div class="emoji-big">🔑</div><h2>API Key Setup</h2><p>Powers the AI. Do this later in Settings if you prefer.</p><input type="password" id="ob-key" placeholder="Paste OpenAI key (sk-...)" value="${localStorage.getItem('homeBrain_apiKey')||''}"><p style="font-size:0.75rem;color:var(--text-muted)">Get one at platform.openai.com → API Keys</p><button class="btn btn-primary" onclick="let k=document.getElementById('ob-key').value.trim();if(k)localStorage.setItem('homeBrain_apiKey',k);obNext();">Save & Continue</button><button class="btn btn-secondary" onclick="obNext()">Skip</button></div>`;
-    else if(step==='name')c.innerHTML=`<div class="ob-step"><div class="emoji-big">👋</div><h2>What should I call you?</h2><input type="text" id="ob-name" placeholder="Name or nickname" value="${state.profile.name}" style="text-align:center;font-size:1.1rem;"><button class="btn btn-primary" onclick="let n=document.getElementById('ob-name').value.trim();if(!n)return;state.profile.name=n;saveState();obNext();">Next →</button></div>`;
+    else if(step==='name')c.innerHTML=`<div class="ob-step"><div class="emoji-big">👋</div><h2>What should I call you?</h2><input type="text" id="ob-name" placeholder="Name or nickname" value="${escAttr(state.profile.name)}" style="text-align:center;font-size:1.1rem;"><button class="btn btn-primary" onclick="let n=document.getElementById('ob-name').value.trim();if(!n)return;state.profile.name=n;saveState();obNext();">Next →</button></div>`;
     else if(step==='goal')c.innerHTML=`<div class="ob-step"><h2>What's your main goal?</h2><p>Changes how the app works for you.</p><div class="option-grid">${[['scratch','🆕','Organize from scratch'],['maintain','🧹','Help me maintain'],['declutter','📦','Help me declutter'],['purge','🌊','Full purge mode']].map(([v,e,l])=>`<button class="option-btn ${state.profile.goal===v?'selected':''}" onclick="state.profile.goal='${v}';saveState();document.querySelectorAll('#ob-content .option-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected');document.getElementById('ob-gnext').classList.remove('hidden');"><span class="emoji">${e}</span>${l}</button>`).join('')}</div><button class="btn btn-primary hidden" id="ob-gnext" onclick="obNext()">Next →</button></div>`;
     else if(step==='spaceType')c.innerHTML=`<div class="ob-step"><h2>What's your space?</h2><div class="option-grid">${[['room','🛏️','Just my room'],['apartment','🏢','Apartment'],['house','🏠','House'],['mobile','🏡','Mobile/Modular']].map(([v,e,l])=>`<button class="option-btn ${state.profile.spaceType===v?'selected':''}" onclick="state.profile.spaceType='${v}';saveState();document.querySelectorAll('#ob-content .option-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected');document.getElementById('ob-snext').classList.remove('hidden');"><span class="emoji">${e}</span>${l}</button>`).join('')}</div><button class="btn btn-primary hidden" id="ob-snext" onclick="obNext()">Next →</button></div>`;
     else if(step==='rooms'){
@@ -494,7 +511,7 @@ function renderOb(){
         if(t==='house')sugg=['Bedroom','Bathroom','Kitchen','Living Room','Dining Room','Garage','Hall Closet','Laundry Room','Office'];
         if(t==='mobile')sugg=['Bedroom','Bathroom','Kitchen','Living Room','Hall Closet','Porch','Outdoor Storage'];
         const multi=['Bedroom','Bathroom','Closet','Hall Closet'];
-        c.innerHTML=`<div class="ob-step"><h2>Your rooms</h2><p>Tap to add. For multiples, I'll ask how many.</p><div style="margin-bottom:10px;">${sugg.map(r=>`<span class="tag ${state.profile.rooms.includes(r)||state.profile.rooms.some(x=>x.startsWith(r+' '))?'selected':''}" onclick="obToggleRoom('${r}',${multi.includes(r)})">${r}</span>`).join('')}</div><div style="display:flex;gap:8px;margin:10px 0;"><input type="text" id="ob-cr" placeholder="Custom room..." style="margin:0;flex:1;"><button class="btn btn-small btn-primary" onclick="let r=document.getElementById('ob-cr').value.trim();if(r&&!state.profile.rooms.includes(r)){state.profile.rooms.push(r);saveState();renderOb();}">+</button></div><p style="font-size:0.85rem;font-weight:600;">Your rooms: ${state.profile.rooms.join(', ')||'None yet'}</p><button class="btn btn-primary mt-10" onclick="obNext()">Next →</button></div>`;
+        c.innerHTML=`<div class="ob-step"><h2>Your rooms</h2><p>Tap to add. For multiples, I'll ask how many.</p><div style="margin-bottom:10px;">${sugg.map(r=>`<span class="tag ${state.profile.rooms.includes(r)||state.profile.rooms.some(x=>x.startsWith(r+' '))?'selected':''}" onclick="obToggleRoom('${r}',${multi.includes(r)})">${r}</span>`).join('')}</div><div style="display:flex;gap:8px;margin:10px 0;"><input type="text" id="ob-cr" placeholder="Custom room..." style="margin:0;flex:1;"><button class="btn btn-small btn-primary" onclick="let r=document.getElementById('ob-cr').value.trim();if(r&&!state.profile.rooms.includes(r)){state.profile.rooms.push(r);saveState();renderOb();}">+</button></div><p style="font-size:0.85rem;font-weight:600;">Your rooms: ${escHtml(state.profile.rooms.join(', '))||'None yet'}</p><button class="btn btn-primary mt-10" onclick="obNext()">Next →</button></div>`;
     }
     else if(step==='storage'){
         const types=[['closets','🚪 Closets'],['walkin','🚶 Walk-in'],['dressers','🗄️ Dressers/Drawers'],['builtins','📐 Built-ins'],['bookshelves','📚 Bookshelves'],['underbed','🛏️ Under-bed'],['hallcloset','🚪 Hall/Linen closet'],['pantry','🥫 Pantry'],['laundry','🧺 Laundry storage'],['garage','🚗 Garage'],['shed','🏚️ Shed'],['attic','🏠 Attic'],['cabinets','🗃️ Cabinets']];
@@ -505,16 +522,34 @@ function renderOb(){
     else if(step==='pets')c.innerHTML=`<div class="ob-step"><h2>Any pets?</h2><p>Pets affect organization!</p><div class="option-grid"><button class="option-btn" onclick="state.profile.pets.push({type:'dog',count:1,size:'medium',roam:'full',dedicatedSpace:''});saveState();renderOb();"><span class="emoji">🐕</span>Dog(s)</button><button class="option-btn" onclick="state.profile.pets.push({type:'cat',count:1,roam:'full',dedicatedSpace:''});saveState();renderOb();"><span class="emoji">🐈</span>Cat(s)</button><button class="option-btn" onclick="state.profile.pets.push({type:'other',count:1,roam:'limited',dedicatedSpace:''});saveState();renderOb();"><span class="emoji">🐾</span>Other</button><button class="option-btn" onclick="state.profile.pets=[];saveState();obStep++;obNext();"><span class="emoji">🚫</span>No pets</button></div><div style="margin:8px 0;">${state.profile.pets.map((p,i)=>`<span class="tag selected">${p.type==='dog'?'🐕':p.type==='cat'?'🐈':'🐾'} ${p.type} <span onclick="state.profile.pets.splice(${i},1);saveState();renderOb();" style="cursor:pointer">✕</span></span>`).join('')}</div>${state.profile.pets.length?'<button class="btn btn-primary" onclick="obNext()">Next →</button>':''}</div>`;
     else if(step==='petDetails'){
         if(!state.profile.pets.length){obNext();return;}
-        c.innerHTML=`<div class="ob-step"><h2>About your pets</h2>${state.profile.pets.map((p,i)=>`<div class="card" style="text-align:left;"><h3>${p.type==='dog'?'🐕':p.type==='cat'?'🐈':'🐾'} ${p.type}</h3><label style="font-size:0.78rem;color:var(--text-muted)">How many?</label><input type="number" value="${p.count||1}" min="1" max="10" onchange="state.profile.pets[${i}].count=parseInt(this.value);saveState();">${p.type==='dog'?`<label style="font-size:0.78rem;color:var(--text-muted)">Size</label><select onchange="state.profile.pets[${i}].size=this.value;saveState();"><option value="small" ${p.size==='small'?'selected':''}>Small</option><option value="medium" ${p.size==='medium'?'selected':''}>Medium</option><option value="large" ${p.size==='large'?'selected':''}>Large (55+lbs)</option></select>`:''}<label style="font-size:0.78rem;color:var(--text-muted)">Free roam?</label><select onchange="state.profile.pets[${i}].roam=this.value;saveState();"><option value="full" ${p.roam==='full'?'selected':''}>Full</option><option value="mostly" ${p.roam==='mostly'?'selected':''}>Mostly</option><option value="limited" ${p.roam==='limited'?'selected':''}>Limited</option></select><label style="font-size:0.78rem;color:var(--text-muted)">Dedicated space?</label><input type="text" value="${p.dedicatedSpace||''}" placeholder="e.g., 2nd bath for litter" onchange="state.profile.pets[${i}].dedicatedSpace=this.value;saveState();"></div>`).join('')}<button class="btn btn-primary" onclick="obNext()">Next →</button></div>`;
+        c.innerHTML=`<div class="ob-step"><h2>About your pets</h2>${state.profile.pets.map((p,i)=>`<div class="card" style="text-align:left;"><h3>${p.type==='dog'?'🐕':p.type==='cat'?'🐈':'🐾'} ${p.type}</h3><label style="font-size:0.78rem;color:var(--text-muted)">How many?</label><input type="number" value="${p.count||1}" min="1" max="10" onchange="state.profile.pets[${i}].count=parseInt(this.value);saveState();">${p.type==='dog'?`<label style="font-size:0.78rem;color:var(--text-muted)">Size</label><select onchange="state.profile.pets[${i}].size=this.value;saveState();"><option value="small" ${p.size==='small'?'selected':''}>Small</option><option value="medium" ${p.size==='medium'?'selected':''}>Medium</option><option value="large" ${p.size==='large'?'selected':''}>Large (55+lbs)</option></select>`:''}<label style="font-size:0.78rem;color:var(--text-muted)">Free roam?</label><select onchange="state.profile.pets[${i}].roam=this.value;saveState();"><option value="full" ${p.roam==='full'?'selected':''}>Full</option><option value="mostly" ${p.roam==='mostly'?'selected':''}>Mostly</option><option value="limited" ${p.roam==='limited'?'selected':''}>Limited</option></select><label style="font-size:0.78rem;color:var(--text-muted)">Dedicated space?</label><input type="text" value="${escAttr(p.dedicatedSpace||'')}" placeholder="e.g., 2nd bath for litter" onchange="state.profile.pets[${i}].dedicatedSpace=this.value;saveState();"></div>`).join('')}<button class="btn btn-primary" onclick="obNext()">Next →</button></div>`;
     }
-    else if(step==='collections')c.innerHTML=`<div class="ob-step"><h2>Collect anything?</h2><p>I'll never suggest removing these unless YOU bring it up. 💛</p><div style="margin-bottom:10px;">${['Books','Funko Pops','Vinyl','Art','Plants','Shoes','Video Games','Manga/Comics','Candles','Mugs'].map(x=>`<span class="tag ${state.profile.collections.includes(x)?'selected':''}" onclick="let i=state.profile.collections.indexOf('${x}');if(i>-1)state.profile.collections.splice(i,1);else state.profile.collections.push('${x}');saveState();renderOb();">${x}</span>`).join('')}</div><div style="display:flex;gap:8px;margin-bottom:10px;"><input type="text" id="ob-coll" placeholder="Add your own" style="margin:0;flex:1;"><button class="btn btn-small btn-primary" onclick="let v=document.getElementById('ob-coll').value.trim();if(v){state.profile.collections.push(v);saveState();renderOb();}">+</button></div><button class="btn btn-primary" onclick="obNext()">Next →</button><button class="btn btn-secondary" onclick="obNext()">Skip</button></div>`;
-    else if(step==='location')c.innerHTML=`<div class="ob-step"><h2>Where are you?</h2><p>City/state — for donation & disposal suggestions.</p><input type="text" id="ob-loc" placeholder="e.g., Sacramento, CA" value="${state.profile.location}" style="text-align:center;"><button class="btn btn-primary" onclick="state.profile.location=document.getElementById('ob-loc').value.trim();saveState();obNext();">Next →</button><button class="btn btn-secondary" onclick="obNext()">Skip</button></div>`;
+    else if(step==='collections'){
+        const presetColl=['Books','Funko Pops','Vinyl','Art','Plants','Shoes','Video Games','Manga/Comics','Candles','Mugs'];
+        // Bug 10: custom collections were pushed to state but never rendered —
+        // type "Warhammer", it saves, and you never see it again.
+        const allColl=[...presetColl,...(state.profile.collections||[]).filter(c=>!presetColl.includes(c))];
+        c.innerHTML=`<div class="ob-step"><h2>Collect anything?</h2><p>I'll never suggest removing these unless YOU bring it up. 💛</p><div style="margin-bottom:10px;">${allColl.map(x=>`<span class="tag ${state.profile.collections.includes(x)?'selected':''}" onclick="toggleColl('${jsStr(x)}')">${escHtml(x)}</span>`).join('')}</div><div style="display:flex;gap:8px;margin-bottom:10px;"><input type="text" id="ob-coll" placeholder="Add your own" style="margin:0;flex:1;"><button class="btn btn-small btn-primary" onclick="addColl()">+</button></div><button class="btn btn-primary" onclick="obNext()">Next →</button><button class="btn btn-secondary" onclick="obNext()">Skip</button></div>`;
+    }
+    else if(step==='location')c.innerHTML=`<div class="ob-step"><h2>Where are you?</h2><p>City/state — for donation & disposal suggestions.</p><input type="text" id="ob-loc" placeholder="e.g., Sacramento, CA" value="${escAttr(state.profile.location)}" style="text-align:center;"><button class="btn btn-primary" onclick="state.profile.location=document.getElementById('ob-loc').value.trim();saveState();obNext();">Next →</button><button class="btn btn-secondary" onclick="obNext()">Skip</button></div>`;
     else if(step==='theme')c.innerHTML=`<div class="ob-step"><h2>Pick your vibe 🎨</h2><div class="option-grid">${[['meadow','🌿','Meadow'],['reef','🐠','Reef'],['golden','🌅','Golden'],['chibi','⚡','Chibi'],['tome','📚','Tome'],['midnight','🌙','Midnight']].map(([t,e,l])=>`<button class="option-btn ${state.profile.theme===t?'selected':''}" onclick="state.profile.theme='${t}';saveState();applyTheme();document.querySelectorAll('#ob-content .option-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected');"><span class="emoji">${e}</span>${l}</button>`).join('')}</div><p style="font-size:0.82rem;margin-top:10px;">Background visibility:</p><div class="vibe-slider"><div class="vibe-labels"><span>Subtle</span><span>Vibrant</span></div><input type="range" min="20" max="80" value="${state.profile.bgIntensity||60}" oninput="state.profile.bgIntensity=parseInt(this.value);saveState();applyTheme();"></div><button class="btn btn-primary" onclick="obNext()">Next →</button></div>`;
     else if(step==='vibe')c.innerHTML=`<div class="ob-step"><h2>How should I talk to you?</h2><div class="vibe-slider"><div class="vibe-labels"><span>🧘 Chill</span><span>🎉 Hype</span></div><input type="range" min="0" max="100" value="${state.profile.vibe}" oninput="state.profile.vibe=parseInt(this.value);saveState();"><div class="vibe-notches"><span>Calm</span><span>Gentle</span><span>Balanced</span><span>Upbeat</span><span>Energetic</span></div></div><button class="btn btn-primary" onclick="obNext()">Next →</button></div>`;
     else if(step==='privacy')c.innerHTML=`<div class="ob-step"><div class="emoji-big">🔒</div><h2>Your Privacy</h2><div class="card" style="text-align:left;"><p style="margin-bottom:6px;">✅ Everything stays <strong>on this device only</strong></p><p style="margin-bottom:6px;">✅ No account, no cloud, no tracking</p><p style="margin-bottom:6px;">✅ AI doesn't keep your info</p><p style="margin-bottom:6px;">✅ Photos processed & forgotten</p><p>✅ Export or delete anytime</p></div><button class="btn btn-primary" onclick="obNext()">Got it →</button></div>`;
-    else if(step==='done')c.innerHTML=`<div class="ob-step"><div class="emoji-big">🎉</div><h2>Ready, ${state.profile.name}!</h2><div class="card" style="text-align:left;"><p style="margin-bottom:5px;">🏠 <b>Space</b> — your rooms</p><p style="margin-bottom:5px;">✅ <b>Focus</b> — timed tasks</p><p style="margin-bottom:5px;">📦 <b>Items</b> — sort & organize</p><p style="margin-bottom:5px;">♻️ <b>Let Go</b> — release with support</p><p style="margin-bottom:5px;">🏆 <b>Stars</b> — celebrate wins</p><p>🧠 <b>Brain bubble</b> — tap for help anytime!</p></div><button class="btn btn-primary" onclick="state.onboarded=true;state.lastActive=new Date().toDateString();saveState();showApp();">Let's Go! 🚀</button></div>`;
+    else if(step==='done')c.innerHTML=`<div class="ob-step"><div class="emoji-big">🎉</div><h2>Ready, ${escHtml(state.profile.name)}!</h2><div class="card" style="text-align:left;"><p style="margin-bottom:5px;">🏠 <b>Space</b> — your rooms</p><p style="margin-bottom:5px;">✅ <b>Focus</b> — timed tasks</p><p style="margin-bottom:5px;">📦 <b>Items</b> — sort & organize</p><p style="margin-bottom:5px;">♻️ <b>Let Go</b> — release with support</p><p style="margin-bottom:5px;">🏆 <b>Stars</b> — celebrate wins</p><p>🧠 <b>Brain bubble</b> — tap for help anytime!</p></div><button class="btn btn-primary" onclick="state.onboarded=true;state.lastActive=new Date().toDateString();saveState();showApp();">Let's Go! 🚀</button></div>`;
 }
 
+function toggleColl(x){
+    const i=state.profile.collections.indexOf(x);
+    if(i>-1)state.profile.collections.splice(i,1);
+    else state.profile.collections.push(x);
+    saveState();renderOb();
+}
+function addColl(){
+    const v=document.getElementById('ob-coll').value.trim();
+    if(!v)return;
+    if(!state.profile.collections.includes(v))state.profile.collections.push(v);
+    saveState();renderOb();
+}
 function obToggleRoom(room,isMulti){
     const has=state.profile.rooms.includes(room)||state.profile.rooms.some(r=>r.startsWith(room+' '));
     if(has){state.profile.rooms=state.profile.rooms.filter(r=>r!==room&&!r.startsWith(room+' '));}
@@ -535,6 +570,7 @@ function showApp(){
 }
 
 function navigate(view){
+    if(view!=='room')currentRoom='';
     document.querySelectorAll('#main-app .view').forEach(v=>v.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
     const el=document.getElementById(`view-${view}`);if(el)el.classList.add('active');
@@ -556,14 +592,14 @@ function updateStreak(){
 
 // ============ CHECK-IN ============
 function renderCheckin(){
-    const hour=new Date().getHours(),name=state.profile.name;
+    const hour=new Date().getHours(),name=escHtml(state.profile.name);
     const g={early:[`Up early, ${name}! ☀️`,`Early bird! 🐦`,`Morning, ${name}! Fresh start 🌱`],morning:[`Good morning, ${name}! ☀️`,`Morning! What's on your mind? 🌤️`,`Hey ${name}! New day ✨`],afternoon:[`Hey ${name}! 👋`,`Afternoon! Got a few minutes? ☀️`],evening:[`Evening, ${name} 🌙`,`Hey ${name}, winding down? 🌙`,`Cozy evening ✨`],late:[`Hey night owl 🦉`,`Late night — be gentle 💫`]};
     let pool=hour<8?g.early:hour<12?g.morning:hour<17?g.afternoon:hour<21?g.evening:g.late;
     const greeting=pool[Math.floor(Math.random()*pool.length)];
     const streak=state.streak>1?`<div style="text-align:center;margin-bottom:15px;"><span class="streak-badge">🔥 ${state.streak} days in a row!</span></div>`:'';
-    document.getElementById('view-checkin').innerHTML=`<div class="view-header text-center"><h2>${greeting}</h2><p>How are you feeling?</p></div>${streak}<div class="mood-selector"><button class="mood-btn" onclick="setMood('great')">🟢</button><button class="mood-btn" onclick="setMood('okay')">🟡</button><button class="mood-btn" onclick="setMood('rough')">🔴</button></div><div style="display:flex;justify-content:center;gap:15px;"><span style="font-size:0.75rem;color:var(--text-muted);width:72px;text-align:center">Let's go!</span><span style="font-size:0.75rem;color:var(--text-muted);width:72px;text-align:center">Something small</span><span style="font-size:0.75rem;color:var(--text-muted);width:72px;text-align:center">Be gentle</span></div>`;
+    document.getElementById('view-checkin').innerHTML=`<div class="view-header text-center"><h2>${greeting}</h2><p>How are you feeling?</p></div>${streak}<div class="mood-selector"><button class="mood-btn" onclick="setMood('great',this)">🟢</button><button class="mood-btn" onclick="setMood('okay',this)">🟡</button><button class="mood-btn" onclick="setMood('rough',this)">🔴</button></div><div style="display:flex;justify-content:center;gap:15px;"><span style="font-size:0.75rem;color:var(--text-muted);width:72px;text-align:center">Let's go!</span><span style="font-size:0.75rem;color:var(--text-muted);width:72px;text-align:center">Something small</span><span style="font-size:0.75rem;color:var(--text-muted);width:72px;text-align:center">Be gentle</span></div>`;
 }
-function setMood(m){state.mood=m;saveState();document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');setTimeout(()=>navigate('home'),400);}
+function setMood(m,el){state.mood=m;saveState();document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');setTimeout(()=>navigate('home'),400);}
 
 // ============ MY SPACE ============
 function renderHome(){
@@ -572,74 +608,90 @@ function renderHome(){
         return;
     }
     const rooms=state.profile.rooms;
-    document.getElementById('view-home').innerHTML=`<div class="view-header"><h2>🏠 My Space</h2><p>Your rooms & what's where</p></div><div class="room-grid">${rooms.length?rooms.map(r=>{const cnt=state.items.filter(i=>(i.origin===r||i.destination===r)&&!i.completed).length;return`<div class="room-tile" onclick="viewRoom('${r}')"><span class="emoji">${roomEmoji(r)}</span><div class="name">${r}</div><div class="count">${cnt} item${cnt!==1?'s':''}</div></div>`;}).join(''):'<p style="grid-column:1/-1;text-align:center;color:var(--text-muted)">No rooms yet!</p>'}</div><button class="btn btn-secondary" onclick="showModal('addRoom')">+ Add Room</button><button class="btn btn-secondary" onclick="window.location.href='floorplan.html'" style="margin-top:0;">🗺️ View Floor Plan</button>`;
+    document.getElementById('view-home').innerHTML=`<div class="view-header"><h2>🏠 My Space</h2><p>Your rooms & what's where</p></div><div class="room-grid">${rooms.length?rooms.map(r=>{const cnt=state.items.filter(i=>(i.origin===r||i.destination===r)&&!i.completed).length;return`<div class="room-tile" onclick="viewRoom('${jsStr(r)}')"><span class="emoji">${roomEmoji(r)}</span><div class="name">${escHtml(r)}</div><div class="count">${cnt} item${cnt!==1?'s':''}</div></div>`;}).join(''):'<p style="grid-column:1/-1;text-align:center;color:var(--text-muted)">No rooms yet!</p>'}</div><button class="btn btn-secondary" onclick="showModal('addRoom')">+ Add Room</button><button class="btn btn-secondary" onclick="window.location.href='floorplan.html'" style="margin-top:0;">🗺️ View Floor Plan</button>`;
 }
 
 function roomEmoji(r){r=r.toLowerCase();if(r.includes('bed'))return'🛏️';if(r.includes('bath'))return'🛁';if(r.includes('kitchen'))return'🍳';if(r.includes('living'))return'🛋️';if(r.includes('garage'))return'🚗';if(r.includes('closet'))return'🚪';if(r.includes('laundry'))return'🧺';if(r.includes('dining'))return'🍽️';if(r.includes('office')||r.includes('desk'))return'💻';if(r.includes('porch')||r.includes('patio'))return'🪑';if(r.includes('shed')||r.includes('storage'))return'🏚️';return'📍';}
 
+// Bug 5: Add Item asked "where is it now?" while you were standing in a room.
+// currentRoom tracks the room being viewed so the origin select can default.
+let currentRoom='';
 function viewRoom(room){
+    currentRoom=room;
     const items=state.items.filter(i=>(i.origin===room||i.destination===room)&&!i.completed);
-    const bkts=['keep','give','toss','unsure'],bLbl={keep:'🏠 Keep',give:'🎁 Give Away',toss:'🗑️ Toss',unsure:'🤷 Unsure'};
+    // Bug 2: unsorted (bucket:null) items were counted but never rendered —
+    // a scanned room showed "12 items" above "Nothing here yet."
+    // Bug 3: 'sell' was offered in Quick Sort and Inbox but rendered nowhere.
+    const bkts=['keep','give','toss','sell','unsure'],bLbl={keep:'🏠 Keep',give:'🎁 Give Away',toss:'🗑️ Toss',sell:'💰 Sell',unsure:'🤷 Unsure'};
     let html='';
+    const unsortedHere=items.filter(i=>i.bucket===null||i.bucket===undefined);
+    if(unsortedHere.length){
+        html+=`<h3 style="margin:12px 0 6px;font-size:0.9rem;color:var(--accent);">📥 Not sorted yet (${unsortedHere.length})</h3>`;
+        unsortedHere.forEach(it=>{html+=itemCard(it);});
+    }
     bkts.forEach(b=>{const bi=items.filter(i=>i.bucket===b);if(bi.length){html+=`<h3 style="margin:12px 0 6px;font-size:0.9rem;color:var(--accent);">${bLbl[b]} (${bi.length})</h3>`;bi.forEach(it=>{html+=itemCard(it);});}});
-    document.getElementById('view-room').innerHTML=`<button class="back-btn" onclick="navigate('home')">← Back</button><div class="view-header"><h2>${roomEmoji(room)} ${room}</h2><p>${items.length} item${items.length!==1?'s':''}</p></div>${html||'<p style="color:var(--text-muted);text-align:center;padding:20px;">Nothing here yet.</p>'}<button class="btn btn-primary mt-10" onclick="showModal('addItem')">+ Add Item</button><button class="btn btn-secondary" onclick="openAIScanRoom('${room}')">📸 Scan This Space</button>`;
+    document.getElementById('view-room').innerHTML=`<button class="back-btn" onclick="navigate('home')">← Back</button><div class="view-header"><h2>${roomEmoji(room)} ${escHtml(room)}</h2><p>${items.length} item${items.length!==1?'s':''}</p></div>${html||'<p style="color:var(--text-muted);text-align:center;padding:20px;">Nothing here yet.</p>'}<button class="btn btn-primary mt-10" onclick="showModal('addItem')">+ Add Item</button><button class="btn btn-secondary" onclick="openAIScanRoom('${jsStr(room)}')">📸 Scan This Space</button>`;
     document.querySelectorAll('#main-app .view').forEach(v=>v.classList.remove('active'));document.getElementById('view-room').classList.add('active');
-}
 
-function moveRoom(index,direction){
-    const rooms=state.profile.rooms;
-    const newIndex=index+direction;
-    if(newIndex<0||newIndex>=rooms.length)return;
-    const temp=rooms[index];
-    rooms[index]=rooms[newIndex];
-    rooms[newIndex]=temp;
-    saveState();
-    renderHome();
 }
 function itemCard(it){
     const ix=state.items.indexOf(it),meta=[];
-    if(it.origin)meta.push(`📍 ${it.origin}`);if(it.destination)meta.push(`🎯 → ${it.destination}${it.spot?' ('+it.spot+')':''}`);if(it.giveTo)meta.push(`👤 ${it.giveTo}`);if(it.moved)meta.push('✅ Moved!');
-    return`<div class="item-card"><div class="item-name">${it.name}</div><div class="item-meta">${meta.join(' • ')}</div>${it.tags?.length?`<div class="item-tags">${it.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>`:''}<div class="item-actions"><button onclick="showModal('editItem',{item:state.items[${ix}],index:${ix}})">✏️</button>${it.bucket==='keep'&&it.destination&&!it.moved?`<button onclick="markMoved(${ix})">✅ Moved!</button>`:''}${it.bucket==='unsure'?`<button onclick="aiDecide(${ix})">🧠 Help</button>`:''}<button onclick="doDelItem(${ix})">🗑️</button></div></div>`;
+    if(it.origin)meta.push(`📍 ${escHtml(it.origin)}`);
+    if(it.destination)meta.push(`🎯 → ${escHtml(it.destination)}${it.spot?' ('+escHtml(it.spot)+')':''}`);
+    if(it.giveTo)meta.push(`👤 ${escHtml(it.giveTo)}`);
+    if(it.moved)meta.push('✅ Moved!');
+    return`<div class="item-card"><div class="item-name">${escHtml(it.name)}</div><div class="item-meta">${meta.join(' • ')}</div>${it.tags?.length?`<div class="item-tags">${it.tags.map(t=>`<span class="tag">${escHtml(t)}</span>`).join('')}</div>`:''}<div class="item-actions"><button onclick="showModal('editItem',{item:state.items[${ix}],index:${ix}})">✏️</button>${it.bucket==='keep'&&it.destination&&!it.moved?`<button onclick="markMoved(${ix})">✅ Moved!</button>`:''}${it.bucket==='unsure'||(it.bucket==='keep'&&!it.destination)?`<button onclick="aiDecide(${ix})">🧠 Help</button>`:''}<button onclick="doDelItem(${ix})">🗑️</button></div></div>`;
 }
-
 function markMoved(ix){state.items[ix].moved=true;state.stars++;saveState();celebrate();renderItems();}
-function aiDecide(ix){sendHelpMsg(`Help me decide about "${state.items[ix].name}". Ask me questions to figure out if I should keep, give, or toss it.`);openHelp();}
+function aiDecide(ix){
+    const it=state.items[ix];
+    if(it.bucket==='keep'&&!it.destination){
+        sendHelpMsg(`Where should I put "${it.name}"?${it.origin?` It's currently in the ${it.origin}.`:''}`);
+    } else {
+        sendHelpMsg(`Help me decide about "${it.name}". Ask me questions to figure out if I should keep, give, or toss it.`);
+    }
+    openHelp();
+}
 
 // ============ ITEMS VIEW ============
 let itemsView='bucket';
 function renderItems(){
-    const active=state.items.filter(i=>!i.completed&&i.bucket!==null),bE={keep:'🏠',give:'🎁',toss:'🗑️',unsure:'🤷'},bL={keep:'Keep',give:'Give Away',toss:'Toss',unsure:'Unsure'};
+    const active=state.items.filter(i=>!i.completed&&i.bucket!==null),bE={keep:'🏠',give:'🎁',toss:'🗑️',sell:'💰',unsure:'🤷'},bL={keep:'Keep',give:'Give Away',toss:'Toss',sell:'Sell',unsure:'Unsure'};
     const unsortedCount=getUnsortedItems().length;
 let html=`${unsortedCount>0?`<div class="card" onclick="navigate('unsorted')" style="cursor:pointer;border-color:var(--accent);margin-bottom:14px;"><div style="display:flex;justify-content:space-between;align-items:center;"><div><h3 style="margin:0;">📥 Unsorted Inbox</h3><p style="margin:0;font-size:0.82rem;">${unsortedCount} item${unsortedCount!==1?'s':''} to sort</p></div><span style="font-size:1.3rem;">→</span></div></div>`:''}<div class="view-header"><h2>📦 All Items</h2><p>${active.length} active</p></div><div class="view-toggle"><button class="${itemsView==='bucket'?'active':''}" onclick="itemsView='bucket';renderItems();">By Bucket</button><button class="${itemsView==='room'?'active':''}" onclick="itemsView='room';renderItems();">By Room</button></div>`;
-    if(itemsView==='bucket')html+=`<div class="bucket-grid">${['keep','give','toss','unsure'].map(b=>`<div class="bucket-tile" onclick="viewBucket('${b}')"><span class="emoji">${bE[b]}</span><div class="label">${bL[b]}</div><div class="count">${active.filter(i=>i.bucket===b).length}</div></div>`).join('')}</div>`;
-    else html+=state.profile.rooms.map(rm=>{const ri=active.filter(i=>i.origin===rm||i.destination===rm);if(!ri.length)return'';return`<div class="card" onclick="viewRoom('${rm}')"><h3>${roomEmoji(rm)} ${rm}</h3><p>${ri.length} items</p></div>`;}).join('');
+    if(itemsView==='bucket')html+=`<div class="bucket-grid">${['keep','give','toss','sell','unsure'].map(b=>`<div class="bucket-tile" onclick="viewBucket('${b}')"><span class="emoji">${bE[b]}</span><div class="label">${bL[b]}</div><div class="count">${active.filter(i=>i.bucket===b).length}</div></div>`).join('')}</div>`;
+    else html+=state.profile.rooms.map(rm=>{const ri=active.filter(i=>i.origin===rm||i.destination===rm);if(!ri.length)return'';return`<div class="card" onclick="viewRoom('${jsStr(rm)}')"><h3>${roomEmoji(rm)} ${escHtml(rm)}</h3><p>${ri.length} items</p></div>`;}).join('');
     html+=`<button class="btn btn-primary mt-10" onclick="showModal('addItem')">+ Add Item</button>`;
     document.getElementById('view-items').innerHTML=html;
 }
 
-function viewBucket(bucket){
-    const bL={keep:'🏠 Keep',give:'🎁 Give Away',toss:'🗑️ Toss',unsure:'🤷 Unsure'};
-    const items=state.items.filter(i=>i.bucket===bucket&&!i.completed);
-    const tags=[...new Set(items.flatMap(i=>i.tags||[]))];
-    let html=`<button class="back-btn" onclick="navigate('items')">← Back</button><div class="view-header"><h2>${bL[bucket]}</h2><p>${items.length} item${items.length!==1?'s':''}</p></div>`;
-    if(tags.length)html+=`<div style="margin-bottom:10px;overflow-x:auto;white-space:nowrap;">${tags.map(t=>`<span class="tag" onclick="filterBkt('${bucket}','${t}')">${t}</span>`).join('')}</div>`;
-    html+=`<div id="bkt-list">${items.map(it=>itemCard(it)).join('')}</div>`;
-    if(items.length)html+=`<button class="btn btn-primary mt-10" onclick="signOff('${bucket}')">✅ All Done!</button>`;
+let bktFilter=null;
+function viewBucket(bucket,tagFilter=null){
+    bktFilter=tagFilter;
+    const bL={keep:'🏠 Keep',give:'🎁 Give Away',toss:'🗑️ Toss',sell:'💰 Sell',unsure:'🤷 Unsure'};
+    const all=state.items.filter(i=>i.bucket===bucket&&!i.completed);
+    const tags=[...new Set(all.flatMap(i=>i.tags||[]))];
+    // Bug 9: filterBkt() re-rendered the identical list. It now actually filters.
+    const items=tagFilter?all.filter(i=>(i.tags||[]).includes(tagFilter)):all;
+    let html=`<button class="back-btn" onclick="navigate('items')">← Back</button><div class="view-header"><h2>${bL[bucket]}</h2><p>${items.length} item${items.length!==1?'s':''}${tagFilter?` tagged "${escHtml(tagFilter)}"`:''}</p></div>`;
+    if(tags.length)html+=`<div style="margin-bottom:10px;overflow-x:auto;white-space:nowrap;">${tags.map(t=>`<span class="tag ${tagFilter===t?'selected':''}" onclick="filterBkt('${jsStr(bucket)}','${jsStr(t)}')">${escHtml(t)}</span>`).join('')}${tagFilter?`<span class="tag" onclick="viewBucket('${jsStr(bucket)}')">✕ clear</span>`:''}</div>`;
+    html+=`<div id="bkt-list">${items.length?items.map(it=>itemCard(it)).join(''):'<p style="color:var(--text-muted);text-align:center;padding:20px;">Nothing with that tag.</p>'}</div>`;
+    if(all.length&&!tagFilter)html+=`<button class="btn btn-primary mt-10" onclick="signOff('${jsStr(bucket)}')">✅ All Done!</button>`;
     document.getElementById('view-bucket-detail').innerHTML=html;
     document.querySelectorAll('#main-app .view').forEach(v=>v.classList.remove('active'));document.getElementById('view-bucket-detail').classList.add('active');
 }
-
+function filterBkt(bucket,tag){viewBucket(bucket,bktFilter===tag?null:tag);}
 function signOff(bucket){
     const items=state.items.filter(i=>i.bucket===bucket&&!i.completed);
-    items.forEach(it=>{it.completed=true;if(bucket==='give'||bucket==='toss')state.releasedItems.push({name:it.name,released:new Date().toISOString()});});
+    // 'sell' counts as released — it leaves the home. Revisit after beta feedback.
+    items.forEach(it=>{it.completed=true;if(bucket==='give'||bucket==='toss'||bucket==='sell')state.releasedItems.push({name:it.name,released:new Date().toISOString()});});
     state.stars+=items.length;saveState();celebrate();navigate('items');
 }
-function filterBkt(bucket,tag){viewBucket(bucket);} // simplified for now
 
 // ============ FOCUS MODE ============
 let fTimer=null,fTimeLeft=0,fSteps=[],fStep=0,fRoom='';
 function renderFocus(){
-    document.getElementById('view-focus').innerHTML=`<div class="view-header"><h2>✅ Focus Mode</h2><p>Pick a spot and time</p></div><div id="f-setup"><p style="font-weight:600;margin-bottom:8px;">Where?</p><div class="room-grid">${state.profile.rooms.map(r=>`<div class="room-tile ${fRoom===r?'selected':''}" onclick="fRoom='${r}';renderFocus();"><span class="emoji">${roomEmoji(r)}</span><div class="name" style="font-size:0.78rem;">${r}</div></div>`).join('')}<div class="room-tile ${fRoom==='anywhere'?'selected':''}" onclick="fRoom='anywhere';renderFocus();"><span class="emoji">🎲</span><div class="name" style="font-size:0.78rem;">Anywhere</div></div></div><p style="font-weight:600;margin-bottom:8px;margin-top:12px;">How long?</p><div class="option-grid"><button class="option-btn" onclick="startFocus(3)"><span class="emoji">⚡</span>3 min</button><button class="option-btn" onclick="startFocus(5)"><span class="emoji">🌱</span>5 min</button><button class="option-btn" onclick="startFocus(10)"><span class="emoji">💪</span>10 min</button><button class="option-btn" onclick="startFocus(15)"><span class="emoji">🔥</span>15 min</button><button class="option-btn" onclick="startFocus(20)"><span class="emoji">💥</span>20 min</button><button class="option-btn" onclick="startFocus(30)"><span class="emoji">🏆</span>30 min</button></div><button class="btn btn-secondary" onclick="let m=parseInt(prompt('How many minutes?'));if(m&&m>0)startFocus(m);">⏱️ Custom Time</button><button class="btn btn-secondary" onclick="startFocus(0)">🐢 Just one thing</button></div><div id="f-active" class="hidden"></div><div id="f-done" class="hidden"></div>`;
+    document.getElementById('view-focus').innerHTML=`<div class="view-header"><h2>✅ Focus Mode</h2><p>Pick a spot and time</p></div><div id="f-setup"><p style="font-weight:600;margin-bottom:8px;">Where?</p><div class="room-grid">${state.profile.rooms.map(r=>`<div class="room-tile ${fRoom===r?'selected':''}" onclick="fRoom='${jsStr(r)}';renderFocus();"><span class="emoji">${roomEmoji(r)}</span><div class="name" style="font-size:0.78rem;">${escHtml(r)}</div></div>`).join('')}<div class="room-tile ${fRoom==='anywhere'?'selected':''}" onclick="fRoom='anywhere';renderFocus();"><span class="emoji">🎲</span><div class="name" style="font-size:0.78rem;">Anywhere</div></div></div><p style="font-weight:600;margin-bottom:8px;margin-top:12px;">How long?</p><div class="option-grid"><button class="option-btn" onclick="startFocus(3)"><span class="emoji">⚡</span>3 min</button><button class="option-btn" onclick="startFocus(5)"><span class="emoji">🌱</span>5 min</button><button class="option-btn" onclick="startFocus(10)"><span class="emoji">💪</span>10 min</button><button class="option-btn" onclick="startFocus(15)"><span class="emoji">🔥</span>15 min</button><button class="option-btn" onclick="startFocus(20)"><span class="emoji">💥</span>20 min</button><button class="option-btn" onclick="startFocus(30)"><span class="emoji">🏆</span>30 min</button></div><button class="btn btn-secondary" onclick="let m=parseInt(prompt('How many minutes?'));if(m&&m>0)startFocus(m);">⏱️ Custom Time</button><button class="btn btn-secondary" onclick="startFocus(0)">🐢 Just one thing</button></div><div id="f-active" class="hidden"></div><div id="f-done" class="hidden"></div>`;
 }
 
 async function startFocus(min){
@@ -659,7 +711,7 @@ async function startFocus(min){
     fStep=0;renderFSteps();
 }
 
-function renderFSteps(){document.getElementById('f-steps').innerHTML=fSteps.map((s,i)=>`<div class="step-item ${i<fStep?'completed':''} ${i===fStep?'current':''}""><input type="checkbox" ${i<fStep?'checked':''} disabled><span>${s}</span></div>`).join('');}
+function renderFSteps(){document.getElementById('f-steps').innerHTML=fSteps.map((s,i)=>`<div class="step-item ${i<fStep?'completed':''} ${i===fStep?'current':''}"><input type="checkbox" ${i<fStep?'checked':''} disabled><span>${escHtml(s)}</span></div>`).join('');}
 function fNext(){fStep++;if(fStep>=fSteps.length)fComplete();else renderFSteps();}
 function fComplete(){
     if(fTimer)clearInterval(fTimer);const earned=Math.max(1,fStep);state.stars+=earned;state.focusHistory.push({date:new Date().toISOString(),steps:fStep,room:fRoom});saveState();
@@ -700,7 +752,7 @@ function toggleHelp(){document.getElementById('help-drawer').classList.toggle('o
 function openHelp(){document.getElementById('help-drawer').classList.add('open');renderHelp();}
 function renderHelp(){
     const b=document.getElementById('help-body');
-    b.innerHTML=state.helpMessages.length?state.helpMessages.map(m=>`<div class="chat-bubble ${m.role==='user'?'user':'ai'}">${fmtMsg(m.content)}</div>`).join(''):`<div class="chat-bubble ai">Hey ${state.profile.name}! Ask me anything. 🧠</div>`;
+    b.innerHTML=state.helpMessages.length?state.helpMessages.map(m=>`<div class="chat-bubble ${m.role==='user'?'user':'ai'}">${fmtMsg(m.content)}</div>`).join(''):`<div class="chat-bubble ai">Hey ${escHtml(state.profile.name)}! Ask me anything. 🧠</div>`;
     b.scrollTop=b.scrollHeight;
 }
 async function sendHelp(){const inp=document.getElementById('help-input');const m=inp.value.trim();if(!m)return;inp.value='';await sendHelpMsg(m);}
@@ -720,8 +772,6 @@ async function sendHelpMsg(msg,img=null){
     saveState();renderHelp();
 }
 
-function scanRoom(room){if(!state.photoDisclaimer){showModal('photoDisclaimer');return;}const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.capture='environment';inp.onchange=async e=>{const f=e.target.files[0];if(!f)return;const b=await toB64(f);await sendHelpMsg(`Showing you my ${room}. Help me organize.`,b);openHelp();};inp.click();}
-
 function buildSysPrompt(){
     const p=state.profile,mood=state.mood||'okay',vibe=parseInt(p.vibe);
     let tone=vibe<20?'Very calm. Short.':vibe<40?'Calm, supportive.':vibe<60?'Warm, friendly.':vibe<80?'Upbeat, encouraging!':'Enthusiastic! Hype!';
@@ -735,7 +785,7 @@ function buildSysPrompt(){
 // ============ PROGRESS ============
 function renderProgress(){
     const total=state.focusHistory.reduce((s,f)=>s+f.steps,0),needsMove=state.items.filter(i=>i.bucket==='keep'&&i.destination&&!i.moved&&!i.completed).length;
-    document.getElementById('view-progress').innerHTML=`<div class="view-header"><h2>🏆 Progress</h2><p>Look how far you've come!</p></div><div class="card text-center"><div style="font-size:3rem;">⭐</div><h3 style="font-size:2rem;margin:8px 0;">${state.stars}</h3><p>Stars Earned</p></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><div class="card text-center"><div style="font-size:1.5rem;">🔥</div><h3>${state.streak}</h3><p style="font-size:0.78rem;">Day Streak</p></div><div class="card text-center"><div style="font-size:1.5rem;">♻️</div><h3>${state.releasedItems.length}</h3><p style="font-size:0.78rem;">Released</p></div></div><div class="card"><h3>📊 Stats</h3><p style="margin:3px 0;">Focus sessions: ${state.focusHistory.length}</p><p style="margin:3px 0;">Steps done: ${total}</p><p style="margin:3px 0;">Items tracked: ${state.items.length}</p><p style="margin:3px 0;">Need to move: ${needsMove}</p></div>${state.releasedItems.length?`<div class="card"><h3>🌟 Recently Released</h3>${state.releasedItems.slice(-5).reverse().map(i=>`<p style="margin:3px 0;color:var(--text-secondary);">✓ ${i.name}</p>`).join('')}</div>`:''}`;
+    document.getElementById('view-progress').innerHTML=`<div class="view-header"><h2>🏆 Progress</h2><p>Look how far you've come!</p></div><div class="card text-center"><div style="font-size:3rem;">⭐</div><h3 style="font-size:2rem;margin:8px 0;">${state.stars}</h3><p>Stars Earned</p></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><div class="card text-center"><div style="font-size:1.5rem;">🔥</div><h3>${state.streak}</h3><p style="font-size:0.78rem;">Day Streak</p></div><div class="card text-center"><div style="font-size:1.5rem;">♻️</div><h3>${state.releasedItems.length}</h3><p style="font-size:0.78rem;">Released</p></div></div><div class="card"><h3>📊 Stats</h3><p style="margin:3px 0;">Focus sessions: ${state.focusHistory.length}</p><p style="margin:3px 0;">Steps done: ${total}</p><p style="margin:3px 0;">Items tracked: ${state.items.length}</p><p style="margin:3px 0;">Need to move: ${needsMove}</p></div>${state.releasedItems.length?`<div class="card"><h3>🌟 Recently Released</h3>${state.releasedItems.slice(-5).reverse().map(i=>`<p style="margin:3px 0;color:var(--text-secondary);">✓ ${escHtml(i.name)}</p>`).join('')}</div>`:''}`;
 }
 
 // ============ SETTINGS ============
@@ -746,7 +796,7 @@ function renderSettings(){
     <div class="card"><h3>🎚️ Vibe</h3><div class="vibe-slider"><div class="vibe-labels"><span>🧘 Chill</span><span>🎉 Hype</span></div><input type="range" min="0" max="100" value="${state.profile.vibe}" onchange="state.profile.vibe=parseInt(this.value);saveState();"><div class="vibe-notches"><span>Calm</span><span>Gentle</span><span>Balanced</span><span>Upbeat</span><span>Energetic</span></div></div></div>
     <div class="card"><h3>🎆 Celebrations</h3><div class="option-grid">${[['confetti','🎊','Confetti'],['fireworks','🎆','Fireworks'],['starburst','🌟','Starburst'],['none','🔇','Subtle']].map(([v,e,l])=>`<button class="option-btn ${state.profile.celebrationStyle===v?'selected':''}" onclick="state.profile.celebrationStyle='${v}';saveState();renderSettings();"><span class="emoji">${e}</span>${l}</button>`).join('')}</div></div>
     <div class="card"><h3>⏱️ Focus</h3><div class="step-item"><input type="checkbox" ${state.profile.screenAwake!==false?'checked':''} onchange="state.profile.screenAwake=this.checked;saveState();"><span>Screen awake</span></div><div class="step-item"><input type="checkbox" ${state.profile.showTimer!==false?'checked':''} onchange="state.profile.showTimer=this.checked;saveState();"><span>Show countdown</span></div></div>
-    <div class="card"><h3>📍 Location</h3><input type="text" value="${state.profile.location}" placeholder="City, State" onchange="state.profile.location=this.value.trim();saveState();"></div>
+    <div class="card"><h3>📍 Location</h3><input type="text" value="${escAttr(state.profile.location)}" placeholder="City, State" onchange="state.profile.location=this.value.trim();saveState();"></div>
     <div class="card"><h3>🏠 Space View</h3><div class="option-grid"><button class="option-btn ${state.profile.spaceView!=='floorplan'?'selected':''}" onclick="state.profile.spaceView='grid';saveState();renderSettings();"><span class="emoji">🔲</span>Room Grid</button><button class="option-btn ${state.profile.spaceView==='floorplan'?'selected':''}" onclick="state.profile.spaceView='floorplan';saveState();renderSettings();"><span class="emoji">🗺️</span>Floor Plan</button></div></div>
     <div class="card"><h3>🎯 Goal</h3><select onchange="state.profile.goal=this.value;saveState();"><option value="scratch" ${state.profile.goal==='scratch'?'selected':''}>Organize from scratch</option><option value="maintain" ${state.profile.goal==='maintain'?'selected':''}>Help me maintain</option><option value="declutter" ${state.profile.goal==='declutter'?'selected':''}>Help me declutter</option><option value="purge" ${state.profile.goal==='purge'?'selected':''}>Full purge mode</option></select></div>
     <div class="card"><h3>💾 Data</h3><button class="btn btn-secondary" onclick="exportCSV()">📊 Export Items (CSV/Excel)</button><button class="btn btn-secondary" onclick="exportJSON()">💾 Backup All (JSON)</button><button class="btn btn-secondary" onclick="importJSON()">📂 Restore Backup</button><button class="btn btn-danger mt-10" onclick="showModal('confirm',{title:'Delete Everything?',message:'Cannot be undone!',danger:true,confirmText:'Delete All',onConfirm:'resetAll()'})">⚠️ Delete All Data</button></div>
@@ -754,7 +804,35 @@ function renderSettings(){
     <div class="privacy-badge">🔒 All data on this device only.</div>`;
 }
 
-function setCustBg(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{localStorage.setItem('homeBrain_customBg',ev.target.result);state.profile.customBg=true;saveState();document.body.style.backgroundImage=`url(${ev.target.result})`;};r.readAsDataURL(f);}
+function setCustBg(e){
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=ev=>{
+        const img=new Image();
+        img.onload=()=>{
+            // Bug 6: a full-res photo as base64 blows the cap and breaks all
+            // future saves. Downscale on purpose, then step quality down until
+            // it fits. Deliberate downscaling beats a coin flip (§8).
+            const MAX=1600;
+            let w=img.width,h=img.height;
+            if(w>MAX||h>MAX){const s=MAX/Math.max(w,h);w=Math.round(w*s);h=Math.round(h*s);}
+            const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+            cv.getContext('2d').drawImage(img,0,0,w,h);
+            const LIMIT=2600000; // ~2.6MB base64 — leaves headroom for app data
+            let q=0.85,out=cv.toDataURL('image/jpeg',q);
+            while(out.length>LIMIT&&q>0.35){q-=0.1;out=cv.toDataURL('image/jpeg',q);}
+            if(out.length>LIMIT){showToast('⚠️ That photo is too big even compressed. Try another.');return;}
+            try{localStorage.setItem('homeBrain_customBg',out);}
+            catch(err){showToast('⚠️ Not enough storage for a custom background.');return;}
+            state.profile.customBg=true;
+            if(saveState())showToast('🎨 Background updated!');
+            document.body.style.backgroundImage=`url(${out})`;
+        };
+        img.onerror=()=>showToast('⚠️ Couldn\'t read that image.');
+        img.src=ev.target.result;
+    };
+    r.readAsDataURL(f);
+}
 
 function exportCSV(){
     const h=['Name','Bucket','Current Room','Destination','Spot','Give To','Tags','Added','Done','Moved'];
@@ -780,7 +858,10 @@ function playChime(){try{const c=new(window.AudioContext||window.webkitAudioCont
 
 // ============ UTILITIES ============
 function toB64(f){return new Promise((res,rej)=>{const r=new FileReader();r.readAsDataURL(f);r.onload=()=>res(r.result);r.onerror=rej;});}
-function fmtMsg(t){if(!t)return'';return t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br>').replace(/\[(.*?)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" style="color:var(--accent);text-decoration:underline;">$1</a>');}
+// Bug 11 (found conversation #4): this built HTML from unescaped text. Chat
+// carries item names, so a name with < or > broke the bubble. Escape first —
+// markdown characters pass through escHtml untouched.
+function fmtMsg(t){if(!t)return'';return escHtml(t).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br>').replace(/\[(.*?)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" style="color:var(--accent);text-decoration:underline;">$1</a>');}
 
 // ============ START ============
 if(state.profile.customBg){const sb=localStorage.getItem('homeBrain_customBg');if(sb)document.body.style.backgroundImage=`url(${sb})`;}
@@ -877,7 +958,7 @@ function renderUnsorted(){
 function renderUnsortedCard(it,ix){
     const selClass=(b)=>it.bucket===b?`sel-${b}`:'';
     const showRoom=it.bucket==='keep';
-    const roomOpts=state.profile.rooms.map(r=>`<option value="${r}" ${it.destination===r?'selected':''}>${r}</option>`).join('');
+    const roomOpts=state.profile.rooms.map(r=>`<option value="${escAttr(r)}" ${it.destination===r?'selected':''}>${escHtml(r)}</option>`).join('');
     const tagHtml=(it.tags||[]).map((t,ti)=>`<span class="tag selected" onclick="removeUnsortedTag(${ix},${ti})">${escHtml(t)} ✕</span>`).join('')+`<span class="tag" onclick="addUnsortedTag(${ix})">+ tag</span>`;
     
     return`<div class="item-card">
@@ -931,7 +1012,38 @@ function removeUnsortedTag(ix,tagIndex){
     renderUnsorted();
 }
 
-function escHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
+// ============ ESCAPING — §3 interaction rules, §8 bug 1 ============
+// escHtml : text that will be DISPLAYED as HTML
+// jsStr   : text going INSIDE a quoted JS string in an onclick attribute
+// Every user-typed value — room names, item names, tags, spots, giveTo,
+// collections, reminder labels (§6k) — must pass through one of these.
+// Missing it fails silently and permanently. Do not skip.
+function escHtml(t){
+    if(t===null||t===undefined)return'';
+    const d=document.createElement('div');
+    d.textContent=String(t);
+    return d.innerHTML;
+}
+function escAttr(v){
+    if(v===null||v===undefined)return'';
+    return String(v)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#39;');
+}
+function jsStr(v){
+    if(v===null||v===undefined)return'';
+    return String(v)
+        .replace(/\\/g,'\\\\')
+        .replace(/'/g,"\\'")
+        .replace(/\r?\n/g,'\\n')
+        .replace(/&/g,'&amp;')
+        .replace(/"/g,'&quot;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;');
+}
 
 // ============ QUICK SORT ============
 
@@ -1229,7 +1341,7 @@ If you cannot identify any items, return: {"items":[]}`;
                 <p class="subtitle">Couldn't process the image. Try again.</p>
                 <div class="actions">
                     <button class="btn btn-secondary" onclick="closeBrainDump()">Cancel</button>
-                    <button class="btn btn-primary" onclick="closeBrainDump();openAIScanRoom('${room}');">Try Again</button>
+                    <button class="btn btn-primary" onclick="closeBrainDump();openAIScanRoom('${jsStr(room)}');">Try Again</button>
                 </div>
             </div>
         </div>`;
@@ -1245,7 +1357,7 @@ function showScanResultsRoom(items,imgSrc,room){
                 <p class="subtitle">Try a clearer photo with better lighting.</p>
                 <div class="actions">
                     <button class="btn btn-secondary" onclick="closeBrainDump()">Cancel</button>
-                    <button class="btn btn-primary" onclick="closeBrainDump();openAIScanRoom('${room}');">Try Again</button>
+                    <button class="btn btn-primary" onclick="closeBrainDump();openAIScanRoom('${jsStr(room)}');">Try Again</button>
                 </div>
             </div>
         </div>`;
@@ -1262,7 +1374,7 @@ function showScanResultsRoom(items,imgSrc,room){
     document.getElementById('brain-dump-container').innerHTML=`
     <div class="brain-dump-overlay" onclick="if(event.target===this)closeBrainDump()">
         <div class="brain-dump-sheet">
-            <h3>📸 Found ${items.length} items in ${room}!</h3>
+            <h3>📸 Found ${items.length} items in ${escHtml(room)}!</h3>
             <p class="subtitle">Uncheck anything wrong. These will be tagged with this room.</p>
             <div style="border-radius:12px;overflow:hidden;margin-bottom:14px;max-height:150px;">
                 <img src="${imgSrc}" style="width:100%;display:block;object-fit:cover;">
@@ -1272,7 +1384,7 @@ function showScanResultsRoom(items,imgSrc,room){
             </div>
             <div class="actions">
                 <button class="btn btn-secondary" onclick="closeBrainDump()" style="flex:0.4;">Cancel</button>
-                <button class="btn btn-primary" onclick="confirmScanItemsRoom('${room}')" style="flex:1;">✓ Add to ${room}</button>
+                <button class="btn btn-primary" onclick="confirmScanItemsRoom('${jsStr(room)}')" style="flex:1;">✓ Add to ${escHtml(room)}</button>
             </div>
         </div>
     </div>`;
