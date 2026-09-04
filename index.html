@@ -762,8 +762,15 @@ function spSave(){
         return false;
     }
 }
+// Undo has to capture everything a floor-plan action can touch, not just
+// geometry. Delete and Rename mutate rooms and item links too — snapshotting
+// spLayout alone made Undo a silent no-op for both (§8).
 function spPushUndo(){
-    spUndo.push(JSON.stringify(spLayout));
+    spUndo.push(JSON.stringify({
+        layout:spLayout,
+        rooms:state.profile.rooms,
+        links:state.items.map(i=>({origin:i.origin||'',destination:i.destination||'',spot:i.spot||''}))
+    }));
     if(spUndo.length>20)spUndo.shift();
 }
 
@@ -850,8 +857,21 @@ function spExitEdit(){
 }
 function spDoUndo(){
     if(!spUndo.length)return;
-    spLayout=JSON.parse(spUndo.pop());
-    spSave();renderHome();showToast('↩ Undone');
+    const s=JSON.parse(spUndo.pop());
+    spLayout=s.layout;
+    state.profile.rooms=s.rooms;
+    // links is index-aligned to state.items at snapshot time. If items were
+    // added or removed since, indexes no longer line up — skip rather than
+    // scramble every item's room.
+    if(Array.isArray(s.links)&&s.links.length===state.items.length){
+        state.items.forEach((i,ix)=>{
+            i.origin=s.links[ix].origin;
+            i.destination=s.links[ix].destination;
+            i.spot=s.links[ix].spot;
+        });
+    }
+    spSelected.clear();
+    saveState();spSave();renderHome();showToast('↩ Undone');
 }
 function spReset(){
     spPushUndo();
@@ -985,6 +1005,7 @@ function spDoDeleteSelected(){
     let touched=0;
     // Items are never deleted with a room — they just lose the link (§6a).
     state.items.forEach(i=>{
+        if(i.completed)return;   // finished items are history — don't rewrite them
         let hit=false;
         if(names.includes(i.origin)){i.origin='';hit=true;}
         if(names.includes(i.destination)){i.destination='';i.spot='';hit=true;}
