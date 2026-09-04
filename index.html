@@ -469,18 +469,17 @@ let mEBucket='';
 function mEBkt(b,el){mEBucket=b;document.querySelectorAll('#m-ebkts .option-btn').forEach(x=>x.classList.remove('selected'));el.classList.add('selected');}
 
 function doAddRoom(){const n=document.getElementById('m-room').value.trim();if(n&&!state.profile.rooms.includes(n)){state.profile.rooms.push(n);saveState();closeModal();renderHome();}}
-// Redraw whichever view is actually open. Bug 12.
+// Bug 12, second attempt. The first version inferred the current view from DOM
+// classes and silently fell through to renderItems() when that read was wrong.
+// Now the view is tracked explicitly — no inference.
+let currentView='checkin';
 function refreshCurrentView(){
-    const roomOpen=document.getElementById('view-room')?.classList.contains('active');
-    if(roomOpen&&currentRoom){viewRoom(currentRoom);return;}
-    const bktOpen=document.getElementById('view-bucket-detail')?.classList.contains('active');
-    if(bktOpen&&currentBucket){viewBucket(currentBucket,bktFilter);return;}
-    const unsOpen=document.getElementById('view-unsorted')?.classList.contains('active');
-    if(unsOpen){renderUnsorted();updateDumpBadge();return;}
+    if(currentView==='room'&&currentRoom){viewRoom(currentRoom);return;}
+    if(currentView==='bucket'&&currentBucket){viewBucket(currentBucket,bktFilter);return;}
+    if(currentView==='unsorted'){renderUnsorted();updateDumpBadge();return;}
     renderItems();
     updateDumpBadge();
 }
-
 function doAddItem(){
     const name=document.getElementById('m-iname').value.trim();if(!name)return;
     const item={id:Date.now(),name,bucket:mBucket,origin:document.getElementById('m-iorigin').value,destination:mBucket==='keep'?(document.getElementById('m-idest')?.value||''):'',spot:mBucket==='keep'?(document.getElementById('m-ispot')?.value||''):'',giveTo:mBucket==='give'?(document.getElementById('m-igiveto')?.value||''):'',tags:document.getElementById('m-itags').value.split(',').map(t=>t.trim()).filter(t=>t),added:new Date().toISOString(),completed:false,moved:false};
@@ -580,6 +579,7 @@ function showApp(){
 }
 
 function navigate(view){
+    currentView=view;
     if(view!=='room')currentRoom='';
     document.querySelectorAll('#main-app .view').forEach(v=>v.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
@@ -628,6 +628,7 @@ function roomEmoji(r){r=r.toLowerCase();if(r.includes('bed'))return'🛏️';if(
 let currentRoom='';
 function viewRoom(room){
     currentRoom=room;
+    currentView='room';
     const items=state.items.filter(i=>(i.origin===room||i.destination===room)&&!i.completed);
     // Bug 2: unsorted (bucket:null) items were counted but never rendered —
     // a scanned room showed "12 items" above "Nothing here yet."
@@ -679,6 +680,7 @@ let bktFilter=null,currentBucket=null;
 function viewBucket(bucket,tagFilter=null){
     bktFilter=tagFilter;
     currentBucket=bucket;
+    currentView='bucket';
     const bL={keep:'🏠 Keep',give:'🎁 Give Away',toss:'🗑️ Toss',sell:'💰 Sell',unsure:'🤷 Unsure'};
     const all=state.items.filter(i=>i.bucket===bucket&&!i.completed);
     const tags=[...new Set(all.flatMap(i=>i.tags||[]))];
