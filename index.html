@@ -344,6 +344,52 @@
     .nav-bar { max-width: 650px; }
 }
 
+/* ============ MERGED SPACE / FLOOR PLAN (§6a) ============ */
+.sp-toolbar { display:flex; gap:8px; margin-bottom:10px; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:2px; }
+.sp-btn { background:var(--bg-input); border:1px solid var(--border); border-radius:10px; padding:9px 14px; font-size:0.82rem; font-weight:600; color:var(--text-primary); cursor:pointer; white-space:nowrap; flex-shrink:0; }
+.sp-btn:active { transform:scale(0.95); }
+.sp-btn.primary { background:var(--accent); color:white; border-color:var(--accent); }
+.sp-btn.active { background:var(--accent); color:white; border-color:var(--accent); }
+.sp-btn:disabled { opacity:0.4; pointer-events:none; }
+
+.sp-hint { font-size:0.78rem; color:var(--text-muted); margin-bottom:10px; line-height:1.45; }
+
+.sp-canvas { position:relative; width:100%; border-radius:14px; border:1px solid transparent; margin-bottom:12px; }
+.sp-canvas.editing {
+    border-color:var(--border);
+    background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size:40px 40px;
+}
+
+.sp-canvas.editing .sp-tile { touch-action:none; }
+.sp-tile { position:absolute; background:var(--bg-card); border:2px solid var(--border); border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow:0 2px 8px var(--shadow); user-select:none; -webkit-user-select:none; transition:box-shadow 0.2s, border-color 0.2s; overflow:hidden; }
+.sp-canvas:not(.editing) .sp-tile { cursor:pointer; }
+.sp-canvas.editing .sp-tile { cursor:grab; }
+.sp-canvas.editing .sp-tile:active { cursor:grabbing; }
+
+.sp-tile .sp-emoji { font-size:1.4rem; pointer-events:none; line-height:1.1; }
+.sp-tile .sp-name { font-size:0.68rem; font-weight:600; color:var(--text-primary); pointer-events:none; margin-top:2px; text-align:center; padding:0 4px; line-height:1.2; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.sp-tile .sp-count { font-size:0.58rem; color:var(--text-muted); pointer-events:none; margin-top:1px; }
+
+.sp-tile.dragging { opacity:0.85; z-index:1000; box-shadow:0 4px 18px rgba(0,0,0,0.18); }
+.sp-tile.selected { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent); }
+.sp-tile.just-added { border-color:var(--accent-secondary); box-shadow:0 0 0 3px var(--accent-secondary); }
+
+.sp-resize { position:absolute; bottom:0; right:0; width:26px; height:26px; display:none; align-items:center; justify-content:center; }
+.sp-canvas.editing .sp-resize { display:flex; }
+.sp-resize::after { content:''; width:10px; height:10px; border-right:2px solid var(--accent); border-bottom:2px solid var(--accent); opacity:0.7; }
+
+.sp-empty { text-align:center; color:var(--text-muted); padding:28px 16px; font-size:0.9rem; }
+.sp-empty .emoji { font-size:2.4rem; display:block; margin-bottom:8px; }
+
+@media (min-width:768px) {
+    .sp-tile .sp-emoji { font-size:1.8rem; }
+    .sp-tile .sp-name { font-size:0.82rem; }
+    .sp-tile .sp-count { font-size:0.68rem; }
+    .sp-btn { padding:11px 18px; font-size:0.88rem; }
+}
 .hidden { display:none !important; }
         .text-center { text-align:center; }
         .mt-10 { margin-top:10px; }
@@ -428,11 +474,8 @@ function init(){
         showApp();
         const params=new URLSearchParams(window.location.search);
         const openRoom=params.get('room');
-        const from=params.get('from');
         if(openRoom&&state.profile.rooms.includes(openRoom)){
             setTimeout(()=>viewRoom(openRoom),100);
-        } else if(from==='floorplan'){
-            setTimeout(()=>navigate('home'),100);
         }
     }
 }
@@ -468,7 +511,34 @@ function mBkt(b,el){mBucket=b;document.querySelectorAll('#m-bkts .option-btn').f
 let mEBucket='';
 function mEBkt(b,el){mEBucket=b;document.querySelectorAll('#m-ebkts .option-btn').forEach(x=>x.classList.remove('selected'));el.classList.add('selected');}
 
-function doAddRoom(){const n=document.getElementById('m-room').value.trim();if(n&&!state.profile.rooms.includes(n)){state.profile.rooms.push(n);saveState();closeModal();renderHome();}}
+function doAddRoom(){
+    const n=document.getElementById('m-room').value.trim();
+    if(!n||state.profile.rooms.includes(n)){closeModal();return;}
+    state.profile.rooms.push(n);
+    saveState();closeModal();
+    // §6a: a new tile lands in the first free slot and drops you into edit mode
+    // with it highlighted, so the next action is obvious.
+    spPlaceNewRoom(n);
+    spJustAdded=n;
+    spEdit=true;
+    navigate('home');
+    showToast('Added — drag it where you want it');
+}
+
+// First free grid slot, scanning left-to-right then top-to-bottom. Never
+// overlaps an existing tile (§6a).
+function spPlaceNewRoom(name){
+    const{cols,w,h,gap}=spGridGeometry((state.profile.rooms||[]).length);
+    const taken=(state.profile.rooms||[]).filter(r=>r!==name&&spLayout[r]).map(r=>spLayout[r]);
+    const hits=(x,y)=>taken.some(L=>x<L.x+L.w&&x+w>L.x&&y<L.y+L.h&&y+h>L.y);
+    for(let row=0;row<40;row++){
+        for(let col=0;col<cols;col++){
+            const x=gap+col*(w+gap), y=gap+row*(h+gap);
+            if(!hits(x,y)){spLayout[name]={x,y,w,h};spSave();return;}
+        }
+    }
+    spLayout[name]={x:gap,y:gap,w,h};spSave();
+}
 // Bug 12, second attempt. The first version inferred the current view from DOM
 // classes and silently fell through to renderItems() when that read was wrong.
 // Now the view is tracked explicitly — no inference.
@@ -612,13 +682,184 @@ function renderCheckin(){
 function setMood(m,el){state.mood=m;saveState();document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');setTimeout(()=>navigate('home'),400);}
 
 // ============ MY SPACE ============
+// ============ MERGED SPACE / FLOOR PLAN (§6a) ============
+// Tiles auto-order into a grid. Edit mode enables drag/resize. No tap-vs-drag
+// timing heuristic — the mode decides. §17b is the port checklist.
+
+let spEdit=false;              // edit mode on/off
+let spSelectMode=false;        // multi-select within edit mode
+let spSelected=new Set();      // room names currently selected
+let spUndo=[];                 // JSON snapshots, max 20 (§17b E1)
+let spJustAdded=null;          // highlights a newly added tile
+const SP_GRID=40;              // snap AND drawn grid — §6a chose 40/40
+const SP_MIN_W=80, SP_MIN_H=60;
+
+let spLayout=JSON.parse(localStorage.getItem('homeBrain_floorplan')||'null')||{};
+
+function roomBucket(name){
+    const r=(name||'').toLowerCase();
+    // §6a order. 'hall' is tested FIRST so "Hall Closet" lands in Hallway per
+    // the project-file decision, while a plain "Closet" still falls to utility.
+    if(r.includes('hall'))return 7;
+    if(r.includes('entry')||r.includes('foyer'))return 1;
+    if(r.includes('living')||r.includes('family')||r.includes('den')||r.includes('lounge'))return 2;
+    if(r.includes('dining'))return 3;
+    if(r.includes('kitchen')||r.includes('pantry'))return 4;
+    if(r.includes('bed')||r.includes('nursery'))return 5;
+    if(r.includes('bath')||r.includes('powder'))return 6;
+    if(r.includes('office')||r.includes('desk')||r.includes('study'))return 8;
+    if(r.includes('closet')||r.includes('mudroom')||r.includes('laundry')||r.includes('storage')||r.includes('attic')||r.includes('basement')||r.includes('utility'))return 10;
+    if(r.includes('garage')||r.includes('shed')||r.includes('carport'))return 11;
+    return 9;
+}
+function sortRooms(list){
+    return list.slice().sort((a,b)=>{
+        const d=roomBucket(a)-roomBucket(b);
+        if(d!==0)return d;
+        return a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'});
+    });
+}
+
+function spGridGeometry(count){
+    const el=document.getElementById('view-home');
+    const avail=Math.max(280,(el&&el.clientWidth)||340);
+    const gap=SP_GRID;   // full grid step keeps canonical x/y ON the snap grid
+    // Fit as many min-width tiles as will honestly fit, then cap at 4.
+    let cols=Math.floor((avail-gap)/(SP_MIN_W+gap));
+    cols=Math.max(1,Math.min(4,cols,Math.max(1,count)));
+    // FLOOR to the grid, never round — rounding up overflows narrow screens.
+    let w=Math.max(SP_MIN_W,Math.floor(((avail-gap*(cols+1))/cols)/SP_GRID)*SP_GRID);
+    let h=Math.max(SP_MIN_H,Math.floor((w*0.7)/SP_GRID)*SP_GRID);
+    return{cols,w,h,gap};
+}
+
+// Canonical grid positions. Used on first render and by Reset.
+function spCanonicalLayout(){
+    const rooms=sortRooms(state.profile.rooms||[]);
+    const{cols,w,h,gap}=spGridGeometry(rooms.length);
+    const out={};
+    rooms.forEach((name,i)=>{
+        out[name]={x:gap+(i%cols)*(w+gap), y:gap+Math.floor(i/cols)*(h+gap), w, h};
+    });
+    return out;
+}
+
+function spSave(){
+    try{
+        localStorage.setItem('homeBrain_floorplan',JSON.stringify(spLayout));
+        return true;
+    }catch(e){
+        console.error('Floor plan save failed',e);
+        showToast('⚠️ Couldn\'t save layout — storage full.');
+        return false;
+    }
+}
+function spPushUndo(){
+    spUndo.push(JSON.stringify(spLayout));
+    if(spUndo.length>20)spUndo.shift();
+}
+
 function renderHome(){
-    if(state.profile.spaceView==='floorplan'){
-        window.location.href='floorplan.html';
+    const rooms=state.profile.rooms||[];
+    const el=document.getElementById('view-home');
+
+    if(!rooms.length){
+        el.innerHTML=`<div class="view-header"><h2>🏠 My Home</h2></div>
+        <div class="sp-empty"><span class="emoji">🏠</span><p>No rooms yet. Add one to get started.</p></div>
+        <button class="btn btn-primary" onclick="showModal('addRoom')">+ Add Room</button>`;
         return;
     }
-    const rooms=state.profile.rooms;
-    document.getElementById('view-home').innerHTML=`<div class="view-header"><h2>🏠 My Space</h2><p>Your rooms & what's where</p></div><div class="room-grid">${rooms.length?rooms.map(r=>{const cnt=state.items.filter(i=>(i.origin===r||i.destination===r)&&!i.completed).length;return`<div class="room-tile" onclick="viewRoom('${jsStr(r)}')"><span class="emoji">${roomEmoji(r)}</span><div class="name">${escHtml(r)}</div><div class="count">${cnt} item${cnt!==1?'s':''}</div></div>`;}).join(''):'<p style="grid-column:1/-1;text-align:center;color:var(--text-muted)">No rooms yet!</p>'}</div><button class="btn btn-secondary" onclick="showModal('addRoom')">+ Add Room</button><button class="btn btn-secondary" onclick="window.location.href='floorplan.html'" style="margin-top:0;">🗺️ View Floor Plan</button>`;
+
+    // Any room without a saved position gets one. Never overwrites placed tiles.
+    let changed=false;
+// Drop layout entries for rooms that no longer exist, or they'll block
+    // spPlaceNewRoom from finding free slots forever.
+    Object.keys(spLayout).forEach(k=>{
+        if(!rooms.includes(k)){delete spLayout[k];changed=true;}
+    });
+    const canon=spCanonicalLayout();
+    rooms.forEach(r=>{
+        if(!spLayout[r]){spLayout[r]=canon[r]||{x:SP_GRID,y:SP_GRID,w:SP_MIN_W,h:SP_MIN_H};changed=true;}
+    });
+    if(changed)spSave();
+
+    const toolbar=spEdit
+        ? `<div class="sp-toolbar">
+             <button class="sp-btn ${spSelectMode?'active':''}" onclick="spToggleSelect()">${spSelectMode?'✓ Select':'☐ Select'}</button>
+             <button class="sp-btn" id="sp-undo" onclick="spDoUndo()" ${spUndo.length?'':'disabled'}>↩ Undo</button>
+             <button class="sp-btn" onclick="spReset()">↺ Reset</button>
+             <button class="sp-btn primary" onclick="spExitEdit()">✓ Done</button>
+             <button class="sp-btn" onclick="showModal('addRoom')">+ Add Room</button>
+           </div>`
+        : `<div class="sp-toolbar">
+             <button class="sp-btn" onclick="spEnterEdit()">✏️ Edit</button>
+             <button class="sp-btn" onclick="showModal('addRoom')">+ Add Room</button>
+           </div>`;
+
+    const hint=spEdit
+        ? `<p class="sp-hint">Drag tiles to arrange. Pull a corner to resize. Changes save automatically.</p>`
+        : `<p class="sp-hint">Tap a room to open it. The layout is fine as-is — tap ✏️ Edit if you want to arrange it like your actual home.</p>`;
+
+    // Canvas height must fit the lowest tile; the page scrolls, not the canvas.
+    let maxY=0;
+    rooms.forEach(r=>{const L=spLayout[r];if(L)maxY=Math.max(maxY,L.y+L.h);});
+
+    const tiles=rooms.map(r=>{
+        const L=spLayout[r];if(!L)return'';
+        const cnt=state.items.filter(i=>(i.origin===r||i.destination===r)&&!i.completed).length;
+        const cls=['sp-tile'];
+        if(spSelected.has(r))cls.push('selected');
+        if(spJustAdded===r)cls.push('just-added');
+        return`<div class="${cls.join(' ')}" data-room="${escAttr(r)}" style="left:${L.x}px;top:${L.y}px;width:${L.w}px;height:${L.h}px;">
+            <span class="sp-emoji">${roomEmoji(r)}</span>
+            <span class="sp-name">${escHtml(r)}</span>
+            <span class="sp-count">${cnt} item${cnt!==1?'s':''}</span>
+            <div class="sp-resize" data-resize="1"></div>
+        </div>`;
+    }).join('');
+
+    el.innerHTML=`<div class="view-header"><h2>🏠 My Home</h2></div>${toolbar}${hint}
+    <div class="sp-canvas ${spEdit?'editing':''}" id="sp-canvas" style="height:${maxY+SP_GRID}px;">${tiles}</div>`;
+
+    spBindTiles();
+    spJustAdded=null;
+}
+
+function spEnterEdit(){spEdit=true;renderHome();}
+function spExitEdit(){
+    spEdit=false;spSelectMode=false;spSelected.clear();
+    spSave();                                  // §6a: auto-save on exit
+    renderHome();
+    showToast('✓ Layout saved');
+}
+function spToggleSelect(){
+    spSelectMode=!spSelectMode;
+    if(!spSelectMode)spSelected.clear();
+    renderHome();
+}
+function spDoUndo(){
+    if(!spUndo.length)return;
+    spLayout=JSON.parse(spUndo.pop());
+    spSave();renderHome();showToast('↩ Undone');
+}
+function spReset(){
+    spPushUndo();
+    spLayout=spCanonicalLayout();
+    spSelected.clear();
+    spSave();renderHome();
+    showToast('↺ Reset — tap ↩ Undo to restore');
+}
+
+// Placeholder until the handlers land in the next message.
+function spBindTiles(){
+    const canvas=document.getElementById('sp-canvas');
+    if(!canvas)return;
+    canvas.querySelectorAll('.sp-tile').forEach(tile=>{
+        tile.addEventListener('click',()=>{
+            if(spEdit)return;
+            viewRoom(tile.dataset.room);
+        });
+    });
 }
 
 function roomEmoji(r){r=r.toLowerCase();if(r.includes('bed'))return'🛏️';if(r.includes('bath'))return'🛁';if(r.includes('kitchen'))return'🍳';if(r.includes('living'))return'🛋️';if(r.includes('garage'))return'🚗';if(r.includes('closet'))return'🚪';if(r.includes('laundry'))return'🧺';if(r.includes('dining'))return'🍽️';if(r.includes('office')||r.includes('desk'))return'💻';if(r.includes('porch')||r.includes('patio'))return'🪑';if(r.includes('shed')||r.includes('storage'))return'🏚️';return'📍';}
@@ -840,7 +1081,6 @@ function renderSettings(){
     <div class="card"><h3>🎆 Celebrations</h3><div class="option-grid">${[['confetti','🎊','Confetti'],['fireworks','🎆','Fireworks'],['starburst','🌟','Starburst'],['none','🔇','Subtle']].map(([v,e,l])=>`<button class="option-btn ${state.profile.celebrationStyle===v?'selected':''}" onclick="state.profile.celebrationStyle='${v}';saveState();renderSettings();"><span class="emoji">${e}</span>${l}</button>`).join('')}</div></div>
     <div class="card"><h3>⏱️ Focus</h3><div class="step-item"><input type="checkbox" ${state.profile.screenAwake!==false?'checked':''} onchange="state.profile.screenAwake=this.checked;saveState();"><span>Screen awake</span></div><div class="step-item"><input type="checkbox" ${state.profile.showTimer!==false?'checked':''} onchange="state.profile.showTimer=this.checked;saveState();"><span>Show countdown</span></div></div>
     <div class="card"><h3>📍 Location</h3><input type="text" value="${escAttr(state.profile.location)}" placeholder="City, State" onchange="state.profile.location=this.value.trim();saveState();"></div>
-    <div class="card"><h3>🏠 Space View</h3><div class="option-grid"><button class="option-btn ${state.profile.spaceView!=='floorplan'?'selected':''}" onclick="state.profile.spaceView='grid';saveState();renderSettings();"><span class="emoji">🔲</span>Room Grid</button><button class="option-btn ${state.profile.spaceView==='floorplan'?'selected':''}" onclick="state.profile.spaceView='floorplan';saveState();renderSettings();"><span class="emoji">🗺️</span>Floor Plan</button></div></div>
     <div class="card"><h3>🎯 Goal</h3><select onchange="state.profile.goal=this.value;saveState();"><option value="scratch" ${state.profile.goal==='scratch'?'selected':''}>Organize from scratch</option><option value="maintain" ${state.profile.goal==='maintain'?'selected':''}>Help me maintain</option><option value="declutter" ${state.profile.goal==='declutter'?'selected':''}>Help me declutter</option><option value="purge" ${state.profile.goal==='purge'?'selected':''}>Full purge mode</option></select></div>
     <div class="card"><h3>💾 Data</h3><button class="btn btn-secondary" onclick="exportCSV()">📊 Export Items (CSV/Excel)</button><button class="btn btn-secondary" onclick="exportJSON()">💾 Backup All (JSON)</button><button class="btn btn-secondary" onclick="importJSON()">📂 Restore Backup</button><button class="btn btn-danger mt-10" onclick="showModal('confirm',{title:'Delete Everything?',message:'Cannot be undone!',danger:true,confirmText:'Delete All',onConfirm:'resetAll()'})">⚠️ Delete All Data</button></div>
     <div class="card"><h3>🔄 Redo Setup</h3><button class="btn btn-secondary" onclick="showModal('confirm',{title:'Redo Setup?',message:'Items & progress stay.',confirmText:'Redo',onConfirm:'state.onboarded=false;saveState();closeModal();location.reload();'})">Start Over</button></div>
@@ -883,7 +1123,7 @@ function exportCSV(){
     const csv=[h,...rows].map(r=>r.map(c=>`"${(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
     const blob=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`home-brain-${new Date().toISOString().split('T')[0]}.csv`;a.click();
 }
-function exportJSON(){const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`home-brain-backup-${new Date().toISOString().split('T')[0]}.json`;a.click();}
+function exportJSON(){const payload={...state,_floorplan:spLayout};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`home-brain-backup-${new Date().toISOString().split('T')[0]}.json`;a.click();}
 function importJSON(){
     const inp=document.createElement('input');
     inp.type='file';inp.accept='.json';
@@ -900,6 +1140,10 @@ function importJSON(){
                 if(!parsed||typeof parsed!=='object'||!Array.isArray(parsed.items)){
                     throw new Error('Not a Home Brain backup');
                 }
+                if(parsed._floorplan&&typeof parsed._floorplan==='object'){
+                    localStorage.setItem('homeBrain_floorplan',JSON.stringify(parsed._floorplan));
+                }
+                delete parsed._floorplan;
                 state=parsed;
                 saveState();
                 location.reload();
@@ -913,7 +1157,7 @@ function importJSON(){
     };
     inp.click();
 }
-function resetAll(){localStorage.removeItem('homeBrainState');localStorage.removeItem('homeBrain_apiKey');localStorage.removeItem('homeBrain_customBg');closeModal();location.reload();}
+function resetAll(){localStorage.removeItem('homeBrainState');localStorage.removeItem('homeBrain_apiKey');localStorage.removeItem('homeBrain_customBg');localStorage.removeItem('homeBrain_floorplan');closeModal();location.reload();}
 
 // ============ CELEBRATIONS ============
 function celebrate(){
