@@ -469,6 +469,17 @@ let mEBucket='';
 function mEBkt(b,el){mEBucket=b;document.querySelectorAll('#m-ebkts .option-btn').forEach(x=>x.classList.remove('selected'));el.classList.add('selected');}
 
 function doAddRoom(){const n=document.getElementById('m-room').value.trim();if(n&&!state.profile.rooms.includes(n)){state.profile.rooms.push(n);saveState();closeModal();renderHome();}}
+// Redraw whichever view is actually open. Bug 12.
+function refreshCurrentView(){
+    const roomOpen=document.getElementById('view-room')?.classList.contains('active');
+    if(roomOpen&&currentRoom){viewRoom(currentRoom);return;}
+    const bktOpen=document.getElementById('view-bucket-detail')?.classList.contains('active');
+    if(bktOpen&&currentBucket){viewBucket(currentBucket,bktFilter);return;}
+    const unsOpen=document.getElementById('view-unsorted')?.classList.contains('active');
+    if(unsOpen){renderUnsorted();updateDumpBadge();return;}
+    renderItems();
+    updateDumpBadge();
+}
 
 function doAddItem(){
     const name=document.getElementById('m-iname').value.trim();if(!name)return;
@@ -476,11 +487,10 @@ function doAddItem(){
     if(item.giveTo&&!item.tags.includes(item.giveTo))item.tags.push(item.giveTo);
     state.items.push(item);item.tags.forEach(t=>{if(!state.tags.includes(t))state.tags.push(t);});
     saveState();closeModal();mBucket='unsure';
-    // Bug 4: this force-opened the Help drawer, which looked like Add had
-    // failed (§9 — well-intentioned, experienced as a bug). The item now just
-    // saves. itemCard offers 🧠 when a Keep item has no destination, so help is
-    // one tap away instead of unavoidable.
-    renderItems();
+    // Bug 12: every mutation called renderItems() regardless of which view was
+    // open. Standing in a room, the item saved but the screen never redrew —
+    // it looked like nothing happened until you navigated away and back.
+    refreshCurrentView();
     if(state.profile.goal==='scratch'&&item.bucket==='keep'&&!item.destination){
         showToast('Added! Tap 🧠 on the card if you want help placing it.');
     }
@@ -488,9 +498,9 @@ function doAddItem(){
 
 function doSaveItem(ix){
     const it=state.items[ix];it.name=document.getElementById('m-ename').value.trim();it.origin=document.getElementById('m-eorigin').value;it.destination=document.getElementById('m-edest').value;it.spot=document.getElementById('m-espot').value.trim();it.tags=document.getElementById('m-etags').value.split(',').map(t=>t.trim()).filter(t=>t);if(mEBucket)it.bucket=mEBucket;
-    it.tags.forEach(t=>{if(!state.tags.includes(t))state.tags.push(t);});saveState();closeModal();mEBucket='';renderItems();
+    it.tags.forEach(t=>{if(!state.tags.includes(t))state.tags.push(t);});saveState();closeModal();mEBucket='';refreshCurrentView();
 }
-function doDelItem(ix){showModal('confirm',{title:'Delete?',message:`Remove "${escHtml(state.items[ix].name)}"?`,danger:true,confirmText:'Delete',onConfirm:`state.items.splice(${ix},1);saveState();closeModal();renderItems();`});}
+function doDelItem(ix){showModal('confirm',{title:'Delete?',message:`Remove "${escHtml(state.items[ix].name)}"?`,danger:true,confirmText:'Delete',onConfirm:`state.items.splice(${ix},1);saveState();closeModal();refreshCurrentView();`});}
 // ============ ONBOARDING ============
 let obStep=0;
 const obSteps=['welcome','apikey','name','goal','spaceType','rooms','storage','housemates','pets','petDetails','collections','location','theme','vibe','privacy','done'];
@@ -642,7 +652,7 @@ function itemCard(it){
     if(it.moved)meta.push('✅ Moved!');
     return`<div class="item-card"><div class="item-name">${escHtml(it.name)}</div><div class="item-meta">${meta.join(' • ')}</div>${it.tags?.length?`<div class="item-tags">${it.tags.map(t=>`<span class="tag">${escHtml(t)}</span>`).join('')}</div>`:''}<div class="item-actions"><button onclick="showModal('editItem',{item:state.items[${ix}],index:${ix}})">✏️</button>${it.bucket==='keep'&&it.destination&&!it.moved?`<button onclick="markMoved(${ix})">✅ Moved!</button>`:''}${it.bucket==='unsure'||(it.bucket==='keep'&&!it.destination)?`<button onclick="aiDecide(${ix})">🧠 Help</button>`:''}<button onclick="doDelItem(${ix})">🗑️</button></div></div>`;
 }
-function markMoved(ix){state.items[ix].moved=true;state.stars++;saveState();celebrate();renderItems();}
+function markMoved(ix){state.items[ix].moved=true;state.stars++;saveState();celebrate();refreshCurrentView();}
 function aiDecide(ix){
     const it=state.items[ix];
     if(it.bucket==='keep'&&!it.destination){
@@ -665,9 +675,10 @@ let html=`${unsortedCount>0?`<div class="card" onclick="navigate('unsorted')" st
     document.getElementById('view-items').innerHTML=html;
 }
 
-let bktFilter=null;
+let bktFilter=null,currentBucket=null;
 function viewBucket(bucket,tagFilter=null){
     bktFilter=tagFilter;
+    currentBucket=bucket;
     const bL={keep:'🏠 Keep',give:'🎁 Give Away',toss:'🗑️ Toss',sell:'💰 Sell',unsure:'🤷 Unsure'};
     const all=state.items.filter(i=>i.bucket===bucket&&!i.completed);
     const tags=[...new Set(all.flatMap(i=>i.tags||[]))];
@@ -729,7 +740,27 @@ function renderLetGo(){
 }
 
 function lgStart(mode){
-    if(mode==='photo'){if(!state.photoDisclaimer){showModal('photoDisclaimer');return;}const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.capture='environment';inp.onchange=async e=>{const f=e.target.files[0];if(!f)return;const b=await toB64(f);await lgSendMsg("Here's what I'm looking at. Help me sort.",b);};inp.click();return;}
+    if(mode==='photo'){
+        if(!state.photoDisclaimer){showModal('photoDisclaimer');return;}
+        const inp=document.createElement('input');
+        inp.type='file';inp.accept='image/*';inp.capture='environment';
+        inp.style.display='none';                 // Bug 13
+        document.body.appendChild(inp);
+        inp.onchange=async e=>{
+            const f=e.target.files[0];
+            inp.remove();
+            if(!f)return;
+            try{
+                const b=await toB64(f);
+                await lgSendMsg("Here's what I'm looking at. Help me sort.",b);
+            }catch(err){
+                console.error('Photo failed',err);
+                showToast('⚠️ Couldn\'t read that photo. Try again.');
+            }
+        };
+        inp.click();
+        return;
+    }
     const prompts={permission:"I need permission to let go. Be gentle.",logic:"Give me logical reasons to decide keep vs let go.",hype:"Hype me up for decluttering!",tiny:"I'm overwhelmed. Make it tiny."};
     lgMsgs=[];lgSendMsg(prompts[mode]);
 }
@@ -758,7 +789,17 @@ function renderHelp(){
 async function sendHelp(){const inp=document.getElementById('help-input');const m=inp.value.trim();if(!m)return;inp.value='';await sendHelpMsg(m);}
 function helpQuick(t){const inp=document.getElementById('help-input');if(t==='where'){inp.value="Where should I put ";inp.focus();}else if(t==='decide'){inp.value="Help me decide between ";inp.focus();}else if(t==='overwhelm')sendHelpMsg("I'm overwhelmed and don't know where to start.");}
 function helpPhoto(){if(!state.photoDisclaimer){showModal('photoDisclaimer');return;}document.getElementById('help-photo-file').click();}
-async function handleHelpPhoto(e){const f=e.target.files[0];if(!f)return;const b=await toB64(f);await sendHelpMsg("Here's a photo. Help me organize what you see.",b);e.target.value='';}
+async function handleHelpPhoto(e){
+    const f=e.target.files[0];if(!f)return;
+    try{
+        const b=await toB64(f);
+        await sendHelpMsg("Here's a photo. Help me organize what you see.",b);
+    }catch(err){
+        console.error('Photo failed',err);
+        showToast('⚠️ Couldn\'t read that photo. Try again.');
+    }
+    e.target.value='';
+}
 
 async function sendHelpMsg(msg,img=null){
     const apiKey=localStorage.getItem('homeBrain_apiKey');if(!apiKey){showModal('confirm',{title:'API Key Needed',message:'Add in Settings.',confirmText:'Settings',onConfirm:"closeModal();navigate('settings')"});return;}
@@ -841,7 +882,35 @@ function exportCSV(){
     const blob=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`home-brain-${new Date().toISOString().split('T')[0]}.csv`;a.click();
 }
 function exportJSON(){const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`home-brain-backup-${new Date().toISOString().split('T')[0]}.json`;a.click();}
-function importJSON(){const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=e=>{const r=new FileReader();r.onload=ev=>{try{state=JSON.parse(ev.target.result);saveState();location.reload();}catch(err){showModal('confirm',{title:'Error',message:'Invalid file.',confirmText:'OK',onConfirm:'closeModal()'});}};r.readAsText(e.target.files[0]);};inp.click();}
+function importJSON(){
+    const inp=document.createElement('input');
+    inp.type='file';inp.accept='.json';
+    inp.style.display='none';                 // Bug 13 — detached inputs can fail on iOS
+    document.body.appendChild(inp);
+    inp.onchange=e=>{
+        const f=e.target.files[0];
+        inp.remove();
+        if(!f)return;
+        const r=new FileReader();
+        r.onload=ev=>{
+            try{
+                const parsed=JSON.parse(ev.target.result);
+                if(!parsed||typeof parsed!=='object'||!Array.isArray(parsed.items)){
+                    throw new Error('Not a Home Brain backup');
+                }
+                state=parsed;
+                saveState();
+                location.reload();
+            }catch(err){
+                console.error('Import failed',err);
+                showModal('confirm',{title:'Error',message:'That doesn\'t look like a Home Brain backup.',confirmText:'OK',onConfirm:'closeModal()'});
+            }
+        };
+        r.onerror=()=>showModal('confirm',{title:'Error',message:'Couldn\'t read that file.',confirmText:'OK',onConfirm:'closeModal()'});
+        r.readAsText(f);
+    };
+    inp.click();
+}
 function resetAll(){localStorage.removeItem('homeBrainState');localStorage.removeItem('homeBrain_apiKey');localStorage.removeItem('homeBrain_customBg');closeModal();location.reload();}
 
 // ============ CELEBRATIONS ============
@@ -1115,12 +1184,22 @@ function openAIScan(){
     inp.type='file';
     inp.accept='image/*';
     inp.capture='environment';
+    // Bug 13: iOS Safari can fail to fire change on a detached input.
+    inp.style.display='none';
+    document.body.appendChild(inp);
     inp.onchange=async e=>{
         const f=e.target.files[0];
+        inp.remove();
         if(!f)return;
-        const b64=await toB64(f);
-        showScanProcessing(b64);
-        await processScan(b64);
+        try{
+            const b64=await toB64(f);
+            showScanProcessing(b64);
+            await processScan(b64);
+        }catch(err){
+            console.error('Scan failed',err);
+            closeBrainDump();
+            showToast('⚠️ Couldn\'t read that photo. Try again.');
+        }
     };
     inp.click();
 }
@@ -1286,16 +1365,26 @@ function openAIScanRoom(room){
     inp.type='file';
     inp.accept='image/*';
     inp.capture='environment';
+    // Bug 13: iOS Safari can fail to fire change on a detached input. Attach it,
+    // hide it, click it, and clean up afterward.
+    inp.style.display='none';
+    document.body.appendChild(inp);
     inp.onchange=async e=>{
         const f=e.target.files[0];
+        inp.remove();
         if(!f)return;
-        const b64=await toB64(f);
-        showScanProcessing(b64);
-        await processScanRoom(b64,room);
+        try{
+            const b64=await toB64(f);
+            showScanProcessing(b64);
+            await processScanRoom(b64,room);
+        }catch(err){
+            console.error('Scan failed',err);
+            closeBrainDump();
+            showToast('⚠️ Couldn\'t read that photo. Try again.');
+        }
     };
     inp.click();
 }
-
 async function processScanRoom(imgSrc,room){
     const apiKey=localStorage.getItem('homeBrain_apiKey');
     if(!apiKey){
